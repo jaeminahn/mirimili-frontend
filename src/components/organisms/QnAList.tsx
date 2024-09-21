@@ -4,7 +4,7 @@ export default function QnAList() {
   return (
     <div className="w-full">
       <a className="mb-2 text-gray-900 no-underline" href="/questions">
-        <div className="bg-gray-200 h-10 rounded-lg text-center font-semibold leading-10 text-xl">
+        <div className="h-10 text-xl font-semibold leading-10 text-center bg-gray-200 rounded-lg">
           Q&A
         </div>
       </a>
