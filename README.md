@@ -1,3 +1,30 @@
+# 미리밀리
+
+```
+.
+└── mirimili.net/
+    ├── questions/
+    │   ├── new
+    │   ├── :id
+    │   └── tagged/:tag
+    ├── talks/:group/
+    │   ├── new
+    │   ├── :id
+    │   └── tagged/:tag
+    ├── articles/
+    │   ├── :id
+    │   └── tagged/:tag
+    ├── notices/
+    │   ├── :id
+    │   └── tagged/:tag
+    ├── users/
+    │   ├── me
+    │   └── :id
+    └── settings/
+        ├── profile
+        └── account
+```
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
