@@ -20,9 +20,13 @@
     ├── users/
     │   ├── me
     │   └── :id
-    └── settings/
-        ├── profile
-        └── account
+    ├── settings/
+    │   ├── profile
+    │   └── account
+    └── auth/
+        ├── login
+        ├── signup
+        └── logout
 ```
 
 # Getting Started with Create React App

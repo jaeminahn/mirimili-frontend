@@ -1,17 +1,17 @@
 export default function BadgeButtons() {
   return (
-    <div className="right-0 shrink-0 items-center gap-x-2 flex">
+    <div className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-2">
       <div className="">
         <a href="/users/id/scraped">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="none"
             viewBox="0 0 24 24"
-            stroke-width="1.5"
+            fill="#6b7280"
+            stroke-width="1"
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            className="h-6 w-6 text-gray-400 hover:cursor-pointer hover:text-emerald-500"
+            className="w-5 h-5 text-gray-500 hover:cursor-pointer"
           >
             <path
               stroke-linecap="round"
@@ -24,7 +24,7 @@ export default function BadgeButtons() {
       <div className="">
         <div className="relative" data-headlessui-state="">
           <button
-            className="relative -my-1 flex h-8 w-6 items-center justify-center rounded-sm text-gray-400 hover:text-emerald-500 focus:outline-0 focus:ring-0"
+            className="relative flex items-center justify-center w-6 h-8 -my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
             type="button"
             aria-expanded="false"
             data-headlessui-state=""
@@ -32,13 +32,13 @@ export default function BadgeButtons() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
+              fill="#6b7280"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              stroke-width="1"
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              className="h-6 w-6"
+              className="w-5 h-5"
             >
               <path
                 stroke-linecap="round"
@@ -52,7 +52,7 @@ export default function BadgeButtons() {
       <div className="relative">
         <div className="relative" data-headlessui-state="">
           <button
-            className="flex rounded-full bg-white focus:outline-none dark:bg-gray-800"
+            className="flex bg-white rounded-full focus:outline-none dark:bg-gray-800"
             id="headlessui-menu-button-:r43:"
             type="button"
             aria-haspopup="menu"
@@ -60,9 +60,9 @@ export default function BadgeButtons() {
             data-headlessui-state=""
           >
             <span className="sr-only">Open user menu</span>
-            <span className="hidden flex-shrink-0 sm:flex">
+            <span className="flex-shrink-0 hidden sm:flex">
               <img
-                className="h-8 w-8 rounded-full border border-gray-300 object-cover"
+                className="object-cover w-5 h-5 border border-gray-300 rounded-full"
                 src="https://i.namu.wiki/i/cxjahe8osGBv0BNMGWCCC6MACktG6lZbfqTEmMIowVvqNjvS7mTbQ5TRZn-m6qZxxdKEeo5srDl9_9Qu8pjcuYwsHuLj4QMBO2NSGi3kLcvK-WS-Xl0OyziaDaXi24phx4AklgiBen_2q8pgvPXfKQ.webp"
                 alt="프로필 사진"
               />
