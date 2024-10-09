@@ -1,7 +1,7 @@
 export default function SearchBar() {
   return (
     <div className="w-60">
-      <div className="flex items-center transition-colors bg-gray-100 h-9 rounded-xl focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500">
+      <div className="flex items-center transition-colors bg-gray-100 h-9 rounded-xl focus-within:border-emerald-600 focus-within:ring-1 focus-within:ring-emerald-600">
         <input
           className="w-full pl-3 text-sm font-medium text-gray-900 placeholder-gray-500 bg-transparent border-none focus:outline-none focus:ring-0"
           type="text"
@@ -16,7 +16,7 @@ export default function SearchBar() {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            className="h-3.5 w-3.5 text-gray-500 hover:text-emerald-500"
+            className="h-3.5 w-3.5 text-gray-500 hover:text-emerald-600"
           >
             <path
               strokeLinecap="round"

@@ -5,12 +5,14 @@ import Login from "./Auth/Login";
 import Layout from "./Layout";
 import SignUp from "./Auth/SignUp";
 import Logout from "./Auth/Logout";
+import Questions from "./Questions";
 
 export default function RouterSetup() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index path="/" element={<Home />} />
+        <Route index path="/questions" element={<Questions />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />

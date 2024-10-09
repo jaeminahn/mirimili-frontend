@@ -7,6 +7,7 @@ import { useAuth } from "../../contexts";
 
 export default function Header() {
   const { loggedUser } = useAuth();
+
   return (
     <div className="sticky top-0 z-20 flex items-center justify-center h-20 text-base font-semibold leading-6 bg-white border-b border-b-gray-500/30">
       <div className="flex justify-between w-3/4 max-w-5xl">
