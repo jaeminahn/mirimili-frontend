@@ -26,8 +26,10 @@ export default function SignUp() {
 
   return (
     <div className="flex w-screen h-screen">
-      <div className="flex items-center justify-center w-1/2 h-full text-white font-get text-9xl bg-emerald-500">
-        <Link to="/">미리밀리</Link>
+      <div className="flex items-center justify-center w-1/2 h-full bg-emerald-600">
+        <Link className="text-white font-get text-9xl" to="/">
+          미리밀리
+        </Link>
       </div>
       <div className="flex flex-col items-center justify-center w-1/2 gap-4">
         <p className="text-5xl font-get">회원가입</p>
@@ -57,7 +59,8 @@ export default function SignUp() {
         />
         <button
           type="submit"
-          className="w-64 p-2 text-lg font-semibold text-white bg-emerald-500 rounded-xl"
+          onClick={createAccount}
+          className="w-64 p-2 text-lg font-semibold text-white rounded-xl bg-emerald-600"
         >
           계정 만들기
         </button>
