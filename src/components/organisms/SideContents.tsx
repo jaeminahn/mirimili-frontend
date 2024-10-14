@@ -4,6 +4,9 @@ export default function SideContents() {
       <div className="flex items-center justify-center p-5 bg-white rounded-lg h-36">
         <img src="/images/profile.png" alt="" />
       </div>
+      <div className="flex items-center justify-center p-5 bg-white rounded-lg h-36">
+        <img src="/images/profile.png" alt="" />
+      </div>
     </div>
   );
 }
