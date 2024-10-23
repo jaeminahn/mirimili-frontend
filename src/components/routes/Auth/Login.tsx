@@ -31,39 +31,50 @@ export default function Login() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
-      <Link className="text-emerald-600 font-get text-9xl" to="/">
-        미리밀리
-      </Link>
-      <div className="flex flex-col items-center gap-4">
-        <input
-          type="text"
-          className="w-64 p-2 border-2 border-gray-500 rounded-xl"
-          name="email"
-          placeholder="이메일"
-          value={email}
-          onChange={changed("email")}
-        />
-        <input
-          type="text"
-          className="w-64 p-2 border-2 border-gray-500 rounded-xl"
-          name="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={changed("password")}
-        />
-        <button
-          type="submit"
-          onClick={loginAccount}
-          className="w-64 p-2 text-lg font-semibold text-white rounded-xl bg-emerald-600"
-        >
-          로그인
-        </button>
-        <div className="text-gray-400">
-          계정이 없다면?{" "}
-          <Link to="/auth/signup" className="text-gray-900">
+    <div className="flex flex-col items-center justify-center h-screen gap-4 bg-gray-100">
+      <div className="flex gap-2">
+        <p className="text-2xl text-gray-600 font-get">
+          똑똑한 입대, 후회없는 군생활,{" "}
+        </p>
+        <Link className="text-2xl text-emerald-600 font-get" to="/">
+          미리밀리
+        </Link>
+      </div>
+      <div className="flex flex-col items-center gap-4 p-4 bg-white rounded-xl">
+        <p className="text-xl font-semibold">로그인</p>
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            className="w-64 p-2 px-4 border-2 border-gray-200 focus:border-emerald-600 focus:ring-emerald-600 focus:outline-none rounded-xl"
+            name="email"
+            placeholder="이메일"
+            value={email}
+            onChange={changed("email")}
+          />
+          <input
+            type="text"
+            className="w-64 p-2 px-4 border-2 border-gray-200 focus:border-emerald-600 focus:ring-emerald-600 focus:outline-none rounded-xl"
+            name="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={changed("password")}
+          />
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="submit"
+            onClick={loginAccount}
+            className="w-64 p-2 text-base text-white rounded-xl bg-emerald-600"
+          >
+            로그인하기
+          </button>
+          <Link
+            to="/auth/signup"
+            className="flex justify-center w-64 p-2 text-base bg-gray-200 rounded-xl"
+          >
             회원가입
           </Link>
+          <p className="pt-2 text-sm">아이디/비밀번호 찾기</p>
         </div>
       </div>
     </div>

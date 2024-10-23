@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./Home";
 import NoMatch from "./NoMatch";
-import Login from "./Auth/Login";
 import Layout from "./Layout";
 import SignUp from "./Auth/SignUp";
+import Login from "./Auth/Login";
 import Logout from "./Auth/Logout";
 import Questions from "./Questions";
 
