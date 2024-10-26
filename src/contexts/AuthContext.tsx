@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren } from "react";
 import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
+import { post } from "../api";
 
 export type LoggedUser = { email: string; password: string };
 type Callback = () => void;
@@ -26,6 +27,9 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   const [loggedUser, setLoggedUser] = useState<LoggedUser | undefined>(
     undefined
   );
+  const [accessToken, setAccessToken] = useState<string>("");
+  const [refreshToken, setRefreshToken] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const signup = useCallback(
     (email: string, password: string, callback?: Callback) => {
@@ -38,14 +42,29 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const login = useCallback(
     (email: string, password: string, callback?: Callback) => {
-      setLoggedUser((notUsed) => ({ email, password }));
-      callback && callback();
+      const user = { email, password };
+      U.readStringP("accessToken")
+        .then((at) => {
+          setAccessToken(at ?? "");
+          return post("/auth/login", user, at);
+        })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+          if (result.message == "Login Success") {
+            setLoggedUser((notUsed) => user);
+            U.writeObjectP("user", user).finally(() => callback && callback());
+            callback && callback();
+          } else alert(result.message);
+        });
     },
     []
   );
 
   const logout = useCallback((callback?: Callback) => {
     setLoggedUser(undefined);
+    setAccessToken("");
+    setRefreshToken("");
     callback && callback();
   }, []);
 
