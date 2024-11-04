@@ -6,10 +6,8 @@ type SignUpFormType = Record<
   | "email"
   | "password"
   | "confirmPassword"
-  | "name"
   | "tel"
   | "nick"
-  | "birth"
   | "serviceType"
   | "serviceStart"
   | "serviceEnd"
@@ -21,10 +19,8 @@ const initialFormState = {
   email: "",
   password: "",
   confirmPassword: "",
-  name: "",
   tel: "",
   nick: "",
-  birth: "",
   serviceType: "",
   serviceStart: "",
   serviceEnd: "",
@@ -57,10 +53,8 @@ export default function SignUp() {
       email,
       password,
       confirmPassword,
-      name,
       tel,
       nick,
-      birth,
       serviceType,
       serviceStart,
       serviceEnd,
@@ -98,10 +92,8 @@ export default function SignUp() {
       email === "" ||
       password === "" ||
       confirmPassword === "" ||
-      name === "" ||
       tel === "" ||
       nick === "" ||
-      birth === "" ||
       serviceType === "" ||
       serviceStart === "" ||
       serviceEnd === "" ||
@@ -117,10 +109,8 @@ export default function SignUp() {
       email,
       password,
       confirmPassword,
-      name,
       tel,
       nick,
-      birth,
       serviceType,
       serviceStart,
       serviceEnd,
@@ -131,10 +121,8 @@ export default function SignUp() {
     email,
     password,
     confirmPassword,
-    name,
     tel,
     nick,
-    birth,
     serviceType,
     serviceStart,
     serviceEnd,
@@ -178,14 +166,6 @@ export default function SignUp() {
           onChange={changed("confirmPassword")}
         />
         <input
-          type="text"
-          className="w-64 p-2 border-2 border-gray-500 rounded-xl"
-          name="name"
-          placeholder="성명"
-          value={name}
-          onChange={changed("name")}
-        />
-        <input
           type="tel"
           className="w-64 p-2 border-2 border-gray-500 rounded-xl"
           name="tel"
@@ -200,14 +180,6 @@ export default function SignUp() {
           placeholder="닉네임"
           value={nick}
           onChange={changed("nick")}
-        />
-        <input
-          type="date"
-          className="w-64 p-2 border-2 border-gray-500 rounded-xl"
-          name="birth"
-          placeholder="생년월일"
-          value={birth}
-          onChange={changed("birth")}
         />
         <div className="w-64 p-2 border-2 border-gray-500 rounded-xl">
           <p className="mb-2 text-gray-500">군복무 종류</p>
