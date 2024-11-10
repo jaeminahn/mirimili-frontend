@@ -4,22 +4,21 @@ import { SignUpFormType } from "../../routes/Auth/SignUp";
 type PhoneAndPasswordSetupProps = {
   form: SignUpFormType;
   changed: (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => void;
-  onCodeValid: (isValid: boolean) => void;
-  setCanProceed: (value: boolean) => void; // 버튼 활성화 상태 업데이트 함수
+  setCanProceed: (value: boolean) => void;
 };
 
-export default function PhoneAndPasswordSetup({ form, changed, onCodeValid, setCanProceed }: PhoneAndPasswordSetupProps) {
+export default function PhoneAndPasswordSetup({ form, changed, setCanProceed }: PhoneAndPasswordSetupProps) {
   const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isCodeValid, setIsCodeValid] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // 버튼 활성화 조건을 업데이트
   useEffect(() => {
     const isPasswordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,16}$/.test(form.password);
     const isPasswordConfirmed = form.password === form.confirmPassword;
-    setCanProceed(isPasswordValid && isPasswordConfirmed && form.isCodeValid);
-  }, [form.password, form.confirmPassword, form.isCodeValid, setCanProceed]);
+    setCanProceed(isPasswordValid && isPasswordConfirmed && isCodeValid);
+  }, [form.password, form.confirmPassword, isCodeValid, setCanProceed]);
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -50,9 +49,9 @@ export default function PhoneAndPasswordSetup({ form, changed, onCodeValid, setC
   };
 
   const handleVerifyCode = () => {
-    const isCodeValid = form.verificationCode === "7777"; 
-    setVerificationMessage(isCodeValid ? "인증번호가 일치해요." : "인증번호가 일치하지 않아요.");
-    onCodeValid(isCodeValid);
+    const codeIsValid = form.verificationCode === "7777"; 
+    setVerificationMessage(codeIsValid ? "인증번호가 일치해요." : "인증번호가 일치하지 않아요.");
+    setIsCodeValid(codeIsValid); // 내부 상태 업데이트
   };
 
   const isPasswordValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,16}$/.test(form.password);
@@ -60,7 +59,7 @@ export default function PhoneAndPasswordSetup({ form, changed, onCodeValid, setC
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-80">
-      <h2 className="text-2xl text-gray-700 mb-6">전화번호 인증</h2>
+      <h2 className="text-lg font-bold text-gray-700 mb-6">전화번호 인증</h2>
       
       <div className="relative flex items-center mb-2 w-full">
         <input
@@ -73,7 +72,7 @@ export default function PhoneAndPasswordSetup({ form, changed, onCodeValid, setC
         />
         <button
           onClick={handleSendCode}
-          className="absolute right-2 p-1 text-xs bg-emerald-100 text-emerald-700 rounded-full hover:bg-emerald-200"
+          className="absolute right-2 p-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
           disabled={isCodeSent}
         >
           인증번호 전송
@@ -93,16 +92,20 @@ export default function PhoneAndPasswordSetup({ form, changed, onCodeValid, setC
         />
         <button
           onClick={handleVerifyCode}
-          className="absolute right-2 p-1 text-xs bg-emerald-100 text-emerald-700 rounded-full hover:bg-emerald-200"
+          className="absolute right-2 p-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
           disabled={!isCodeSent}
         >
           인증하기
         </button>
       </div>
 
-      {verificationMessage && <div className={`text-xs mb-2 ${form.isCodeValid ? "text-green-500" : "text-red-500"}`}>{verificationMessage}</div>}
+      {verificationMessage && (
+        <div className={`text-xs mb-2 ${isCodeValid ? "text-green-500" : "text-red-500"}`}>
+          {verificationMessage}
+        </div>
+      )}
 
-      <h2 className="text-2xl text-gray-700 mt-6 mb-6">비밀번호</h2>
+      <h2 className="text-lg font-bold text-gray-700 mt-4 mb-6">비밀번호</h2>
 
       <input
         type="password"

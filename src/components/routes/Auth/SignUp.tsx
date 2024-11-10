@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts";
+import TypeSetup from "../../organisms/signup/TypeSetup";
 import PhoneAndPasswordSetup from "../../organisms/signup/PhoneAndPasswordSetup";
 import NicknameSetup from "../../organisms/signup/NicknameSetup";
 
@@ -10,7 +11,6 @@ export type SignUpFormType = {
   password: string;
   confirmPassword: string;
   nickname: string;
-  isCodeValid: boolean;
 };
 
 const initialFormState: SignUpFormType = {
@@ -18,8 +18,7 @@ const initialFormState: SignUpFormType = {
   verificationCode: "",
   password: "",
   confirmPassword: "",
-  nickname: "",
-  isCodeValid: false,
+  nickname: ""
 };
 
 export default function SignUp() {
@@ -34,9 +33,7 @@ export default function SignUp() {
   };
 
   const createAccount = () => {
-    if (form.isCodeValid) {
-      signup(form.phone, form.password, () => navigate("/"));
-    }
+    signup(form.phone, form.password, form.nickname, () => navigate("/"));
   };
 
   const goToNextStep = () => setStep((prev) => prev + 1);
@@ -45,33 +42,57 @@ export default function SignUp() {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
       {step === 1 && (
+        <TypeSetup
+          form={form}
+          changed={changed}
+          goToNextStep={goToNextStep}
+        />
+      )}
+      {step === 2 && (
         <PhoneAndPasswordSetup
           form={form}
           changed={changed}
-          onCodeValid={(isValid) => setForm((prev) => ({ ...prev, isCodeValid: isValid }))}
-          setCanProceed={setCanProceed} // 버튼 활성화 상태 업데이트
+          setCanProceed={setCanProceed}
         />
       )}
-      {step === 2 && <NicknameSetup form={form} changed={changed} />}
+      {step === 3 && (
+        <NicknameSetup
+          form={form}
+          changed={changed}
+          setCanProceed={setCanProceed}
+        />
+      )}
 
       <div className="flex justify-between items-center w-80 mt-4">
-        <button onClick={goToPreviousStep} className="w-24 py-2 text-lg font-semibold text-emerald-700 bg-emerald-100 rounded-lg hover:bg-emerald-300">
-          이전
-        </button>
-        {step < 2 ? (
-          <button
-            onClick={goToNextStep}
-            className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
-              canProceed ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-300 cursor-not-allowed"
-            }`}
-            disabled={!canProceed}
-          >
-            다음
-          </button>
-        ) : (
-          <button onClick={createAccount} className="w-48 py-2 text-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">
-            완료
-          </button>
+        {step > 1 && (
+          <>
+            {step > 1 && (
+              <button
+                onClick={goToPreviousStep}
+                className="w-24 py-2 text-lg font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-300"
+              >
+                이전
+              </button>
+            )}
+            {step < 4 ? (
+              <button
+                onClick={goToNextStep}
+                className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
+                  canProceed ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-300 cursor-not-allowed"
+                }`}
+                disabled={!canProceed}
+              >
+                다음
+              </button>
+            ) : (
+              <button
+                onClick={createAccount}
+                className="w-48 py-2 text-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+              >
+                완료
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

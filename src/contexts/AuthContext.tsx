@@ -2,19 +2,19 @@ import type { FC, PropsWithChildren } from "react";
 import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
 
-export type LoggedUser = { email: string; password: string };
+export type LoggedUser = { phone: string; password: string; nickname?: string }; // nickname을 선택적 속성으로 변경
 type Callback = () => void;
 
 type ContextType = {
   loggedUser?: LoggedUser;
-  signup: (email: string, password: string, callback?: Callback) => void;
-  login: (email: string, password: string, callback?: Callback) => void;
+  signup: (phone: string, password: string, nickname: string, callback?: Callback) => void;
+  login: (phone: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => void;
 };
 
 export const AuthContext = createContext<ContextType>({
-  signup: (email: string, password: string, callback?: Callback) => {},
-  login: (email: string, password: string, callback?: Callback) => {},
+  signup: (phone: string, password: string, nickname: string, callback?: Callback) => {},
+  login: (phone: string, password: string, callback?: Callback) => {},
   logout: (callback?: Callback) => {},
 });
 
@@ -28,17 +28,18 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   );
 
   const signup = useCallback(
-    (email: string, password: string, callback?: Callback) => {
-      const user = { email, password };
-      setLoggedUser((notUsed) => user);
+    (phone: string, password: string, nickname: string, callback?: Callback) => {
+      const user = { phone, password, nickname };
+      setLoggedUser(user);
       U.writeObjectP("user", user).finally(() => callback && callback());
     },
     []
   );
 
   const login = useCallback(
-    (email: string, password: string, callback?: Callback) => {
-      setLoggedUser((notUsed) => ({ email, password }));
+    (phone: string, password: string, callback?: Callback) => {
+      const user = { phone, password }; // nickname을 포함하지 않음
+      setLoggedUser(user);
       callback && callback();
     },
     []
