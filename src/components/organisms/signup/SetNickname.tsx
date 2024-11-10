@@ -1,13 +1,13 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 
-type NicknameSetupProps = {
+type SetNicknameProps = {
   form: SignUpFormType;
   changed: (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => void;
   setCanProceed: (value: boolean) => void;
 };
 
-export default function NicknameSetup({ form, changed, setCanProceed }: NicknameSetupProps) {
+export default function SetNickname({ form, changed, setCanProceed }: SetNicknameProps) {
   const [nicknameMessage, setNicknameMessage] = useState("");
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(false);
 

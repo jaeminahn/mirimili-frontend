@@ -1,9 +1,9 @@
 import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts";
-import TypeSetup from "../../organisms/signup/TypeSetup";
-import PhoneAndPasswordSetup from "../../organisms/signup/PhoneAndPasswordSetup";
-import NicknameSetup from "../../organisms/signup/NicknameSetup";
+import SetMember from "../../organisms/signup/SetMember";
+import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
+import SetNickname from "../../organisms/signup/SetNickname";
 
 export type SignUpFormType = {
   phone: string;
@@ -42,21 +42,21 @@ export default function SignUp() {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
       {step === 1 && (
-        <TypeSetup
+        <SetMember
           form={form}
           changed={changed}
           goToNextStep={goToNextStep}
         />
       )}
       {step === 2 && (
-        <PhoneAndPasswordSetup
+        <SetPhonePassword
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
         />
       )}
       {step === 3 && (
-        <NicknameSetup
+        <SetNickname
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}

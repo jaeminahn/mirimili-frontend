@@ -1,13 +1,13 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 
-type PhoneAndPasswordSetupProps = {
+type SetPhonePasswordProps = {
   form: SignUpFormType;
   changed: (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => void;
   setCanProceed: (value: boolean) => void;
 };
 
-export default function PhoneAndPasswordSetup({ form, changed, setCanProceed }: PhoneAndPasswordSetupProps) {
+export default function SetPhonePassword({ form, changed, setCanProceed }: SetPhonePasswordProps) {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isCodeValid, setIsCodeValid] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");

@@ -1,13 +1,13 @@
 import { ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 
-type TypeSetupProps = {
+type SetMemberProps = {
   form: SignUpFormType;
   changed: (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => void;
   goToNextStep: () => void;
 };
 
-export default function TypeSetup({ form, changed, goToNextStep }: TypeSetupProps) {
+export default function SetMember({ form, changed, goToNextStep }: SetMemberProps) {
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-80">
       <h2 className="text-lg font-bold text-gray-700 mb-6">회원종류 선택</h2>
