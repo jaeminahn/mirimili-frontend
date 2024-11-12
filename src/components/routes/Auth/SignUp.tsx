@@ -4,6 +4,7 @@ import { useAuth } from "../../../contexts";
 import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
+import SetType from "../../organisms/signup/SetType";
 
 export type SignUpFormType = {
   phone: string;
@@ -11,14 +12,23 @@ export type SignUpFormType = {
   password: string;
   confirmPassword: string;
   nickname: string;
+  serviceType: string;
+  enlistmentYear: string;
+  enlistmentMonth: string;
+  enlistmentDay: string;
 };
 
+const today = new Date();
 const initialFormState: SignUpFormType = {
   phone: "",
   verificationCode: "",
   password: "",
   confirmPassword: "",
-  nickname: ""
+  nickname: "",
+  serviceType: "공군",
+  enlistmentYear: today.getFullYear().toString(),
+  enlistmentMonth: (today.getMonth() + 1).toString(),
+  enlistmentDay: today.getDate().toString(),
 };
 
 export default function SignUp() {
@@ -28,12 +38,21 @@ export default function SignUp() {
   const navigate = useNavigate();
   const { signup } = useAuth();
 
-  const changed = (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => {
+  const changed = (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
   const createAccount = () => {
-    signup(form.phone, form.password, form.nickname, () => navigate("/"));
+    signup(
+      form.phone,
+      form.password,
+      form.nickname,
+      form.serviceType,
+      form.enlistmentYear,
+      form.enlistmentMonth,
+      form.enlistmentDay,
+      () => navigate("/")
+    );
   };
 
   const goToNextStep = () => setStep((prev) => prev + 1);
@@ -62,39 +81,45 @@ export default function SignUp() {
           setCanProceed={setCanProceed}
         />
       )}
+      {step === 4 && (
+        <SetType 
+          form={form}
+          changed={changed}
+          setCanProceed={setCanProceed}
+        />
+      )}
 
-      <div className="flex justify-between items-center w-80 mt-4">
-        {step > 1 && (
-          <>
-            {step > 1 && (
-              <button
-                onClick={goToPreviousStep}
-                className="w-24 py-2 text-lg font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-300"
-              >
-                이전
-              </button>
-            )}
-            {step < 4 ? (
-              <button
-                onClick={goToNextStep}
-                className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
-                  canProceed ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-300 cursor-not-allowed"
-                }`}
-                disabled={!canProceed}
-              >
-                다음
-              </button>
-            ) : (
-              <button
-                onClick={createAccount}
-                className="w-48 py-2 text-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
-              >
-                완료
-              </button>
-            )}
-          </>
-        )}
-      </div>
+      {/* 버튼 표시 조건: step이 1이 아닐 때에만 렌더링 */}
+      {step > 1 && (
+        <div className="flex justify-between items-center w-80 mt-4">
+          {step > 1 && (
+            <button
+              onClick={goToPreviousStep}
+              className="w-24 py-2 text-lg font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-300"
+            >
+              이전
+            </button>
+          )}
+          {step < 5 ? (
+            <button
+              onClick={goToNextStep}
+              className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
+                canProceed ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-300 cursor-not-allowed"
+              }`}
+              disabled={!canProceed}
+            >
+              다음
+            </button>
+          ) : (
+            <button
+              onClick={createAccount}
+              className="w-48 py-2 text-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+            >
+              완료
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

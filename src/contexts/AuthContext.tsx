@@ -2,18 +2,45 @@ import type { FC, PropsWithChildren } from "react";
 import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
 
-export type LoggedUser = { phone: string; password: string; nickname?: string }; // nickname을 선택적 속성으로 변경
+export type LoggedUser = { 
+  phone: string; 
+  password: string; 
+  nickname: string; 
+  serviceType: string;
+  enlistmentYear: string;
+  enlistmentMonth: string;
+  enlistmentDay: string;
+};
+
 type Callback = () => void;
 
 type ContextType = {
   loggedUser?: LoggedUser;
-  signup: (phone: string, password: string, nickname: string, callback?: Callback) => void;
+  signup: (
+    phone: string, 
+    password: string, 
+    nickname: string, 
+    serviceType: string, 
+    enlistmentYear: string, 
+    enlistmentMonth: string, 
+    enlistmentDay: string, 
+    callback?: Callback
+  ) => void;
   login: (phone: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => void;
 };
 
 export const AuthContext = createContext<ContextType>({
-  signup: (phone: string, password: string, nickname: string, callback?: Callback) => {},
+  signup: (
+    phone: string, 
+    password: string, 
+    nickname: string, 
+    serviceType: string, 
+    enlistmentYear: string, 
+    enlistmentMonth: string, 
+    enlistmentDay: string, 
+    callback?: Callback
+  ) => {},
   login: (phone: string, password: string, callback?: Callback) => {},
   logout: (callback?: Callback) => {},
 });
@@ -28,8 +55,25 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   );
 
   const signup = useCallback(
-    (phone: string, password: string, nickname: string, callback?: Callback) => {
-      const user = { phone, password, nickname };
+    (
+      phone: string,
+      password: string,
+      nickname: string,
+      serviceType: string,
+      enlistmentYear: string,
+      enlistmentMonth: string,
+      enlistmentDay: string,
+      callback?: Callback
+    ) => {
+      const user: LoggedUser = { 
+        phone, 
+        password, 
+        nickname, 
+        serviceType, 
+        enlistmentYear, 
+        enlistmentMonth, 
+        enlistmentDay 
+      };
       setLoggedUser(user);
       U.writeObjectP("user", user).finally(() => callback && callback());
     },
@@ -38,7 +82,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const login = useCallback(
     (phone: string, password: string, callback?: Callback) => {
-      const user = { phone, password }; // nickname을 포함하지 않음
+      const user: LoggedUser = { 
+        phone, 
+        password, 
+        nickname: "",
+        serviceType: "",
+        enlistmentYear: "",
+        enlistmentMonth: "",
+        enlistmentDay: ""
+      };
       setLoggedUser(user);
       callback && callback();
     },
@@ -57,7 +109,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
     logout,
   };
 
-  return <AuthContext.Provider value={value} children={children} />;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
