@@ -89,7 +89,6 @@ export default function SignUp() {
         />
       )}
 
-      {/* 버튼 표시 조건: step이 1이 아닐 때에만 렌더링 */}
       {step > 1 && (
         <div className="flex justify-between items-center w-80 mt-4">
           {step > 1 && (
