@@ -10,8 +10,8 @@ import Questions from "./Questions";
 export default function RouterSetup() {
   return (
     <Routes>
+      <Route index path="/" element={<Home />} />
       <Route path="/" element={<Layout />}>
-        <Route index path="/" element={<Home />} />
         <Route index path="/questions" element={<Questions />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
