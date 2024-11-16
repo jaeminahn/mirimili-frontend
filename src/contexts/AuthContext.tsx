@@ -3,19 +3,19 @@ import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
 import { post } from "../api";
 
-export type LoggedUser = { email: string; password: string };
+export type LoggedUser = { tel: string; password: string };
 type Callback = () => void;
 
 type ContextType = {
   loggedUser?: LoggedUser;
-  signup: (email: string, password: string, callback?: Callback) => void;
-  login: (email: string, password: string, callback?: Callback) => void;
+  signup: (tel: string, password: string, callback?: Callback) => void;
+  login: (tel: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => void;
 };
 
 export const AuthContext = createContext<ContextType>({
-  signup: (email: string, password: string, callback?: Callback) => {},
-  login: (email: string, password: string, callback?: Callback) => {},
+  signup: (tel: string, password: string, callback?: Callback) => {},
+  login: (tel: string, password: string, callback?: Callback) => {},
   logout: (callback?: Callback) => {},
 });
 
@@ -32,8 +32,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const signup = useCallback(
-    (email: string, password: string, callback?: Callback) => {
-      const user = { email, password };
+    (tel: string, password: string, callback?: Callback) => {
+      const user = { tel, password };
       setLoggedUser((notUsed) => user);
       U.writeObjectP("user", user).finally(() => callback && callback());
     },
@@ -41,8 +41,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   );
 
   const login = useCallback(
-    (email: string, password: string, callback?: Callback) => {
-      const user = { email, password };
+    (tel: string, password: string, callback?: Callback) => {
+      const user = { tel, password };
       U.readStringP("accessToken")
         .then((at) => {
           setAccessToken(at ?? "");
