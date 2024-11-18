@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import MainContents from "../organisms/MainContents";
 import SideContents from "../organisms/SideContents";
 import SearchBar from "../molecules/SearchBar";
 import BadgeButtons from "../molecules/BadgeButtons";
