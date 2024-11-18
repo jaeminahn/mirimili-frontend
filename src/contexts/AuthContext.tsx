@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren } from "react";
 import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
+import { post } from "../api";
 
 export type LoggedUser = { 
   phone: string; 
@@ -53,6 +54,9 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   const [loggedUser, setLoggedUser] = useState<LoggedUser | undefined>(
     undefined
   );
+  const [accessToken, setAccessToken] = useState<string>("");
+  const [refreshToken, setRefreshToken] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const signup = useCallback(
     (
@@ -99,6 +103,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const logout = useCallback((callback?: Callback) => {
     setLoggedUser(undefined);
+    setAccessToken("");
+    setRefreshToken("");
     callback && callback();
   }, []);
 
