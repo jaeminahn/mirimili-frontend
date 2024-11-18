@@ -187,7 +187,7 @@ export default function QuestionPostContent() {
         <div className="flex flex-col gap-4 pt-2">
           <div className="flex items-center justify-between h-10 text-xs">
             <p className="font-semibold text-emerald-600">
-              답변 {postData.answer}개
+              답변 {answerData.length}개
             </p>
             <button className="flex items-center gap-1 text-gray-600">
               추천순
