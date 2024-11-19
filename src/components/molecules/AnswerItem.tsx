@@ -33,8 +33,10 @@ export default function AnswerItem({
           src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
           alt="프로필 사진"
         />
-        <p>김뚝딱</p>
-        <p className="text-emerald-600">공군∙병장∙무선통신장비정비</p>
+        <p>{writerNick}</p>
+        <p className="text-emerald-600">
+          {writerType}∙{writerLevel}∙무선통신장비정비
+        </p>
         <p className="text-xs text-gray-500">{createdAt}</p>
       </div>
       <p>{content}</p>
