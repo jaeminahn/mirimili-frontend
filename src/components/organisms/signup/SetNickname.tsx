@@ -3,13 +3,19 @@ import { SignUpFormType } from "../../routes/Auth/SignUp";
 
 type SetNicknameProps = {
   form: SignUpFormType;
-  changed: (key: keyof SignUpFormType) => (e: ChangeEvent<HTMLInputElement>) => void;
+  changed: (
+    key: keyof SignUpFormType
+  ) => (e: ChangeEvent<HTMLInputElement>) => void;
   setCanProceed: (value: boolean) => void;
 };
 
-export default function SetNickname({ form, changed, setCanProceed }: SetNicknameProps) {
-  const [nicknameMessage, setNicknameMessage] = useState("");
+export default function SetNickname({
+  form,
+  changed,
+  setCanProceed,
+}: SetNicknameProps) {
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(false);
+  const [nicknameMessage, setNicknameMessage] = useState("");
 
   const handleCheckNickname = () => {
     if (form.nickname.trim()) {
@@ -23,21 +29,17 @@ export default function SetNickname({ form, changed, setCanProceed }: SetNicknam
 
   useEffect(() => {
     setCanProceed(isNicknameAvailable);
-  }, [isNicknameAvailable, setCanProceed]);
+  }, [isNicknameAvailable]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-80">
-      <h2 className="text-lg font-bold text-gray-700 mb-6">닉네임 설정</h2>
+      <h2 className="mb-6 text-lg font-bold text-gray-700">닉네임 설정</h2>
       <div className="relative flex items-center mb-2">
         <input
           type="text"
           placeholder="닉네임 입력"
           value={form.nickname}
-          onChange={(e) => {
-            changed("nickname")(e);
-            setNicknameMessage("");
-            setIsNicknameAvailable(false);
-          }}
+          onChange={changed("nickname")}
           className="w-full p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
         />
         <button
@@ -51,7 +53,11 @@ export default function SetNickname({ form, changed, setCanProceed }: SetNicknam
         </button>
       </div>
       {nicknameMessage && (
-        <div className={`text-xs ${isNicknameAvailable ? "text-green-500" : "text-red-500"} mb-2`}>
+        <div
+          className={`text-xs ${
+            isNicknameAvailable ? "text-green-500" : "text-red-500"
+          } mb-2`}
+        >
           {nicknameMessage}
         </div>
       )}
