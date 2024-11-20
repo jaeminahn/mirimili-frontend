@@ -1,10 +1,10 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts";
 import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
-import SetType from "../../organisms/signup/SetType";
+import SetTypeAndStartDate from "../../organisms/signup/SetTypeAndStartDate";
 
 export type SignUpFormType = {
   phone: string;
@@ -12,10 +12,8 @@ export type SignUpFormType = {
   password: string;
   confirmPassword: string;
   nickname: string;
-  serviceType: string;
-  enlistmentYear: string;
-  enlistmentMonth: string;
-  enlistmentDay: string;
+  serviceType: number;
+  serviceStartDate: Date;
 };
 
 const today = new Date();
@@ -25,15 +23,13 @@ const initialFormState: SignUpFormType = {
   password: "",
   confirmPassword: "",
   nickname: "",
-  serviceType: "공군",
-  enlistmentYear: today.getFullYear().toString(),
-  enlistmentMonth: (today.getMonth() + 1).toString(),
-  enlistmentDay: today.getDate().toString(),
+  serviceType: 0,
+  serviceStartDate: today,
 };
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(3);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -44,15 +40,16 @@ export default function SignUp() {
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
     };
 
+  const changedDate = (key: keyof SignUpFormType, date: Date) =>
+    setForm((prev) => ({ ...prev, [key]: date }));
+
   const createAccount = () => {
     signup(
       form.phone,
       form.password,
       form.nickname,
       form.serviceType,
-      form.enlistmentYear,
-      form.enlistmentMonth,
-      form.enlistmentDay,
+      form.serviceStartDate,
       () => navigate("/")
     );
   };
@@ -62,6 +59,10 @@ export default function SignUp() {
     setStep((prev) => prev - 1);
     setCanProceed(true);
   };
+
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
@@ -89,7 +90,12 @@ export default function SignUp() {
         />
       </div>
       <div className={`${step === 4 ? "" : "hidden"}`}>
-        <SetType form={form} changed={changed} setCanProceed={setCanProceed} />
+        <SetTypeAndStartDate
+          form={form}
+          changed={changed}
+          changedDate={changedDate}
+          setCanProceed={setCanProceed}
+        />
       </div>
       {step > 1 && (
         <div className="flex items-center justify-between mt-4 w-80">

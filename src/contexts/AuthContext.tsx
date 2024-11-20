@@ -3,14 +3,11 @@ import { createContext, useContext, useState, useCallback } from "react";
 import * as U from "../utils";
 import { post } from "../api";
 
-export type LoggedUser = { 
-  phone: string; 
-  password: string; 
-  nickname: string; 
-  serviceType: string;
-  enlistmentYear: string;
-  enlistmentMonth: string;
-  enlistmentDay: string;
+export type LoggedUser = {
+  phone: string;
+  password: string;
+  nickname: string;
+  serviceType: number;
 };
 
 type Callback = () => void;
@@ -18,13 +15,11 @@ type Callback = () => void;
 type ContextType = {
   loggedUser?: LoggedUser;
   signup: (
-    phone: string, 
-    password: string, 
-    nickname: string, 
-    serviceType: string, 
-    enlistmentYear: string, 
-    enlistmentMonth: string, 
-    enlistmentDay: string, 
+    phone: string,
+    password: string,
+    nickname: string,
+    serviceType: number,
+    serviceStartDate: Date,
     callback?: Callback
   ) => void;
   login: (phone: string, password: string, callback?: Callback) => void;
@@ -33,13 +28,11 @@ type ContextType = {
 
 export const AuthContext = createContext<ContextType>({
   signup: (
-    phone: string, 
-    password: string, 
-    nickname: string, 
-    serviceType: string, 
-    enlistmentYear: string, 
-    enlistmentMonth: string, 
-    enlistmentDay: string, 
+    phone: string,
+    password: string,
+    nickname: string,
+    serviceType: number,
+    serviceStartDate: Date,
     callback?: Callback
   ) => {},
   login: (phone: string, password: string, callback?: Callback) => {},
@@ -63,20 +56,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       phone: string,
       password: string,
       nickname: string,
-      serviceType: string,
-      enlistmentYear: string,
-      enlistmentMonth: string,
-      enlistmentDay: string,
+      serviceType: number,
+      serviceStartDate: Date,
       callback?: Callback
     ) => {
-      const user: LoggedUser = { 
-        phone, 
-        password, 
-        nickname, 
-        serviceType, 
-        enlistmentYear, 
-        enlistmentMonth, 
-        enlistmentDay 
+      const user: LoggedUser = {
+        phone,
+        password,
+        nickname,
+        serviceType,
       };
       setLoggedUser(user);
       U.writeObjectP("user", user).finally(() => callback && callback());
@@ -86,14 +74,11 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const login = useCallback(
     (phone: string, password: string, callback?: Callback) => {
-      const user: LoggedUser = { 
-        phone, 
-        password, 
+      const user: LoggedUser = {
+        phone,
+        password,
         nickname: "",
-        serviceType: "",
-        enlistmentYear: "",
-        enlistmentMonth: "",
-        enlistmentDay: ""
+        serviceType: 0,
       };
       setLoggedUser(user);
       callback && callback();
