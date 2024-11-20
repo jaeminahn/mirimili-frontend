@@ -58,6 +58,7 @@ export default function SetTypeAndStartDate({
       <DatePicker date={startDate} setDate={setStartDate} />
 
       <div className="p-2 mt-4 mb-2 text-sm text-red-600 bg-red-100 rounded-lg">
+        <Icon icon="fluent:warning-28-filled" />
         ⚠️ 특별한 사유 없이 추후 변경이 불가능하니 신중하게 설정해주세요
       </div>
       <div className="p-2 text-sm rounded-lg bg-emerald-100 text-emerald-600">
