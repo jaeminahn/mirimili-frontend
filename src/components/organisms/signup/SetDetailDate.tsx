@@ -37,14 +37,8 @@ export default function SetDetailDate({
   }, [sgtDate]);
 
   useEffect(() => {
-    setCanProceed(!!form.serviceType);
+    setCanProceed(form.serviceEndDate !== null);
   }, [form.serviceType, setCanProceed]);
-
-  const handleServiceTypeSelect = (typeId: number) => {
-    changed("serviceType")({
-      target: { value: typeId },
-    } as unknown as ChangeEvent<HTMLSelectElement>);
-  };
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">

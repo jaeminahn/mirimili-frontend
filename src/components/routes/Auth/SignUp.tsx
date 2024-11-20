@@ -128,7 +128,7 @@ export default function SignUp() {
               이전
             </button>
           )}
-          {step < 5 ? (
+          {step < 6 ? (
             <button
               onClick={goToNextStep}
               className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
