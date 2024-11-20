@@ -96,7 +96,7 @@ export default function SetPhonePassword({
   };
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-80">
+    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
       <h2 className="mb-6 text-lg font-bold text-gray-700">전화번호 인증</h2>
       <div className="relative flex items-center w-full mb-2">
         <input
