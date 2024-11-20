@@ -5,6 +5,7 @@ import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
 import SetTypeAndStartDate from "../../organisms/signup/SetTypeAndStartDate";
+import SetDetailDate from "../../organisms/signup/SetDetailDate";
 
 export type SignUpFormType = {
   phone: string;
@@ -14,6 +15,10 @@ export type SignUpFormType = {
   nickname: string;
   serviceType: number;
   serviceStartDate: Date;
+  serviceEndDate: Date;
+  servicePfcDate: Date;
+  serviceCplDate: Date;
+  serviceSgtDate: Date;
 };
 
 const today = new Date();
@@ -25,6 +30,10 @@ const initialFormState: SignUpFormType = {
   nickname: "",
   serviceType: 0,
   serviceStartDate: today,
+  serviceEndDate: today,
+  servicePfcDate: today,
+  serviceCplDate: today,
+  serviceSgtDate: today,
 };
 
 export default function SignUp() {
@@ -50,6 +59,10 @@ export default function SignUp() {
       form.nickname,
       form.serviceType,
       form.serviceStartDate,
+      form.servicePfcDate,
+      form.serviceCplDate,
+      form.serviceSgtDate,
+      form.serviceEndDate,
       () => navigate("/")
     );
   };
@@ -91,6 +104,14 @@ export default function SignUp() {
       </div>
       <div className={`${step === 4 ? "" : "hidden"}`}>
         <SetTypeAndStartDate
+          form={form}
+          changed={changed}
+          changedDate={changedDate}
+          setCanProceed={setCanProceed}
+        />
+      </div>
+      <div className={`${step === 5 ? "" : "hidden"}`}>
+        <SetDetailDate
           form={form}
           changed={changed}
           changedDate={changedDate}

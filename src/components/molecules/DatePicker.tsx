@@ -6,9 +6,6 @@ interface DatePickerProps {
 }
 
 const DatePicker = ({ date, setDate }: DatePickerProps) => {
-  // const [selectedYear, setSelectedYear] = useState(date.getFullYear());
-  // const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
-  // const [selectedDay, setSelectedDay] = useState(date.getDate());
   const [days, setDays] = useState<number[]>([]);
 
   const today = new Date();
@@ -39,11 +36,11 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
   };
 
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="flex w-full gap-2">
       <select
         onChange={handleYearChange}
         value={date.getFullYear()}
-        className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        className="flex-grow p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
       >
         {Array.from({ length: currentYear - 1980 + 1 }, (_, i) => 1980 + i).map(
           (year) => (
@@ -56,7 +53,7 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
       <select
         onChange={handleMonthChange}
         value={date.getMonth()}
-        className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        className="flex-grow p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
           <option key={month} value={month}>
@@ -67,7 +64,7 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
       <select
         onChange={handleDayChange}
         value={date.getDate()}
-        className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        className="flex-grow p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
       >
         {days.map((day) => (
           <option key={day} value={day}>

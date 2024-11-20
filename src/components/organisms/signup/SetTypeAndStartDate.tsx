@@ -25,8 +25,8 @@ export default function SetTypeAndStartDate({
   }, [startDate]);
 
   useEffect(() => {
-    setCanProceed(!!form.serviceType);
-  }, [form.serviceType, setCanProceed]);
+    setCanProceed(form.serviceType !== null);
+  }, [form.serviceType]);
 
   const handleServiceTypeSelect = (typeId: number) => {
     changed("serviceType")({
@@ -57,7 +57,7 @@ export default function SetTypeAndStartDate({
       <h2 className="mb-4 text-lg font-bold text-gray-700">입대일</h2>
       <DatePicker date={startDate} setDate={setStartDate} />
 
-      <div className="p-2 mb-2 text-sm text-red-600 bg-red-100 rounded-lg">
+      <div className="p-2 mt-4 mb-2 text-sm text-red-600 bg-red-100 rounded-lg">
         ⚠️ 특별한 사유 없이 추후 변경이 불가능하니 신중하게 설정해주세요
       </div>
       <div className="p-2 text-sm rounded-lg bg-emerald-100 text-emerald-600">

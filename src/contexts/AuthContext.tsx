@@ -20,6 +20,10 @@ type ContextType = {
     nickname: string,
     serviceType: number,
     serviceStartDate: Date,
+    servicePfcDate: Date,
+    serviceCplDate: Date,
+    serviceSgtDate: Date,
+    serviceEndDate: Date,
     callback?: Callback
   ) => void;
   login: (phone: string, password: string, callback?: Callback) => void;
@@ -33,6 +37,10 @@ export const AuthContext = createContext<ContextType>({
     nickname: string,
     serviceType: number,
     serviceStartDate: Date,
+    servicePfcDate: Date,
+    serviceCplDate: Date,
+    serviceSgtDate: Date,
+    serviceEndDate: Date,
     callback?: Callback
   ) => {},
   login: (phone: string, password: string, callback?: Callback) => {},
@@ -58,6 +66,10 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       nickname: string,
       serviceType: number,
       serviceStartDate: Date,
+      servicePfcDate: Date,
+      serviceCplDate: Date,
+      serviceSgtDate: Date,
+      serviceEndDate: Date,
       callback?: Callback
     ) => {
       const user: LoggedUser = {
