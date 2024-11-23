@@ -6,6 +6,7 @@ import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
 import SetTypeAndStartDate from "../../organisms/signup/SetTypeAndStartDate";
 import SetDetailDate from "../../organisms/signup/SetDetailDate";
+import SetMosAndUnit from "../../organisms/signup/SetMosAndUnit";
 
 export type SignUpFormType = {
   phone: string;
@@ -19,6 +20,8 @@ export type SignUpFormType = {
   servicePfcDate: Date;
   serviceCplDate: Date;
   serviceSgtDate: Date;
+  serviceMos: number;
+  serviceUnit: number;
 };
 
 const today = new Date();
@@ -34,11 +37,13 @@ const initialFormState: SignUpFormType = {
   servicePfcDate: today,
   serviceCplDate: today,
   serviceSgtDate: today,
+  serviceMos: -1,
+  serviceUnit: -1,
 };
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(6);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -63,6 +68,8 @@ export default function SignUp() {
       form.serviceCplDate,
       form.serviceSgtDate,
       form.serviceEndDate,
+      form.serviceMos,
+      form.serviceUnit,
       () => navigate("/")
     );
   };
@@ -118,6 +125,13 @@ export default function SignUp() {
           setCanProceed={setCanProceed}
         />
       </div>
+      <div className={`${step === 6 ? "" : "hidden"}`}>
+        <SetMosAndUnit
+          form={form}
+          changed={changed}
+          setCanProceed={setCanProceed}
+        />
+      </div>
       {step > 1 && (
         <div className="flex items-center justify-between mt-4 w-80">
           {step > 1 && (
@@ -143,7 +157,12 @@ export default function SignUp() {
           ) : (
             <button
               onClick={createAccount}
-              className="w-48 py-2 text-lg font-semibold text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
+              className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
+                canProceed
+                  ? "bg-emerald-600 hover:bg-emerald-700"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+              disabled={!canProceed}
             >
               완료
             </button>
