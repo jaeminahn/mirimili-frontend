@@ -45,14 +45,28 @@ const MosModal: React.FC<TypeModalProps> = ({ isOpen, onClose, onSelect }) => {
         setFilteredSpecialties(result);
     }, [filter, searchTerm]);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="w-3/5 p-6 bg-white rounded-lg shadow-lg max-h-[80vh]">
+            <div className="p-6 bg-white rounded-lg shadow-lg h-[80vh] w-[500px]">
                 <div className="flex justify-between items-center mb-4">
                     <p className="text-lg font-semibold">특기 검색</p>
-                    <button className="text-xl font-bold text-gray-600" onClick={onClose}>
+                    <button
+                        className="text-xl font-bold text-gray-600"
+                        onClick={onClose}
+                    >
                         ✕
                     </button>
                 </div>
@@ -68,22 +82,35 @@ const MosModal: React.FC<TypeModalProps> = ({ isOpen, onClose, onSelect }) => {
                         <Icon icon="mdi:magnify" className="text-xl" />
                     </button>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {["일반", "공병", "군악", "기계", "의무", "의장"].map((category) => (
+                <div className="flex mb-2 gap-2 overflow-x-auto h-12 items-center flex-nowrap whitespace-nowrap scrollbar-hide w-full">
+                    {[
+                        "일반",
+                        "공병",
+                        "군악",
+                        "기계",
+                        "의무",
+                        "의장",
+                        "전자계산",
+                        "차량운전",
+                        "차량정비",
+                        "통신전자전기",
+                        "화생방",
+                    ].map((category) => (
                         <button
                             key={category}
+                            onClick={() => setFilter(category)}
                             className={`px-4 py-2 text-sm rounded-lg ${
                                 filter === category
-                                    ? "bg-emerald-100 text-emerald-600 border border-emerald-600"
-                                    : "bg-gray-100 text-gray-600 border border-gray-300"
-                            }`}
-                            onClick={() => setFilter(category)}
+                                    ? "bg-emerald-100 border-2 border-emerald-600"
+                                    : "bg-gray-100 text-gray-600 border-2 border-gray-100"
+                            } flex-shrink-0 whitespace-nowrap`}
+                            style={{ minWidth: "fit-content" }}
                         >
                             {category}
                         </button>
                     ))}
                 </div>
-                <div className="overflow-y-auto max-h-[400px]">
+                <div className="overflow-y-auto scrollbar-hide max-h-[60vh]">
                     {filteredSpecialties.length > 0 ? (
                         filteredSpecialties.map((specialty) => (
                             <div
@@ -95,12 +122,14 @@ const MosModal: React.FC<TypeModalProps> = ({ isOpen, onClose, onSelect }) => {
                                     className="text-emerald-600 font-bold text-lg"
                                     onClick={() => onSelect(specialty)}
                                 >
-                                    <Icon icon="mdi:plus-circle-outline" className="text-2xl" />
+                                    <Icon icon="mdi:plus-circle" className="text-2xl" />
                                 </button>
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500">검색 결과가 없습니다.</p>
+                        <p className="text-center text-gray-500">
+                            검색 결과가 없습니다.
+                        </p>
                     )}
                 </div>
             </div>
