@@ -6,6 +6,8 @@ import SignUp from "./Auth/SignUp";
 import Login from "./Auth/Login";
 import Logout from "./Auth/Logout";
 import Questions from "./Questions";
+import QuestionPost from "./QuestionPost";
+import QuestionNew from "./QuestionNew";
 
 export default function RouterSetup() {
   return (
@@ -13,6 +15,8 @@ export default function RouterSetup() {
       <Route index path="/" element={<Home />} />
       <Route path="/" element={<Layout />}>
         <Route index path="/questions" element={<Questions />} />
+        <Route index path="/questions/new" element={<QuestionNew />} />
+        <Route index path="/questions/:id" element={<QuestionPost />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />

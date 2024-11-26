@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import MainContents from "../organisms/MainContents";
 import SideContents from "../organisms/SideContents";
 import SearchBar from "../molecules/SearchBar";
 import BadgeButtons from "../molecules/BadgeButtons";
@@ -24,7 +23,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <main className="flex flex-col items-center justify-center h-full pt-6 bg-gray-100 ">
+      <main className="flex flex-col items-center justify-center flex-grow pt-6 bg-gray-100 ">
         <div className="flex flex-col w-3/4 max-w-5xl gap-4">
           <div className="flex flex-col gap-4">
             <p className="text-2xl font-semibold text-gray-500">

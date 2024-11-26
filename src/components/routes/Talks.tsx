@@ -1,4 +1,4 @@
-import QuestionsMain from "../organisms/QuestionsMain";
+import QuestionsMain from "../organisms/QuestionsContent";
 import QuestionsSide from "../organisms/QuestionsSide";
 
 export default function Talks() {

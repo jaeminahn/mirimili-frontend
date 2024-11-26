@@ -1,26 +1,36 @@
-import QuestionButton from "../molecules/QuestionButton";
+import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
 
 export default function QuestionsSide() {
   return (
-    <div className="flex flex-col w-1/4 gap-4">
-    {/* Q&A Section */}
-    <div className="bg-white p-5 rounded-lg shadow-sm mb-2">
-      <div className="text-lg font-get font-bold">내 질문&답변</div>
-      <div className="flex items-center justify-between mt-2">
-        <div className="bg-gray-200 p-2 rounded-md flex justify-between items-center">
-          <span className="text-sm">질문 <span className="font-bold">5</span></span>
-          <span className="text-sm ml-4">답변 <span className="font-bold">2</span></span>
-        </div>
-        <div className="bg-emerald-100 p-2 rounded-md flex justify-between items-center ml-4">
-          <span className="text-emerald-600 text-sm font-bold">🏆 1021</span>
+    <div className="flex flex-col w-1/5 gap-4">
+      <div className="flex flex-col gap-1 p-4 bg-white rounded-lg">
+        <p className="text-base font-semibold font-get">내 질문 & 답변</p>
+        <div className="flex justify-center gap-2 text-xs">
+          <div className="flex gap-1 p-2 bg-gray-200 rounded-lg">
+            <div className="flex gap-1">
+              <p>질문</p>
+              <p className="font-semibold">5</p>
+            </div>
+            <div className="flex gap-1">
+              <p>답변</p>
+              <p className="font-semibold">2</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 px-2 font-semibold rounded-lg bg-emerald-200 text-emerald-700">
+            <Icon icon="fluent:trophy-24-filled" />
+            <p>1096</p>
+          </div>
         </div>
       </div>
-    </div>
-
-      {/* Question Button */}
-      <QuestionButton />
-
-      {/* Popular Keywords Section */}
+      <Link to="/questions/new">
+        <div className="flex items-center justify-center h-10 gap-2 font-semibold text-white rounded-lg bg-emerald-600">
+          <p>질문하기</p>
+          <Icon icon="fluent:chat-help-24-filled" />
+        </div>
+      </Link>
+    
+    {/* Popular Keywords Section */}
       <div className="bg-white p-5 rounded-lg shadow-sm my-2">
         <div className="text-lg font-get font-bold mb-2">인기 키워드</div>
         <div className="flex flex-wrap gap-2">
@@ -49,7 +59,6 @@ export default function QuestionsSide() {
             </li>
           ))}
         </ul>
-      </div>
     </div>
   );
 }
