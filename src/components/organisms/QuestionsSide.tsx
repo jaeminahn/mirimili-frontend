@@ -29,13 +29,27 @@ export default function QuestionsSide() {
           <Icon icon="fluent:chat-help-24-filled" />
         </div>
       </Link>
-    
-    {/* Popular Keywords Section */}
-      <div className="bg-white p-5 rounded-lg shadow-sm my-2">
-        <div className="text-lg font-get font-bold mb-2">인기 키워드</div>
+
+      {/* Popular Keywords Section */}
+      <div className="p-5 my-2 bg-white rounded-lg shadow-sm">
+        <div className="mb-2 text-lg font-bold font-get">인기 키워드</div>
         <div className="flex flex-wrap gap-2">
-          {['#공군', '#제10전투비행단', '#공군훈련소', '#특기시험', '#훈련', '#865기', '#자기개발', '#면회외출', '#운항관제', '#ORI'].map((keyword, index) => (
-            <span key={index} className="bg-gray-200 text-sm px-2 py-1 rounded-md">
+          {[
+            "#공군",
+            "#제10전투비행단",
+            "#공군훈련소",
+            "#특기시험",
+            "#훈련",
+            "#865기",
+            "#자기개발",
+            "#면회외출",
+            "#운항관제",
+            "#ORI",
+          ].map((keyword, index) => (
+            <span
+              key={index}
+              className="px-2 py-1 text-sm bg-gray-200 rounded-md"
+            >
               {keyword}
             </span>
           ))}
@@ -43,22 +57,25 @@ export default function QuestionsSide() {
       </div>
 
       {/* Answer Ranking Section */}
-      <div className="bg-white p-5 rounded-lg shadow-sm">
-        <div className="text-lg font-get font-bold mb-2">답변랭킹</div>
+      <div className="p-5 bg-white rounded-lg shadow-sm">
+        <div className="mb-2 text-lg font-bold font-get">답변랭킹</div>
         <ul>
           {[
-            { name: '국방부택시운전사', score: 1021 },
-            { name: '보라매의꿈', score: 985 },
-            { name: '빨간마후라', score: 849 },
-            { name: '17비대장', score: 698 },
-            { name: '공군지망생', score: 572 },
+            { name: "국방부택시운전사", score: 1021 },
+            { name: "보라매의꿈", score: 985 },
+            { name: "빨간마후라", score: 849 },
+            { name: "17비대장", score: 698 },
+            { name: "공군지망생", score: 572 },
           ].map((user, index) => (
             <li key={index} className="flex justify-between mb-2">
               <span>{user.name}</span>
-              <span className="text-emerald-600 font-bold">🏆 {user.score}</span>
+              <span className="font-bold text-emerald-600">
+                🏆 {user.score}
+              </span>
             </li>
           ))}
         </ul>
+      </div>
     </div>
   );
 }
