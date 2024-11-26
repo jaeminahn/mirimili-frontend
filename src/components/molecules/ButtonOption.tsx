@@ -1,8 +1,9 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { TypeRecord } from "../../data/data";
+import { TypeRecord, MosAndUnitRecord } from "../../data/data";
 
 interface ButtonOptionProps {
-  options: TypeRecord[];
+  data: TypeRecord[] | MosAndUnitRecord[];
+  options: number[];
   selected: number[];
   setSelected: Dispatch<SetStateAction<number[]>>;
   isAllSelected?: boolean;
@@ -17,6 +18,7 @@ const getButtonClasses = (isActive: boolean): string =>
   }`;
 
 const ButtonOption = ({
+  data,
   options,
   selected,
   setSelected,
@@ -31,7 +33,7 @@ const ButtonOption = ({
 
   const handleIsAllSelected = () => {
     if (!isAllSelected) {
-      setSelected(options.map((item) => item.id));
+      setSelected(data.map((item) => item.id));
       setIsAllSelected!(true);
     } else {
       setSelected([]);
@@ -41,7 +43,7 @@ const ButtonOption = ({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {isAllSelected !== null && (
+      {isAllSelected != null && (
         <button
           key={0}
           className={getButtonClasses(isAllSelected!)}
@@ -50,13 +52,13 @@ const ButtonOption = ({
           전체
         </button>
       )}
-      {options.map((option) => (
+      {options.map((id) => (
         <button
-          key={option.id}
-          className={getButtonClasses(selected.includes(option.id))}
-          onClick={() => handleToggle(option.id)}
+          key={id}
+          className={getButtonClasses(selected.includes(id))}
+          onClick={() => handleToggle(id)}
         >
-          {option.label}
+          {data.find((item) => item.id === id)!.label}
         </button>
       ))}
     </div>

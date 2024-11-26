@@ -12,9 +12,12 @@ export default function QuestionWrite() {
   const [keywordInput, setKeywordInput] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [isAllType, setIsAllType] = useState(true);
-  const [type, setType] = useState<number[]>([]);
-  const [mosList, setMosList] = useState<MosAndUnitRecord[]>([]);
-  const [mos, setMos] = useState<string[]>(["전체"]);
+  const [type, setType] = useState<number[]>(
+    serviceType.map((item) => item.id)
+  );
+  const [isAllMos, setIsAllMos] = useState(true);
+  const [mosList, setMosList] = useState<number[]>([]);
+  const [mos, setMos] = useState<number[]>([]);
   const [isMosModalOpen, setMosModalOpen] = useState(false);
 
   const addKeyword = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -36,24 +39,29 @@ export default function QuestionWrite() {
 
   const toggleMosModal = () => setMosModalOpen(!isMosModalOpen);
 
-  //   const handleMosSelect = (mos: MosAndUnitRecord) => {
-  //     setMosList((prev) =>
-  //       prev.includes(mos.label) ? prev : [...prev, mos.label]
-  //     );
-  //     setMosModalOpen(false);
-  //   };
-
-  const handleMosChange = (selectedMos: string[]) => {
-    if (selectedMos.includes("전체")) {
-      setMos(["전체"]);
-    } else {
-      setMos(selectedMos.filter((item) => item !== "전체"));
-    }
+  const handleMosListSelect = (mos: MosAndUnitRecord) => {
+    setMosList((prev) => (prev.includes(mos.id) ? prev : [...prev, mos.id]));
+    setMos((prev) => [...prev, mos.id]);
+    setMosModalOpen(false);
   };
 
   useEffect(() => {
     setIsAllType(type.length === serviceType.length);
   }, [type]);
+
+  useEffect(() => {
+    if (mos.length > 0) setIsAllMos(false);
+  }, [mos]);
+
+  const handleAllMos = () => {
+    if (!isAllMos) {
+      setMos([]);
+      setIsAllMos(true);
+    } else {
+      setMos(mosList);
+      setIsAllMos(false);
+    }
+  };
 
   return (
     <div className="flex flex-col w-4/5 gap-6 p-6 bg-gray-100 rounded-lg">
@@ -131,9 +139,10 @@ export default function QuestionWrite() {
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
         <p className="mb-2 text-lg font-semibold">누가 답변할까요?</p>
         <div className="flex items-center gap-4">
-          <span className="w-20 mr-2 text-base font-semibold">군구분</span>
+          <span className="mr-2 text-base font-semibold min-w-12">군구분</span>
           <ButtonOption
-            options={serviceType}
+            data={serviceType}
+            options={serviceType.map((item) => item.id)}
             selected={type}
             setSelected={setType}
             isAllSelected={isAllType}
@@ -141,12 +150,24 @@ export default function QuestionWrite() {
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="mr-2 text-base font-semibold">특기</span>
-          {/* <ButtonOption
+          <span className="mr-2 text-base font-semibold min-w-12">특기</span>
+          <button
+            key={0}
+            className={`px-2 py-1 text-sm rounded-xl border-2 ${
+              isAllMos
+                ? "bg-emerald-100 border-emerald-600"
+                : "bg-gray-100 text-gray-500 border-gray-100"
+            }`}
+            onClick={handleAllMos}
+          >
+            전체
+          </button>
+          <ButtonOption
+            data={serviceMos}
             options={mosList}
             selected={mos}
-            onChange={handleMosChange}
-          /> */}
+            setSelected={setMos}
+          />
           <button
             className="flex items-center justify-center w-8 h-8 text-xl font-bold text-gray-500 bg-gray-100 border-2 border-gray-100 rounded-full hover:bg-gray-200"
             onClick={toggleMosModal}
@@ -160,13 +181,13 @@ export default function QuestionWrite() {
         질문 게시하기
       </button>
 
-      {/* <SelectModal
+      <SelectModal
         title="특기"
         isOpen={isMosModalOpen}
         onClose={toggleMosModal}
-        onSelect={handleMosSelect}
+        onSelect={handleMosListSelect}
         DataList={serviceMos}
-      /> */}
+      />
     </div>
   );
 }
