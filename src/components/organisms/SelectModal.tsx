@@ -17,7 +17,7 @@ const SelectModal = ({
   onSelect,
   DataList,
 }: SelectModalProps) => {
-  const [searchCategory, setSearchCategory] = useState<string>("");
+  const [searchCategory, setSearchCategory] = useState<string>("전체");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredSpecialties, setFilteredSpecialties] =
     useState<MosAndUnitRecord[]>(DataList);
@@ -33,8 +33,8 @@ const SelectModal = ({
 
   useEffect(() => {
     let result = DataList;
-    if (searchCategory)
-      result = result.filter((item) => item.category === searchCategory);
+    if (searchCategory == "전체") result = DataList;
+    else result = result.filter((item) => item.category === searchCategory);
     if (searchTerm.trim() !== "")
       result = result.filter((item) => koreanSearch(searchTerm, item.label));
     setFilteredSpecialties(result);
@@ -69,6 +69,18 @@ const SelectModal = ({
           </button>
         </div>
         <div className="flex items-center w-full h-12 gap-2 mb-2 overflow-x-auto flex-nowrap whitespace-nowrap scrollbar-hide">
+          <button
+            key={0}
+            onClick={() => setSearchCategory("전체")}
+            className={`px-4 py-2 text-sm rounded-lg ${
+              searchCategory === "전체"
+                ? "bg-emerald-100 border-2 border-emerald-600"
+                : "bg-gray-100 text-gray-600 border-2 border-gray-100"
+            } flex-shrink-0 whitespace-nowrap`}
+            style={{ minWidth: "fit-content" }}
+          >
+            {"전체"}
+          </button>
           {extractCategories(DataList).map((category) => (
             <button
               key={category}
