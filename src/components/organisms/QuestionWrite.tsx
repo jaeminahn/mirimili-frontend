@@ -18,7 +18,7 @@ export default function QuestionWrite() {
   const [isAllMos, setIsAllMos] = useState(true);
   const [mosList, setMosList] = useState<number[]>([]);
   const [mos, setMos] = useState<number[]>([]);
-  const [isMosModalOpen, setMosModalOpen] = useState(false);
+  const [isMosModalOpen, setIsMosModalOpen] = useState(false);
 
   const addKeyword = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" || e.key === " ") && keywordInput.trim() !== "") {
@@ -37,12 +37,12 @@ export default function QuestionWrite() {
     setKeywords((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const toggleMosModal = () => setMosModalOpen(!isMosModalOpen);
+  const toggleMosModal = () => setIsMosModalOpen(!isMosModalOpen);
 
   const handleMosListSelect = (mos: MosAndUnitRecord) => {
     setMosList((prev) => (prev.includes(mos.id) ? prev : [...prev, mos.id]));
     setMos((prev) => [...prev, mos.id]);
-    setMosModalOpen(false);
+    setIsMosModalOpen(false);
   };
 
   useEffect(() => {

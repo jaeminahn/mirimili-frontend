@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1,
+    "type": "공군",
+    "category": "직할부대",
+    "label": "공본직할"
+  },
+  {
+    "id": 2,
+    "type": "공군",
+    "category": "사령부",
+    "label": "작전사령부"
+  },
+  {
+    "id": 3,
+    "type": "공군",
+    "category": "모름",
+    "label": "공군사관학교"
+  },
+  {
+    "id": 4,
+    "type": "공군",
+    "category": "사령부",
+    "label": "교육사령부"
+  },
+  {
+    "id": 5,
+    "type": "공군",
+    "category": "사령부",
+    "label": "군수사령부"
+  },
+  {
+    "id": 6,
+    "type": "공군",
+    "category": "사령부",
+    "label": "미사일방어사령부"
+  },
+  {
+    "id": 7,
+    "type": "공군",
+    "category": "사령부",
+    "label": "방공관제사령부"
+  },
+  {
+    "id": 8,
+    "type": "공군",
+    "category": "사령부",
+    "label": "공중전투사령부"
+  },
+  {
+    "id": 9,
+    "type": "공군",
+    "category": "사령부",
+    "label": "공중기동정찰사령부"
+  },
+  {
+    "id": 10,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제1전투비행단"
+  },
+  {
+    "id": 11,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제3훈련비행단"
+  },
+  {
+    "id": 12,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제5공중기동비행단"
+  },
+  {
+    "id": 13,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제8전투비행단"
+  },
+  {
+    "id": 14,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제10전투비행단"
+  },
+  {
+    "id": 15,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제11전투비행단"
+  },
+  {
+    "id": 16,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제15특수임무비행단"
+  },
+  {
+    "id": 17,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제16전투비행단"
+  },
+  {
+    "id": 18,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제17전투비행단"
+  },
+  {
+    "id": 19,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제18전투비행단"
+  },
+  {
+    "id": 20,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제19전투비행단"
+  },
+  {
+    "id": 21,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제20전투비행단"
+  },
+  {
+    "id": 22,
+    "type": "공군",
+    "category": "비행단",
+    "label": "제39전투비행단"
+  },
+  {
+    "id": 23,
+    "type": "공군",
+    "category": "여단",
+    "label": "1여단"
+  },
+  {
+    "id": 24,
+    "type": "공군",
+    "category": "여단",
+    "label": "2여단"
+  },
+  {
+    "id": 25,
+    "type": "공군",
+    "category": "여단",
+    "label": "3여단"
+  },
+  {
+    "id": 26,
+    "type": "공군",
+    "category": "모름",
+    "label": "항안단"
+  },
+  {
+    "id": 27,
+    "type": "공군",
+    "category": "모름",
+    "label": "작근단"
+  },
+  {
+    "id": 28,
+    "type": "공군",
+    "category": "모름",
+    "label": "항공정보단"
+  },
+  {
+    "id": 29,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "6전대"
+  },
+  {
+    "id": 30,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "7전대"
+  },
+  {
+    "id": 31,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "28전대"
+  },
+  {
+    "id": 32,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "29전대"
+  },
+  {
+    "id": 33,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "35전대"
+  },
+  {
+    "id": 34,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "38전대"
+  },
+  {
+    "id": 35,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "51전대"
+  },
+  {
+    "id": 36,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "52전대"
+  },
+  {
+    "id": 37,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "53전대"
+  },
+  {
+    "id": 38,
+    "type": "공군",
+    "category": "독립전대",
+    "label": "91전대"
+  },
+  {
+    "id": 39,
+    "type": "공군",
+    "category": "모름",
+    "label": "항공지원작전단"
+  },
+  {
+    "id": 40,
+    "type": "공군",
+    "category": "모름",
+    "label": "작전정보통신단"
+  },
+  {
+    "id": 41,
+    "type": "공군",
+    "category": "모름",
+    "label": "항의원"
+  },
+  {
+    "id": 42,
+    "type": "공군",
+    "category": "모름",
+    "label": "리더십센터"
+  },
+  {
+    "id": 43,
+    "type": "공군",
+    "category": "모름",
+    "label": "방포교"
+  },
+  {
+    "id": 44,
+    "type": "공군",
+    "category": "모름",
+    "label": "사이버작전센터"
+  },
+  {
+    "id": 45,
+    "type": "공군",
+    "category": "모름",
+    "label": "국직부대"
+  }
+]

@@ -96,22 +96,21 @@ const SelectModal = ({
             ))}
           </div>
           <div className="flex flex-col h-full overflow-hidden">
-            {/* 여기에서 flex-1을 사용하여 내부 영역을 꽉 채우고, 스크롤을 활성화 */}
             <div className="flex-1 overflow-y-auto scrollbar-hide">
               {filteredSpecialties.length > 0 ? (
                 filteredSpecialties.map((item) => (
-                  <div
+                  <button
                     key={item.id}
-                    className="flex items-center justify-between px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    className="flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    onClick={() => onSelect(item)}
                   >
                     <span className="text-sm">{item.label}</span>
-                    <button
-                      className="text-lg font-bold text-emerald-600"
-                      onClick={() => onSelect(item)}
-                    >
-                      <Icon icon="mdi:plus-circle" className="text-xl" />
-                    </button>
-                  </div>
+
+                    <Icon
+                      icon="mdi:plus-circle"
+                      className="text-xl text-emerald-600"
+                    />
+                  </button>
                 ))
               ) : (
                 <p className="text-center text-gray-500">

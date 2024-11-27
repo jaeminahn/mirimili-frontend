@@ -85,8 +85,8 @@ export default function SignUp() {
   }, [form]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="flex flex-col items-center justify-start w-screen h-screen bg-gray-100">
+      <div className="flex items-center gap-2 mt-20 mb-4">
         <p className="text-base text-gray-500 font-get">
           똑똑한 입대, 후회없는 군생활
         </p>
