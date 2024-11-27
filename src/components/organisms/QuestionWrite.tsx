@@ -162,6 +162,7 @@ export default function QuestionWrite() {
           >
             전체
           </button>
+          <p className="text-lg text-gray-500">|</p>
           <ButtonOption
             data={serviceMos}
             options={mosList}
