@@ -10,6 +10,7 @@ type SetDetailDateProps = {
   ) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   changedDate: (key: keyof SignUpFormType, date: Date) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetDetailDate({
@@ -17,11 +18,12 @@ export default function SetDetailDate({
   changed,
   changedDate,
   setCanProceed,
+  step,
 }: SetDetailDateProps) {
-  const [endDate, setEndDate] = useState(new Date());
-  const [pfcDate, setPfcDate] = useState(new Date());
-  const [cplDate, setCplDate] = useState(new Date());
-  const [sgtDate, setSgtDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(form.serviceEndDate);
+  const [pfcDate, setPfcDate] = useState(form.servicePfcDate);
+  const [cplDate, setCplDate] = useState(form.serviceCplDate);
+  const [sgtDate, setSgtDate] = useState(form.serviceSgtDate);
 
   useEffect(() => {
     changedDate("serviceEndDate", endDate);
@@ -37,8 +39,20 @@ export default function SetDetailDate({
   }, [sgtDate]);
 
   useEffect(() => {
-    setCanProceed(form.serviceEndDate !== null);
-  }, [form.serviceType, setCanProceed]);
+    setCanProceed(
+      form.serviceStartDate <= form.servicePfcDate &&
+        form.servicePfcDate <= form.serviceCplDate &&
+        form.serviceCplDate <= form.serviceSgtDate &&
+        form.serviceSgtDate <= form.serviceEndDate
+    );
+  }, [
+    form.serviceStartDate,
+    form.servicePfcDate,
+    form.serviceCplDate,
+    form.serviceSgtDate,
+    form.serviceEndDate,
+    step,
+  ]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">

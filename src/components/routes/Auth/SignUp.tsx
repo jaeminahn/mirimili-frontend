@@ -7,6 +7,12 @@ import SetNickname from "../../organisms/signup/SetNickname";
 import SetTypeAndStartDate from "../../organisms/signup/SetTypeAndStartDate";
 import SetDetailDate from "../../organisms/signup/SetDetailDate";
 import SetMosAndUnit from "../../organisms/signup/SetMosAndUnit";
+import {
+  calculateCplDate,
+  calculateEndDate,
+  calculatePfcDate,
+  calculateSgtDate,
+} from "../../../utils/calculateDate";
 
 export type SignUpFormType = {
   phone: string;
@@ -31,19 +37,19 @@ const initialFormState: SignUpFormType = {
   password: "",
   confirmPassword: "",
   nickname: "",
-  serviceType: 0,
+  serviceType: 1,
   serviceStartDate: today,
-  serviceEndDate: today,
-  servicePfcDate: today,
-  serviceCplDate: today,
-  serviceSgtDate: today,
+  serviceEndDate: calculateEndDate(today),
+  servicePfcDate: calculatePfcDate(today),
+  serviceCplDate: calculateCplDate(today),
+  serviceSgtDate: calculateSgtDate(today),
   serviceMos: -1,
   serviceUnit: -1,
 };
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
-  const [step, setStep] = useState(6);
+  const [step, setStep] = useState(4);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -75,10 +81,7 @@ export default function SignUp() {
   };
 
   const goToNextStep = () => setStep((prev) => prev + 1);
-  const goToPreviousStep = () => {
-    setStep((prev) => prev - 1);
-    setCanProceed(true);
-  };
+  const goToPreviousStep = () => setStep((prev) => prev - 1);
 
   useEffect(() => {
     console.log(form);
@@ -100,6 +103,7 @@ export default function SignUp() {
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       <div className={`${step === 3 ? "" : "hidden"}`}>
@@ -107,6 +111,7 @@ export default function SignUp() {
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       <div className={`${step === 4 ? "" : "hidden"}`}>
@@ -115,6 +120,7 @@ export default function SignUp() {
           changed={changed}
           changedDate={changedDate}
           setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       <div className={`${step === 5 ? "" : "hidden"}`}>
@@ -123,6 +129,7 @@ export default function SignUp() {
           changed={changed}
           changedDate={changedDate}
           setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       <div className={`${step === 6 ? "" : "hidden"}`}>
@@ -130,6 +137,7 @@ export default function SignUp() {
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       {step > 1 && (

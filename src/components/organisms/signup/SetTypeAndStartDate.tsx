@@ -3,6 +3,12 @@ import { SignUpFormType } from "../../routes/Auth/SignUp";
 import ServiceType from "../../../data/serviceType.json";
 import DatePicker from "../../molecules/DatePicker";
 import { Icon } from "@iconify/react";
+import {
+  calculateCplDate,
+  calculateEndDate,
+  calculatePfcDate,
+  calculateSgtDate,
+} from "../../../utils/calculateDate";
 
 type SetTypeAndStartDateProps = {
   form: SignUpFormType;
@@ -11,6 +17,7 @@ type SetTypeAndStartDateProps = {
   ) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   changedDate: (key: keyof SignUpFormType, date: Date) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetTypeAndStartDate({
@@ -18,16 +25,21 @@ export default function SetTypeAndStartDate({
   changed,
   changedDate,
   setCanProceed,
+  step,
 }: SetTypeAndStartDateProps) {
   const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
     changedDate("serviceStartDate", startDate);
+    changedDate("servicePfcDate", calculatePfcDate(startDate));
+    changedDate("serviceCplDate", calculateCplDate(startDate));
+    changedDate("serviceSgtDate", calculateSgtDate(startDate));
+    changedDate("serviceEndDate", calculateEndDate(startDate));
   }, [startDate]);
 
   useEffect(() => {
-    setCanProceed(form.serviceType !== null);
-  }, [form.serviceType]);
+    setCanProceed(form.serviceType !== 0);
+  }, [step]);
 
   const handleServiceTypeSelect = (typeId: number) => {
     changed("serviceType")({
@@ -48,7 +60,7 @@ export default function SetTypeAndStartDate({
                 ? "bg-emerald-100  border-emerald-600 font-semibold"
                 : "bg-gray-100 border-gray-100 font-medium"
             } cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
-            disabled={type.id !== 0}
+            disabled={type.id !== 1}
           >
             {type.label}
           </button>

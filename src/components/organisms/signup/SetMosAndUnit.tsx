@@ -14,12 +14,14 @@ type SetMosAndUnitProps = {
     key: keyof SignUpFormType
   ) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetMosAndUnit({
   form,
   changed,
   setCanProceed,
+  step,
 }: SetMosAndUnitProps) {
   const [isNoMos, setIsNoMos] = useState(false);
   const [isMosModalOpen, setIsMosModalOpen] = useState(false);
@@ -60,7 +62,7 @@ export default function SetMosAndUnit({
 
   useEffect(() => {
     setCanProceed(form.serviceMos !== -1 && form.serviceUnit !== -1);
-  }, [form.serviceMos, form.serviceUnit, setCanProceed]);
+  }, [form.serviceMos, form.serviceUnit, step]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">

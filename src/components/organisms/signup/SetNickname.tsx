@@ -7,12 +7,14 @@ type SetNicknameProps = {
     key: keyof SignUpFormType
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetNickname({
   form,
   changed,
   setCanProceed,
+  step,
 }: SetNicknameProps) {
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(false);
   const [nicknameMessage, setNicknameMessage] = useState("");
@@ -29,7 +31,7 @@ export default function SetNickname({
 
   useEffect(() => {
     setCanProceed(isNicknameAvailable);
-  }, [isNicknameAvailable]);
+  }, [isNicknameAvailable, step]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">

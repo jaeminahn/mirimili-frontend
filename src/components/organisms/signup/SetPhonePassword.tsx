@@ -8,12 +8,14 @@ type SetPhonePasswordProps = {
     key: keyof SignUpFormType
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetPhonePassword({
   form,
   changed,
   setCanProceed,
+  step,
 }: SetPhonePasswordProps) {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isCodeValid, setIsCodeValid] = useState(false);
@@ -33,7 +35,7 @@ export default function SetPhonePassword({
   useEffect(() => {
     setCanProceed(isCodeValid && isPasswordValid && isPasswordConfirmed);
     console.log(isCodeValid, isPasswordValid, isPasswordConfirmed);
-  }, [isCodeValid, isPasswordValid, isPasswordConfirmed]);
+  }, [isCodeValid, isPasswordValid, isPasswordConfirmed, step]);
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
