@@ -39,6 +39,7 @@ export default function SetDetailDate({
   }, [sgtDate]);
 
   useEffect(() => {
+    if (step !== 5) return;
     setCanProceed(
       form.serviceStartDate <= form.servicePfcDate &&
         form.servicePfcDate <= form.serviceCplDate &&
@@ -46,7 +47,6 @@ export default function SetDetailDate({
         form.serviceSgtDate <= form.serviceEndDate
     );
   }, [
-    form.serviceStartDate,
     form.servicePfcDate,
     form.serviceCplDate,
     form.serviceSgtDate,

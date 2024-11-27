@@ -33,6 +33,7 @@ export default function SetPhonePassword({
   }, [form.password, form.confirmPassword]);
 
   useEffect(() => {
+    if (step !== 2) return;
     setCanProceed(isCodeValid && isPasswordValid && isPasswordConfirmed);
     console.log(isCodeValid, isPasswordValid, isPasswordConfirmed);
   }, [isCodeValid, isPasswordValid, isPasswordConfirmed, step]);

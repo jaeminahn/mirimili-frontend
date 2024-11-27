@@ -38,6 +38,7 @@ export default function SetTypeAndStartDate({
   }, [startDate]);
 
   useEffect(() => {
+    if (step !== 4) return;
     setCanProceed(form.serviceType !== 0);
   }, [step]);
 
