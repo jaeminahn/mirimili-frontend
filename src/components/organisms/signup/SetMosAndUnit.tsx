@@ -1,7 +1,5 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
-import ServiceType from "../../../data/serviceType.json";
-import DatePicker from "../../molecules/DatePicker";
 import SelectModal from "../SelectModal";
 import serviceMos from "../../../data/serviceMos.json";
 import serviceUnit from "../../../data/serviceUnit.json";
