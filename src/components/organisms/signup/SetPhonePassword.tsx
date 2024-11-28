@@ -18,6 +18,7 @@ export default function SetPhonePassword({
   setCanProceed,
   step,
 }: SetPhonePasswordProps) {
+  const [formattedValue, setFormmattedValue] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isCodeValid, setIsCodeValid] = useState(false);
@@ -44,14 +45,16 @@ export default function SetPhonePassword({
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
-    const formattedValue =
+    setFormmattedValue(
       value.length > 7
         ? `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`
         : value.length > 3
         ? `${value.slice(0, 3)}-${value.slice(3)}`
-        : value;
+        : value
+    );
+
     changed("tel")({
-      target: { value: formattedValue },
+      target: { value: value },
     } as ChangeEvent<HTMLInputElement>);
   };
 
@@ -112,7 +115,7 @@ export default function SetPhonePassword({
             isCodeSent ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="전화번호 입력"
-          value={form.tel}
+          value={formattedValue}
           onChange={handlePhoneChange}
           disabled={isCodeSent}
         />
