@@ -1,6 +1,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 import { post } from "../../../api";
+import { Icon } from "@iconify/react";
 
 type SetPhonePasswordProps = {
   form: SignUpFormType;
@@ -23,14 +24,16 @@ export default function SetPhonePassword({
   const [successMessage, setSuccessMessage] = useState("");
   const [verificationMessage, setVerificationMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
 
   useEffect(() => {
     setIsPasswordValid(
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,16}$/.test(form.password)
     );
-    setIsPasswordConfirmed(form.password === form.confirmPassword);
-  }, [form.password, form.confirmPassword]);
+    setIsPasswordConfirmed(form.password === confirmPassword);
+  }, [form.password, confirmPassword]);
 
   useEffect(() => {
     if (step !== 2) return;
@@ -46,7 +49,6 @@ export default function SetPhonePassword({
         : value.length > 3
         ? `${value.slice(0, 3)}-${value.slice(3)}`
         : value;
-
     changed("phone")({
       target: { value: formattedValue },
     } as ChangeEvent<HTMLInputElement>);
@@ -62,7 +64,6 @@ export default function SetPhonePassword({
       setSuccessMessage("");
       return;
     }
-
     post("/auth/join/send-code", { tel })
       .then((res) => res.json())
       .then((result) => {
@@ -79,13 +80,11 @@ export default function SetPhonePassword({
   const handleVerifyCode = () => {
     const tel = form.phone.replace(/-/g, "");
     const code = form.verificationCode;
-
     if (code.length !== 6) {
       setIsCodeValid(false);
       setVerificationMessage("인증번호 6자리를 입력해주세요.");
       return;
     }
-
     post("/auth/join/validate-code", { tel, code })
       .then((res) => res.json())
       .then((result) => {
@@ -114,7 +113,7 @@ export default function SetPhonePassword({
         />
         <button
           onClick={handleSendCode}
-          className={`absolute p-1 text-xs text-gray-700 bg-gray-100 rounded-full right-2 hover:bg-gray-200 ${
+          className={`absolute px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded-full right-2 hover:bg-gray-200 ${
             isCodeSent ? "cursor-not-allowed" : ""
           }`}
           disabled={isCodeSent}
@@ -142,7 +141,7 @@ export default function SetPhonePassword({
         />
         <button
           onClick={handleVerifyCode}
-          className={`absolute p-1 text-xs text-gray-700 bg-gray-100 rounded-full right-2 hover:bg-gray-200 ${
+          className={`absolute px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded-full right-2 hover:bg-gray-200 ${
             !isCodeSent || isCodeValid ? "cursor-not-allowed" : ""
           }`}
           disabled={!isCodeSent || isCodeValid}
@@ -162,13 +161,23 @@ export default function SetPhonePassword({
       )}
 
       <h2 className="mt-4 mb-6 text-lg font-bold text-gray-700">비밀번호</h2>
-      <input
-        type="password"
-        className="w-full p-2 mb-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
-        placeholder="비밀번호 입력"
-        value={form.password}
-        onChange={changed("password")}
-      />
+      <div className="relative flex flex-row items-center justify-between ">
+        <input
+          type={isPasswordVisible ? "text" : "password"}
+          className="w-full p-2 mb-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          placeholder="비밀번호 입력"
+          value={form.password}
+          onChange={changed("password")}
+        />
+        <button
+          className="absolute w-6 h-6 mb-2 text-2xl text-gray-500 bg-gray-100 rounded-lg right-2 hover:text-gray-600 hover:bg-gray-200"
+          onMouseDown={() => setIsPasswordVisible(true)}
+          onMouseUp={() => setIsPasswordVisible(false)}
+          onMouseLeave={() => setIsPasswordVisible(false)}
+        >
+          <Icon icon="bitcoin-icons:visible-filled" />
+        </button>
+      </div>
       {form.password && (
         <div
           className={`text-xs mb-2 ${
@@ -184,10 +193,10 @@ export default function SetPhonePassword({
         type="password"
         className="w-full p-2 mb-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
         placeholder="비밀번호 확인"
-        value={form.confirmPassword}
-        onChange={changed("confirmPassword")}
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
       />
-      {form.confirmPassword && (
+      {confirmPassword && (
         <div
           className={`text-xs mb-2 ${
             isPasswordConfirmed ? "text-green-500" : "text-red-500"

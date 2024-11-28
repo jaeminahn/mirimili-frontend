@@ -18,7 +18,6 @@ export type SignUpFormType = {
   phone: string;
   verificationCode: string;
   password: string;
-  confirmPassword: string;
   nickname: string;
   serviceType: number;
   serviceStartDate: Date;
@@ -35,7 +34,6 @@ const initialFormState: SignUpFormType = {
   phone: "",
   verificationCode: "",
   password: "",
-  confirmPassword: "",
   nickname: "",
   serviceType: 1,
   serviceStartDate: today,
@@ -49,7 +47,7 @@ const initialFormState: SignUpFormType = {
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
-  const [step, setStep] = useState(4);
+  const [step, setStep] = useState(1);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
