@@ -16,7 +16,6 @@ import {
 
 export type SignUpFormType = {
   phone: string;
-  verificationCode: string;
   password: string;
   nickname: string;
   serviceType: number;
@@ -32,7 +31,6 @@ export type SignUpFormType = {
 const today = new Date();
 const initialFormState: SignUpFormType = {
   phone: "",
-  verificationCode: "",
   password: "",
   nickname: "",
   serviceType: 1,

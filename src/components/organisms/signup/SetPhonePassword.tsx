@@ -18,6 +18,7 @@ export default function SetPhonePassword({
   setCanProceed,
   step,
 }: SetPhonePasswordProps) {
+  const [verificationCode, setVerificationCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isCodeValid, setIsCodeValid] = useState(false);
   const [phoneError, setPhoneError] = useState("");
@@ -79,7 +80,7 @@ export default function SetPhonePassword({
 
   const handleVerifyCode = () => {
     const tel = form.phone.replace(/-/g, "");
-    const code = form.verificationCode;
+    const code = verificationCode;
     if (code.length !== 6) {
       setIsCodeValid(false);
       setVerificationMessage("인증번호 6자리를 입력해주세요.");
@@ -135,8 +136,8 @@ export default function SetPhonePassword({
             isCodeValid ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="인증번호 입력"
-          value={form.verificationCode}
-          onChange={changed("verificationCode")}
+          value={verificationCode}
+          onChange={(e) => setVerificationCode(e.target.value)}
           disabled={!isCodeSent || isCodeValid}
         />
         <button
