@@ -1,5 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
+import { post } from "../../../api";
 
 type SetNicknameProps = {
   form: SignUpFormType;
@@ -20,13 +21,31 @@ export default function SetNickname({
   const [nicknameMessage, setNicknameMessage] = useState("");
 
   const handleCheckNickname = () => {
-    if (form.nickname.trim()) {
-      setNicknameMessage("사용 가능한 닉네임이에요.");
-      setIsNicknameAvailable(true);
-    } else {
+    const nick = form.nickname;
+
+    if (nick === "") {
       setNicknameMessage("닉네임을 입력해주세요.");
       setIsNicknameAvailable(false);
+      return;
     }
+    if (nick.includes(" ")) {
+      setNicknameMessage("띄어쓰기가 포함되면 안돼요.");
+      setIsNicknameAvailable(false);
+      return;
+    }
+
+    post("/auth/join/check-nick", { nick })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        if (result.message === "Nick Exist") {
+          setNicknameMessage("누가 이 닉네임을 이미 사용하고 있어요.");
+          setIsNicknameAvailable(false);
+        } else if (result.message === "Nick Available") {
+          setNicknameMessage("사용 가능한 닉네임이에요.");
+          setIsNicknameAvailable(true);
+        }
+      });
   };
 
   useEffect(() => {
