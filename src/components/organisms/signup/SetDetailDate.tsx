@@ -2,6 +2,12 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 import ServiceType from "../../../data/serviceType.json";
 import DatePicker from "../../molecules/DatePicker";
+import {
+  calculateCplDate,
+  calculateEndDate,
+  calculatePfcDate,
+  calculateSgtDate,
+} from "../../../utils/calculateDate";
 
 type SetDetailDateProps = {
   form: SignUpFormType;
@@ -26,14 +32,26 @@ export default function SetDetailDate({
   const [sgtDate, setSgtDate] = useState(form.serviceSgtDate);
 
   useEffect(() => {
+    setEndDate(calculateEndDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
+  useEffect(() => {
     changedDate("serviceEndDate", endDate);
   }, [endDate]);
+  useEffect(() => {
+    setPfcDate(calculatePfcDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
   useEffect(() => {
     changedDate("servicePfcDate", pfcDate);
   }, [pfcDate]);
   useEffect(() => {
+    setCplDate(calculateCplDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
+  useEffect(() => {
     changedDate("serviceCplDate", cplDate);
   }, [cplDate]);
+  useEffect(() => {
+    setSgtDate(calculateSgtDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
   useEffect(() => {
     changedDate("serviceSgtDate", sgtDate);
   }, [sgtDate]);
