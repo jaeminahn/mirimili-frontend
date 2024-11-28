@@ -4,10 +4,16 @@ import * as U from "../utils";
 import { post } from "../api";
 
 export type LoggedUser = {
-  phone: string;
-  password: string;
+  tel: string;
   nickname: string;
   serviceType: number;
+  serviceStartDate: Date;
+  servicePfcDate: Date;
+  serviceCplDate: Date;
+  serviceSgtDate: Date;
+  serviceEndDate: Date;
+  serviceMos: number;
+  serviceUnit: number;
 };
 
 type Callback = () => void;
@@ -15,7 +21,7 @@ type Callback = () => void;
 type ContextType = {
   loggedUser?: LoggedUser;
   signup: (
-    phone: string,
+    tel: string,
     password: string,
     nickname: string,
     serviceType: number,
@@ -28,13 +34,13 @@ type ContextType = {
     serviceUnit: number,
     callback?: Callback
   ) => void;
-  login: (phone: string, password: string, callback?: Callback) => void;
+  login: (tel: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => void;
 };
 
 export const AuthContext = createContext<ContextType>({
   signup: (
-    phone: string,
+    tel: string,
     password: string,
     nickname: string,
     serviceType: number,
@@ -47,7 +53,7 @@ export const AuthContext = createContext<ContextType>({
     serviceUnit: number,
     callback?: Callback
   ) => {},
-  login: (phone: string, password: string, callback?: Callback) => {},
+  login: (tel: string, password: string, callback?: Callback) => {},
   logout: (callback?: Callback) => {},
 });
 
@@ -65,7 +71,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const signup = useCallback(
     (
-      phone: string,
+      tel: string,
       password: string,
       nickname: string,
       serviceType: number,
@@ -79,27 +85,59 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       callback?: Callback
     ) => {
       const user: LoggedUser = {
-        phone,
-        password,
+        tel,
         nickname,
         serviceType,
+        serviceStartDate,
+        servicePfcDate,
+        serviceCplDate,
+        serviceSgtDate,
+        serviceEndDate,
+        serviceMos,
+        serviceUnit,
       };
-      setLoggedUser(user);
-      U.writeObjectP("user", user).finally(() => callback && callback());
+
+      post("/auth/join", {
+        tel,
+        password,
+        nickname,
+        service_type_id: serviceType,
+        service_start: serviceStartDate,
+        service_pfc: servicePfcDate,
+        service_cpl: serviceCplDate,
+        service_sgt: serviceSgtDate,
+        service_end: serviceEndDate,
+        service_mos_id: serviceMos,
+        service_unit_id: serviceUnit,
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+          if (result.message === "join success") {
+            setLoggedUser(user);
+            U.writeObjectP("user", user).finally(() => callback && callback());
+          }
+        });
     },
     []
   );
 
   const login = useCallback(
-    (phone: string, password: string, callback?: Callback) => {
-      const user: LoggedUser = {
-        phone,
-        password,
-        nickname: "",
-        serviceType: 0,
-      };
-      setLoggedUser(user);
-      callback && callback();
+    (tel: string, password: string, callback?: Callback) => {
+      // const user: LoggedUser = {
+      //   tel,
+      //   nickname,
+      //   serviceType,
+      //   serviceStartDate,
+      //   servicePfcDate,
+      //   serviceCplDate,
+      //   serviceSgtDate,
+      //   serviceEndDate,
+      //   serviceMos,
+      //   serviceUnit,
+      // };
+      // setLoggedUser(user);
+      // callback && callback();
     },
     []
   );

@@ -21,20 +21,20 @@ export default function SetNickname({
   const [nicknameMessage, setNicknameMessage] = useState("");
 
   const handleCheckNickname = () => {
-    const nick = form.nickname;
+    const nickname = form.nickname;
 
-    if (nick === "") {
+    if (nickname === "") {
       setNicknameMessage("닉네임을 입력해주세요.");
       setIsNicknameAvailable(false);
       return;
     }
-    if (nick.includes(" ")) {
+    if (nickname.includes(" ")) {
       setNicknameMessage("띄어쓰기가 포함되면 안돼요.");
       setIsNicknameAvailable(false);
       return;
     }
 
-    post("/auth/join/check-nick", { nick })
+    post("/auth/join/check-nick", { nickname })
       .then((res) => res.json())
       .then((result) => {
         console.log(result);

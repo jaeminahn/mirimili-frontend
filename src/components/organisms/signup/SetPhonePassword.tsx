@@ -50,13 +50,13 @@ export default function SetPhonePassword({
         : value.length > 3
         ? `${value.slice(0, 3)}-${value.slice(3)}`
         : value;
-    changed("phone")({
+    changed("tel")({
       target: { value: formattedValue },
     } as ChangeEvent<HTMLInputElement>);
   };
 
   const handleSendCode = () => {
-    const tel = form.phone.replace(/-/g, "");
+    const tel = form.tel.replace(/-/g, "");
     const isValidPhone = tel.length === 11;
     if (!isValidPhone) {
       setPhoneError("유효한 전화번호를 입력해주세요.");
@@ -69,7 +69,11 @@ export default function SetPhonePassword({
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
-        if (result.message === "Send Success") {
+        if (result.message === "user exist") {
+          setIsCodeSent(false);
+          setPhoneError("동일한 전화번호의 사용자가 존재해요.");
+          setVerificationMessage("");
+        } else if (result.message === "Send Success") {
           setIsCodeSent(true);
           setPhoneError("");
           setSuccessMessage("인증번호가 전송되었어요.");
@@ -79,7 +83,7 @@ export default function SetPhonePassword({
   };
 
   const handleVerifyCode = () => {
-    const tel = form.phone.replace(/-/g, "");
+    const tel = form.tel.replace(/-/g, "");
     const code = verificationCode;
     if (code.length !== 6) {
       setIsCodeValid(false);
@@ -108,7 +112,7 @@ export default function SetPhonePassword({
             isCodeSent ? "bg-gray-100 cursor-not-allowed" : ""
           }`}
           placeholder="전화번호 입력"
-          value={form.phone}
+          value={form.tel}
           onChange={handlePhoneChange}
           disabled={isCodeSent}
         />
