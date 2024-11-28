@@ -2,6 +2,12 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 import ServiceType from "../../../data/serviceType.json";
 import DatePicker from "../../molecules/DatePicker";
+import {
+  calculateCplDate,
+  calculateEndDate,
+  calculatePfcDate,
+  calculateSgtDate,
+} from "../../../utils/calculateDate";
 
 type SetDetailDateProps = {
   form: SignUpFormType;
@@ -10,6 +16,7 @@ type SetDetailDateProps = {
   ) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   changedDate: (key: keyof SignUpFormType, date: Date) => void;
   setCanProceed: (value: boolean) => void;
+  step: number;
 };
 
 export default function SetDetailDate({
@@ -17,28 +24,53 @@ export default function SetDetailDate({
   changed,
   changedDate,
   setCanProceed,
+  step,
 }: SetDetailDateProps) {
-  const [endDate, setEndDate] = useState(new Date());
-  const [pfcDate, setPfcDate] = useState(new Date());
-  const [cplDate, setCplDate] = useState(new Date());
-  const [sgtDate, setSgtDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(form.serviceEndDate);
+  const [pfcDate, setPfcDate] = useState(form.servicePfcDate);
+  const [cplDate, setCplDate] = useState(form.serviceCplDate);
+  const [sgtDate, setSgtDate] = useState(form.serviceSgtDate);
 
+  useEffect(() => {
+    setEndDate(calculateEndDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
   useEffect(() => {
     changedDate("serviceEndDate", endDate);
   }, [endDate]);
   useEffect(() => {
+    setPfcDate(calculatePfcDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
+  useEffect(() => {
     changedDate("servicePfcDate", pfcDate);
   }, [pfcDate]);
   useEffect(() => {
+    setCplDate(calculateCplDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
+  useEffect(() => {
     changedDate("serviceCplDate", cplDate);
   }, [cplDate]);
+  useEffect(() => {
+    setSgtDate(calculateSgtDate(form.serviceStartDate));
+  }, [form.serviceStartDate]);
   useEffect(() => {
     changedDate("serviceSgtDate", sgtDate);
   }, [sgtDate]);
 
   useEffect(() => {
-    setCanProceed(form.serviceEndDate !== null);
-  }, [form.serviceType, setCanProceed]);
+    if (step !== 5) return;
+    setCanProceed(
+      form.serviceStartDate <= form.servicePfcDate &&
+        form.servicePfcDate <= form.serviceCplDate &&
+        form.serviceCplDate <= form.serviceSgtDate &&
+        form.serviceSgtDate <= form.serviceEndDate
+    );
+  }, [
+    form.servicePfcDate,
+    form.serviceCplDate,
+    form.serviceSgtDate,
+    form.serviceEndDate,
+    step,
+  ]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">
