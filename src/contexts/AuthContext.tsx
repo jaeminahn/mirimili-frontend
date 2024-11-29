@@ -4,6 +4,7 @@ import * as U from "../utils";
 import { post } from "../api";
 
 export type LoggedUser = {
+  id: number;
   tel: string;
   nickname: string;
   serviceType: number;
@@ -84,19 +85,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       serviceUnit: number,
       callback?: Callback
     ) => {
-      const user: LoggedUser = {
-        tel,
-        nickname,
-        serviceType,
-        serviceStartDate,
-        servicePfcDate,
-        serviceCplDate,
-        serviceSgtDate,
-        serviceEndDate,
-        serviceMos,
-        serviceUnit,
-      };
-
       post("/auth/join", {
         tel,
         password,
@@ -114,6 +102,19 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
         .then((result) => {
           console.log(result);
           if (result.message === "join success") {
+            const user: LoggedUser = {
+              id: result.user.id,
+              tel,
+              nickname,
+              serviceType,
+              serviceStartDate,
+              servicePfcDate,
+              serviceCplDate,
+              serviceSgtDate,
+              serviceEndDate,
+              serviceMos,
+              serviceUnit,
+            };
             setLoggedUser(user);
             U.writeObjectP("user", user).finally(() => callback && callback());
           }
@@ -124,20 +125,30 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
 
   const login = useCallback(
     (tel: string, password: string, callback?: Callback) => {
-      // const user: LoggedUser = {
-      //   tel,
-      //   nickname,
-      //   serviceType,
-      //   serviceStartDate,
-      //   servicePfcDate,
-      //   serviceCplDate,
-      //   serviceSgtDate,
-      //   serviceEndDate,
-      //   serviceMos,
-      //   serviceUnit,
-      // };
-      // setLoggedUser(user);
-      // callback && callback();
+      post("/auth/login", { tel, password })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+          if (result.message == "Login Success") {
+            const user: LoggedUser = {
+              id: result.user.id,
+              tel,
+              nickname: result.user.nickname,
+              serviceType: result.user.service_type_id,
+              serviceStartDate: result.user.service_start,
+              servicePfcDate: result.user.service_pfc,
+              serviceCplDate: result.user.service_cpl,
+              serviceSgtDate: result.user.service_sgt,
+              serviceEndDate: result.user.service_end,
+              serviceMos: result.user.service_mos_id,
+              serviceUnit: result.user.service_unit_id,
+            };
+            setLoggedUser(user);
+            U.writeObjectP("accessToken", result.accessToken);
+            U.writeObjectP("refreshToken", result.refreshToken);
+            U.writeObjectP("user", user).finally(() => callback && callback());
+          } else alert(result.message);
+        });
     },
     []
   );
