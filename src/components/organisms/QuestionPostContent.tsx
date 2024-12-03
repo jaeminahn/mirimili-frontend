@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
 import { useParams } from "react-router-dom";
-import TagButton from "../molecules/TagButton";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
@@ -96,6 +95,7 @@ export default function QuestionPostContent() {
   const params = useParams();
   const { loggedUser } = useAuth();
   const [answerText, setAnswerText] = useState("");
+  const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -106,7 +106,6 @@ export default function QuestionPostContent() {
     }
   };
 
-  const tagsChildren = postData.tags.map((tag) => <TagButton label={tag} />);
   const answerChildren = answerData.map((answer) => (
     <AnswerItem
       id={answer.id}
@@ -128,12 +127,7 @@ export default function QuestionPostContent() {
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2 text-sm">
-            <img
-              className="object-cover w-8 h-8 rounded-full"
-              src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
-              alt="프로필 사진"
-            />
-            <p>{postData.writerNick}</p>
+            <p className="font-semibold">{postData.writerNick}</p>
             <p className="text-emerald-600">
               {postData.writerType}∙{postData.writerLevel}
             </p>
@@ -141,7 +135,6 @@ export default function QuestionPostContent() {
           </div>
           <p className="text-2xl font-semibold">{postData.title}</p>
           <p className="text-base">{postData.content}</p>
-          <div className="flex flex-wrap gap-2">{tagsChildren}</div>
           <div className="flex justify-between text-sm">
             <div className="flex gap-2 font-semibold ">
               <button
@@ -173,13 +166,13 @@ export default function QuestionPostContent() {
               >
                 <Icon icon="fluent:bookmark-20-filled" />
               </button>
+              <button
+                className="flex gap-1 items-center p-1 px-2 rounded-lg text-gray-600 bg-gray-100"
+              >
+                <Icon icon="fluent:share-20-filled" />
+              </button>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
-              <div className="flex gap-1">
-                <p>조회</p>
-                <p>{postData.view}</p>
-              </div>
-              <button>공유하기</button>
               <button>신고하기</button>
             </div>
           </div>
@@ -194,32 +187,33 @@ export default function QuestionPostContent() {
               <Icon icon="fluent:chevron-down-24-regular" />
             </button>
           </div>
-          <div className="flex flex-col gap-2 p-4 bg-gray-200 rounded-lg ">
-            <div className="flex items-center gap-2 text-sm">
-              <img
-                className="object-cover w-6 h-6 rounded-full"
-                src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
-                alt="프로필 사진"
-              />
-              <p>김뚝딱</p>
-              <p className="text-emerald-600">공군∙병장∙무선통신장비정비</p>
+          <div className="flex flex-col gap-2 p-4 bg-gray-100 rounded-lg ">
+            <div className="flex p-1 items-center gap-2 text-sm">
+              <p className="font-semibold">김뚝딱</p>
+              <p className="text-emerald-600">공군∙병장{hideUnit ? null : "∙무선통신장비정비"}</p>
             </div>
             <textarea
               ref={textareaRef}
-              placeholder="답변을 남겨주세요"
+              placeholder="답변을 남겨주세요!"
               value={answerText}
               onChange={handleChange}
-              className="p-4 overflow-hidden border-2 rounded-lg resize-none min-h-20 focus:outline-none focus:border-emerald-600"
+              className="p-4 mb-2 overflow-hidden border-2 rounded-lg resize-none min-h-20 focus:outline-none"
             />
-            <div className="flex justify-end">
-              <button className="p-2 text-sm text-white rounded-lg bg-emerald-600">
-                답변하기
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 text-sm rounded-lg bg-white"
+                onClick={() => setHideUnit(!hideUnit)}
+              >
+                {hideUnit ? "복무 부대 표시하기" : "복무 부대 숨기기"}
+              </button>
+              <button className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600">
+                답변 등록
               </button>
             </div>
           </div>
-          {answerChildren}
         </div>
       </div>
+      {answerChildren}
     </div>
   );
 }

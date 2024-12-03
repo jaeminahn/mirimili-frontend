@@ -26,14 +26,9 @@ export default function AnswerItem({
   isDisliked,
 }: AnswerItemProps) {
   return (
-    <div className="flex flex-col gap-4 p-4 bg-gray-100 rounded-lg ">
+    <div className="flex flex-col gap-4 p-4 bg-white rounded-lg ">
       <div className="flex items-center gap-2 text-sm">
-        <img
-          className="object-cover w-6 h-6 rounded-full"
-          src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
-          alt="프로필 사진"
-        />
-        <p>{writerNick}</p>
+        <p className="font-semibold">{writerNick}</p>
         <p className="text-emerald-600">
           {writerType}∙{writerLevel}∙무선통신장비정비
         </p>
