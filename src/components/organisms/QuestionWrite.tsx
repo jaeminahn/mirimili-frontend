@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import SelectModal from "./SelectModal";
+import CategoryButton from "../molecules/CategoryButton";
 import ButtonOption from "../molecules/ButtonOption";
 import { MosAndUnitRecord } from "../../data/data";
 import serviceType from "../../data/serviceType.json";
@@ -9,8 +10,6 @@ import serviceMos from "../../data/serviceMos.json";
 export default function QuestionWrite() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [keywordInput, setKeywordInput] = useState("");
-  const [keywords, setKeywords] = useState<string[]>([]);
   const [isAllType, setIsAllType] = useState(true);
   const [type, setType] = useState<number[]>(
     serviceType.map((item) => item.id)
@@ -19,22 +18,10 @@ export default function QuestionWrite() {
   const [mosList, setMosList] = useState<number[]>([]);
   const [mos, setMos] = useState<number[]>([]);
   const [isMosModalOpen, setIsMosModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
-  const addKeyword = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if ((e.key === "Enter" || e.key === " ") && keywordInput.trim() !== "") {
-      setKeywords((prev) => [...prev, keywordInput.trim()]);
-      setKeywordInput("");
-    }
-  };
-
-  const handleKeywordInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && keywordInput === "" && keywords.length > 0) {
-      setKeywords((prev) => prev.slice(0, -1));
-    }
-  };
-
-  const removeKeyword = (index: number) => {
-    setKeywords((prev) => prev.filter((_, i) => i !== index));
+  const handleCategorySelect = (categoryId: number | null) => {
+    setSelectedCategory(categoryId);
   };
 
   const toggleMosModal = () => setIsMosModalOpen(!isMosModalOpen);
@@ -64,7 +51,7 @@ export default function QuestionWrite() {
   };
 
   return (
-    <div className="flex flex-col w-4/5 gap-6 p-6 bg-gray-100 rounded-lg">
+    <div className="flex flex-col w-4/5 gap-6 bg-gray-100 rounded-lg">
       <div className="flex flex-col gap-2 p-4 bg-white rounded-lg">
         <p className="mb-2 text-lg font-semibold">질문 제목</p>
         <input
@@ -106,34 +93,8 @@ export default function QuestionWrite() {
       </div>
 
       <div className="flex flex-col gap-2 p-4 bg-white rounded-lg">
-        <p className="mb-2 text-lg font-semibold">키워드 설정</p>
-        <div className="flex flex-wrap items-center gap-2 px-3 py-3 border border-gray-300 rounded-lg">
-          {keywords.map((keyword, index) => (
-            <span
-              key={index}
-              className="flex items-center gap-1 px-2 py-1 text-sm bg-gray-100 rounded-full"
-            >
-              {keyword}
-              <button
-                className="font-bold text-red-500"
-                onClick={() => removeKeyword(index)}
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-          <input
-            className="flex-1 font-medium placeholder-gray-500 bg-transparent focus:outline-none"
-            type="text"
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            onKeyDown={(e) => {
-              addKeyword(e);
-              handleKeywordInput(e);
-            }}
-            placeholder={keywords.length === 0 ? "키워드를 입력해 주세요" : ""}
-          />
-        </div>
+        <p className="mb-2 text-lg font-semibold">카테고리 설정</p>
+        <CategoryButton onCategorySelect={handleCategorySelect} />
       </div>
 
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
@@ -177,10 +138,6 @@ export default function QuestionWrite() {
           </button>
         </div>
       </div>
-
-      <button className="self-center px-6 py-3 font-bold text-white rounded-lg bg-emerald-600">
-        질문 게시하기
-      </button>
 
       <SelectModal
         title="특기"

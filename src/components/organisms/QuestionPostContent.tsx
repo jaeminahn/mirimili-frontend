@@ -158,7 +158,7 @@ export default function QuestionPostContent() {
                 <p>{postData.dislike}</p>
               </button>
               <button
-                className={`flex gap-1 items-center p-1 px-2 rounded-lg ${
+                className={`flex gap-1 items-center px-2 rounded-lg ${
                   postData.isScrapped
                     ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
                     : "text-gray-600 bg-gray-100"
@@ -167,12 +167,12 @@ export default function QuestionPostContent() {
                 <Icon icon="fluent:bookmark-20-filled" />
               </button>
               <button
-                className="flex gap-1 items-center p-1 px-2 rounded-lg text-gray-600 bg-gray-100"
+                className="flex gap-1 items-center px-2 rounded-lg text-gray-600 bg-gray-100"
               >
                 <Icon icon="fluent:share-20-filled" />
               </button>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-gray-600 text-xs">
               <button>신고하기</button>
             </div>
           </div>

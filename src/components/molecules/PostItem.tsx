@@ -24,11 +24,11 @@ export default function PostItem({
   return (
     <Link
       to={`/questions/${id}`}
-      className="flex flex-col gap-2 p-4 border border-gray-300 rounded-lg hover:cursor-pointer"
+      className="flex flex-col gap-2 p-6 border border-gray-300 rounded-lg hover:cursor-pointer"
     >
       <p className="text-lg font-semibold">{title}</p>
       <p className="text-sm text-gray-700 line-clamp-2">{content}</p>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center mt-2">
         <div className="flex gap-2">
           <div className="flex items-center p-2 text-xs rounded-full bg-emerald-50 text-emerald-600">
             <Icon icon="fluent:comment-24-filled" className="mr-1 text-base" />
@@ -49,7 +49,7 @@ export default function PostItem({
             </div>
           </div>
         </div>
-        <p className="text-xs text-gray-500">{createdAt}</p>
+        <p className="text-xs text-gray-500 ml-4">{createdAt}</p>
       </div>
     </Link>
   );

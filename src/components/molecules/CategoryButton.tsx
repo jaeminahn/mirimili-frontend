@@ -32,12 +32,12 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({ onCategorySelect }) => 
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-2">
       {categories.map((category) => (
         <button
           key={category.id}
           onClick={() => handleCategorySelect(category.id)}
-          className={`px-2 py-2 rounded-lg text-sm border-2 ${
+          className={`px-2 py-1 text-sm rounded-xl border-2 ${
             selectedCategory === category.id
               ? "bg-emerald-100 border-emerald-600 font-semibold"
               : "bg-gray-100 border-gray-100 font-medium"
