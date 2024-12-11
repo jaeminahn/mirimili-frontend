@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import categories from "../../data/category.json";
 
 interface Category {
   id: number;
@@ -8,19 +9,6 @@ interface Category {
 interface CategoryButtonProps {
   onCategorySelect: (selectedCategory: number | null) => void;
 }
-
-const categories: Category[] = [
-  { id: 0, label: "입대준비" },
-  { id: 1, label: "훈련소·후반기교육" },
-  { id: 2, label: "특기" },
-  { id: 3, label: "자대생활" },
-  { id: 4, label: "부조리" },
-  { id: 5, label: "징계" },
-  { id: 6, label: "복지" },
-  { id: 7, label: "휴가" },
-  { id: 8, label: "예비군" },
-  { id: 9, label: "기타" },
-];
 
 const CategoryButton: React.FC<CategoryButtonProps> = ({ onCategorySelect }) => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -33,7 +21,7 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({ onCategorySelect }) => 
 
   return (
     <div className="flex flex-wrap gap-2 mb-2">
-      {categories.map((category) => (
+      {categories.map((category: Category) => (
         <button
           key={category.id}
           onClick={() => handleCategorySelect(category.id)}
