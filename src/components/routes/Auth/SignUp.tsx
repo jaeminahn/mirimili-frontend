@@ -45,7 +45,7 @@ const initialFormState: SignUpFormType = {
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(3);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
