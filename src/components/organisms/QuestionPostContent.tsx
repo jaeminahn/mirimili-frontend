@@ -1,15 +1,16 @@
 import { Icon } from "@iconify/react";
 import { useParams } from "react-router-dom";
-import TagButton from "../molecules/TagButton";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
+import category from "../../data/category.json"
 
 const postData = {
   id: 1,
   writerNick: "김뚝딱",
   writerType: "공군",
   writerLevel: "훈련병",
+  categoryId: 0,
   title: "일반차량운전 뭘 준비해야 할까요?",
   content:
     "안녕하십니까. 차량운전 예비입대자입니다. 자격요건과 1차 선발 등을 위한 준비 등은 모두 마쳤습니다. 조금 바보같은 질문일 수 있지만, 수동 연습을 하고 가는 게 도움이 될지 궁금합니다. 당연히 좋은 특기를 받으려면 운전을 잘 해야 할텐데, 오토기어로는 3년 정도 해봤어도 수동기어는 정말 하나도 기억이 안 납니다.. 본가에 있는 트럭이라도 조금 몰아봐야 할지, 그냥 들어가도 될지 궁금합니다.",
@@ -18,7 +19,6 @@ const postData = {
   like: 2,
   dislike: 1,
   answer: 3,
-  tags: ["공군", "일반차량운전", "입대준비"],
   isLiked: true,
   isDisliked: false,
   isScrapped: false,
@@ -96,7 +96,13 @@ export default function QuestionPostContent() {
   const params = useParams();
   const { loggedUser } = useAuth();
   const [answerText, setAnswerText] = useState("");
+  const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  const getCategoryLabel = (id: number) => {
+    const foundCategory = category.find((cat) => cat.id === id);
+    return foundCategory ? foundCategory.label : "카테고리 없음? <- 이게 맞나?";
+  };
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setAnswerText(event.target.value);
@@ -106,7 +112,6 @@ export default function QuestionPostContent() {
     }
   };
 
-  const tagsChildren = postData.tags.map((tag) => <TagButton label={tag} />);
   const answerChildren = answerData.map((answer) => (
     <AnswerItem
       id={answer.id}
@@ -128,20 +133,17 @@ export default function QuestionPostContent() {
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2 text-sm">
-            <img
-              className="object-cover w-8 h-8 rounded-full"
-              src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
-              alt="프로필 사진"
-            />
-            <p>{postData.writerNick}</p>
+            <p className="font-semibold">{postData.writerNick}</p>
             <p className="text-emerald-600">
               {postData.writerType}∙{postData.writerLevel}
             </p>
             <p className="text-xs text-gray-600">{postData.createdAt}</p>
           </div>
-          <p className="text-2xl font-semibold">{postData.title}</p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-emerald-600 font-semibold">{getCategoryLabel(postData.categoryId)}</p>
+            <p className="text-2xl font-semibold">{postData.title}</p>
+          </div>
           <p className="text-base">{postData.content}</p>
-          <div className="flex flex-wrap gap-2">{tagsChildren}</div>
           <div className="flex justify-between text-sm">
             <div className="flex gap-2 font-semibold ">
               <button
@@ -165,7 +167,7 @@ export default function QuestionPostContent() {
                 <p>{postData.dislike}</p>
               </button>
               <button
-                className={`flex gap-1 items-center p-1 px-2 rounded-lg ${
+                className={`flex gap-1 items-center px-2 rounded-lg ${
                   postData.isScrapped
                     ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
                     : "text-gray-600 bg-gray-100"
@@ -173,53 +175,45 @@ export default function QuestionPostContent() {
               >
                 <Icon icon="fluent:bookmark-20-filled" />
               </button>
+              <button
+                className="flex gap-1 items-center px-2 rounded-lg text-gray-600 bg-gray-100"
+              >
+                <Icon icon="fluent:share-20-filled" />
+              </button>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <div className="flex gap-1">
-                <p>조회</p>
-                <p>{postData.view}</p>
-              </div>
-              <button>공유하기</button>
+            <div className="flex items-center gap-2 text-gray-600 text-xs">
               <button>신고하기</button>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4 pt-2">
-          <div className="flex items-center justify-between h-10 text-xs">
-            <p className="font-semibold text-emerald-600">
-              답변 {answerData.length}개
-            </p>
-            <button className="flex items-center gap-1 text-gray-600">
-              추천순
-              <Icon icon="fluent:chevron-down-24-regular" />
-            </button>
-          </div>
-          <div className="flex flex-col gap-2 p-4 bg-gray-200 rounded-lg ">
-            <div className="flex items-center gap-2 text-sm">
-              <img
-                className="object-cover w-6 h-6 rounded-full"
-                src="https://avatars.githubusercontent.com/u/32637779?v=4&size=64"
-                alt="프로필 사진"
-              />
-              <p>김뚝딱</p>
-              <p className="text-emerald-600">공군∙병장∙무선통신장비정비</p>
+          <div className="flex flex-col mt-4 gap-2 p-4 bg-gray-100 rounded-lg">
+            <div className="flex p-1 items-center gap-2 text-sm">
+              <p className="font-semibold">김뚝딱</p>
+              <p className="text-emerald-600">공군∙병장{hideUnit ? null : "∙무선통신장비정비"}</p>
             </div>
             <textarea
               ref={textareaRef}
-              placeholder="답변을 남겨주세요"
+              placeholder="답변을 남겨주세요!"
               value={answerText}
               onChange={handleChange}
-              className="p-4 overflow-hidden border-2 rounded-lg resize-none min-h-20 focus:outline-none focus:border-emerald-600"
+              className="p-4 mb-2 overflow-hidden border-2 rounded-lg resize-none min-h-20 focus:outline-none"
             />
-            <div className="flex justify-end">
-              <button className="p-2 text-sm text-white rounded-lg bg-emerald-600">
-                답변하기
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 text-sm rounded-lg bg-white"
+                onClick={() => setHideUnit(!hideUnit)}
+              >
+                {hideUnit ? "복무 부대 표시하기" : "복무 부대 숨기기"}
+              </button>
+              <button className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600">
+                답변 등록
               </button>
             </div>
           </div>
-          {answerChildren}
         </div>
       </div>
+      {answerChildren}
     </div>
   );
 }
