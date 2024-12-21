@@ -73,7 +73,7 @@ export default function QuestionsSide() {
       </div>
 
       <Link to="/questions/new">
-        <div className="flex items-center justify-center h-10 gap-2 font-semibold text-white rounded-lg bg-emerald-600">
+        <div className="flex items-center justify-center h-10 gap-2 font-semibold text-white rounded-lg bg-emerald-600 hover:bg-emerald-700">
           <p>질문하기</p>
           <Icon icon="fluent:chat-help-24-filled" />
         </div>
