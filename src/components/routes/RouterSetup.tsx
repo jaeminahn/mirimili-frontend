@@ -8,6 +8,7 @@ import Logout from "./Auth/Logout";
 import Questions from "./Questions";
 import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function RouterSetup() {
   return (
@@ -15,7 +16,15 @@ export default function RouterSetup() {
       <Route index path="/" element={<Home />} />
       <Route path="/" element={<Layout />}>
         <Route index path="/questions" element={<Questions />} />
-        <Route index path="/questions/new" element={<QuestionNew />} />
+        <Route
+          index
+          path="/questions/new"
+          element={
+            <ProtectedRoute>
+              <QuestionNew />
+            </ProtectedRoute>
+          }
+        />
         <Route index path="/questions/:id" element={<QuestionPost />} />
         <Route path="*" element={<NoMatch />} />
       </Route>

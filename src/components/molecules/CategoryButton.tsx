@@ -10,7 +10,7 @@ interface CategoryButtonProps {
   onCategorySelect: (selectedCategory: number | null) => void;
 }
 
-const CategoryButton: React.FC<CategoryButtonProps> = ({ onCategorySelect }) => {
+const CategoryButton = ({ onCategorySelect }: CategoryButtonProps) => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const handleCategorySelect = (id: number) => {

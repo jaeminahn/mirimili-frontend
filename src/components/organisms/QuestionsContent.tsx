@@ -65,9 +65,10 @@ export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
-  const filteredPosts = selectedCategory === null
-    ? postData
-    : postData.filter((post) => post.categoryId === selectedCategory);
+  const filteredPosts =
+    selectedCategory === null
+      ? postData
+      : postData.filter((post) => post.categoryId === selectedCategory);
 
   const postItemList = filteredPosts.map((post) => (
     <PostItem
@@ -123,7 +124,9 @@ export default function QuestionsMain() {
         {postItemList.length > 0 ? (
           postItemList
         ) : (
-          <p className="text-gray-600">선택한 카테고리에 해당하는 글이 없어요.</p>
+          <p className="text-gray-600">
+            선택한 카테고리에 해당하는 글이 없어요.
+          </p>
         )}
       </div>
     </div>
