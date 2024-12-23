@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
-import category from "../../data/category.json"
+import category from "../../data/category.json";
 
 const postData = {
   id: 1,
@@ -98,7 +98,7 @@ export default function QuestionPostContent() {
   const [answerText, setAnswerText] = useState("");
   const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   const getCategoryLabel = (id: number) => {
     const foundCategory = category.find((cat) => cat.id === id);
     return foundCategory ? foundCategory.label : "카테고리 없음? <- 이게 맞나?";
@@ -114,6 +114,7 @@ export default function QuestionPostContent() {
 
   const answerChildren = answerData.map((answer) => (
     <AnswerItem
+      key={answer.id}
       id={answer.id}
       writerNick={answer.writerNick}
       writerType={answer.writerType}
@@ -140,7 +141,9 @@ export default function QuestionPostContent() {
             <p className="text-xs text-gray-600">{postData.createdAt}</p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-sm text-emerald-600 font-semibold">{getCategoryLabel(postData.categoryId)}</p>
+            <p className="text-sm font-semibold text-emerald-600">
+              {getCategoryLabel(postData.categoryId)}
+            </p>
             <p className="text-2xl font-semibold">{postData.title}</p>
           </div>
           <p className="text-base">{postData.content}</p>
@@ -175,22 +178,22 @@ export default function QuestionPostContent() {
               >
                 <Icon icon="fluent:bookmark-20-filled" />
               </button>
-              <button
-                className="flex gap-1 items-center px-2 rounded-lg text-gray-600 bg-gray-100"
-              >
+              <button className="flex items-center gap-1 px-2 text-gray-600 bg-gray-100 rounded-lg">
                 <Icon icon="fluent:share-20-filled" />
               </button>
             </div>
-            <div className="flex items-center gap-2 text-gray-600 text-xs">
+            <div className="flex items-center gap-2 text-xs text-gray-600">
               <button>신고하기</button>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4 pt-2">
-          <div className="flex flex-col mt-4 gap-2 p-4 bg-gray-100 rounded-lg">
-            <div className="flex p-1 items-center gap-2 text-sm">
+          <div className="flex flex-col gap-2 p-4 mt-4 bg-gray-100 rounded-lg">
+            <div className="flex items-center gap-2 p-1 text-sm">
               <p className="font-semibold">김뚝딱</p>
-              <p className="text-emerald-600">공군∙병장{hideUnit ? null : "∙무선통신장비정비"}</p>
+              <p className="text-emerald-600">
+                공군∙병장{hideUnit ? null : "∙무선통신장비정비"}
+              </p>
             </div>
             <textarea
               ref={textareaRef}
@@ -201,7 +204,7 @@ export default function QuestionPostContent() {
             />
             <div className="flex justify-between">
               <button
-                className="px-4 py-2 text-sm rounded-lg bg-white"
+                className="px-4 py-2 text-sm bg-white rounded-lg"
                 onClick={() => setHideUnit(!hideUnit)}
               >
                 {hideUnit ? "복무 부대 표시하기" : "복무 부대 숨기기"}
