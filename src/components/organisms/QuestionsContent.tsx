@@ -1,7 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostItem from "../molecules/PostItem";
 import { Icon } from "@iconify/react";
 import CategoryButton from "../molecules/CategoryButton";
+import { get } from "../../api/getAndDel";
+
+interface PostItemProps {
+  id: number;
+  writerId: number;
+  title: string;
+  content: string;
+  categoryId: number;
+  answer: number;
+  like: number;
+  dislike: number;
+  scrapped: number;
+  view: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface _PostItemProps {
+  id: number;
+  writer_id: number;
+  title: string;
+  content: string;
+  category_id: number;
+  answer: number;
+  like: number;
+  dislike: number;
+  scrapped: number;
+  view: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const postData = [
   {
@@ -64,24 +95,31 @@ const postData = [
 export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [postData, setPostData] = useState<PostItemProps[]>([]);
 
-  const filteredPosts =
-    selectedCategory === null
-      ? postData
-      : postData.filter((post) => post.categoryId === selectedCategory);
-
-  const postItemList = filteredPosts.map((post) => (
-    <PostItem
-      key={post.id}
-      id={post.id}
-      title={post.title}
-      content={post.content}
-      createdAt={post.createdAt}
-      view={post.view}
-      like={post.like}
-      answer={post.answer}
-    />
-  ));
+  useEffect(() => {
+    get("/questions")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setPostData(
+          res.map((item: _PostItemProps) => ({
+            id: item.id,
+            writerId: item.writer_id,
+            title: item.title,
+            content: item.content,
+            categoryId: item.category_id,
+            answer: 0,
+            like: item.like,
+            dislike: item.dislike,
+            scrapped: item.scrapped,
+            view: item.view,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+          }))
+        );
+      });
+  }, []);
 
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
@@ -121,10 +159,21 @@ export default function QuestionsMain() {
         {tabIndex === 0 && (
           <CategoryButton onCategorySelect={handleCategorySelect} />
         )}
-        {postItemList.length > 0 ? (
-          postItemList
+        {postData.length > 0 ? (
+          postData.map((item) => (
+            <PostItem
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              content={item.content}
+              createdAt={item.createdAt}
+              view={item.view}
+              like={item.like}
+              answer={item.answer}
+            />
+          ))
         ) : (
-          <p className="text-gray-600">
+          <p className="p-4 text-gray-600">
             선택한 카테고리에 해당하는 글이 없어요.
           </p>
         )}
