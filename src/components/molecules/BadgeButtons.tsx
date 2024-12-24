@@ -1,6 +1,7 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts";
+import { Icon } from "@iconify/react";
 
 export default function BadgeButtons() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function BadgeButtons() {
   }, []);
 
   return (
-    <div className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-2">
+    <Link className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-2" to="/users">
       <div className="">
         <Link to="/users/id/scrapped">
           <svg
@@ -36,28 +37,13 @@ export default function BadgeButtons() {
       <div className="">
         <div className="relative" data-headlessui-state="">
           <button
-            className="relative flex items-center justify-center w-6 h-8 -my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
+            className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
             type="button"
             aria-expanded="false"
             data-headlessui-state=""
             id="headlessui-popover-button-:r41:"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#6b7280"
-              viewBox="0 0 24 24"
-              strokeWidth="1"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              ></path>
-            </svg>
+            <Icon icon="fluent:alert-24-filled" className="mr-1 text-base" />
           </button>
         </div>
       </div>
@@ -83,6 +69,6 @@ export default function BadgeButtons() {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

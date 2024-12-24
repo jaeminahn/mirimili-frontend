@@ -8,6 +8,7 @@ import Logout from "./Auth/Logout";
 import Questions from "./Questions";
 import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
+import Users from "./Users";
 
 export default function RouterSetup() {
   return (
@@ -17,6 +18,7 @@ export default function RouterSetup() {
         <Route index path="/questions" element={<Questions />} />
         <Route index path="/questions/new" element={<QuestionNew />} />
         <Route index path="/questions/:id" element={<QuestionPost />} />
+        <Route index path="/users" element={<Users/>} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />

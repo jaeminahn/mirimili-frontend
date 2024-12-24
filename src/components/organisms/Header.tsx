@@ -19,7 +19,7 @@ export default function Header() {
         </div>
         <div className="flex gap-3">
           <SearchBar />
-          {loggedUser ? <BadgeButtons /> : <LoginButton />}
+          {!loggedUser ? <BadgeButtons /> : <LoginButton />}
         </div>
       </div>
     </div>
