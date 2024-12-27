@@ -33,7 +33,7 @@ const UsersContent: React.FC<UsersContentProps> = ({ activeMenu }) => {
     }
   };
 
-  return <div className="flex-1 p-4 bg-white rounded-lg">{renderContent()}</div>;
+  return renderContent();
 };
 
 export default UsersContent;

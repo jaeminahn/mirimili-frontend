@@ -35,15 +35,15 @@ export default function PostItem({
             <p className="font-semibold">{answer}명</p>
             <p>이 답변했어요!</p>
           </div>
-          <div className="flex items-center gap-2 p-2 text-xs text-gray-500 bg-gray-100 rounded-full">
-            <div className="flex">
+          <div className="flex gap-2">
+            <div className="flex items-center p-2 text-xs text-gray-500 bg-gray-100 rounded-full">
               <Icon
                 icon="fluent:thumb-like-24-filled"
                 className="mr-1 text-base"
               />
               <p>{like}</p>
             </div>
-            <div className="flex">
+            <div className="flex items-center p-2 text-xs text-gray-500 bg-gray-100 rounded-full">
               <Icon icon="fluent:eye-20-filled" className="mr-1 text-base" />
               <p>{view}</p>
             </div>
