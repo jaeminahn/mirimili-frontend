@@ -14,7 +14,7 @@ export default function BadgeButtons() {
 
   return (
     <div className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-1">
-      <div className="">
+      <Link to="/users" state={{ activeMenu: "스크랩한 글" }}>
         <div className="relative" data-headlessui-state="">
           <button
             className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
@@ -26,8 +26,8 @@ export default function BadgeButtons() {
             <Icon icon="fluent:bookmark-24-filled" className="mr-1 text-base" />
           </button>
         </div>
-      </div>
-      <div className="">
+      </Link>
+      <Link to="/users" state={{ activeMenu: "알림" }}>
         <div className="relative" data-headlessui-state="">
           <button
             className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
@@ -39,8 +39,8 @@ export default function BadgeButtons() {
             <Icon icon="fluent:alert-24-filled" className="mr-1 text-base" />
           </button>
         </div>
-      </div>
-      <Link to="/users">
+      </Link>
+      <Link to="/users" state={{ activeMenu: "프로필" }}>
         <div className="relative" data-headlessui-state="">
           <button
             className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
