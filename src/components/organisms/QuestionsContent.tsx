@@ -36,14 +36,27 @@ interface _PostItemProps {
 
 export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number>(0);
   const [postData, setPostData] = useState<PostItemProps[]>([]);
 
   useEffect(() => {
-    get("/questions")
+    console.log(
+      `/questions${
+        tabIndex !== 0
+          ? "?forme=true"
+          : categoryId !== 0
+          ? "?category=" + categoryId
+          : ""
+      }`
+    );
+    get(
+      `/questions${categoryId !== 0 ? "?category=" + categoryId : ""}${
+        tabIndex !== 0 ? "?forme=true" : ""
+      }`
+    )
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setPostData(
           res.map((item: _PostItemProps) => ({
             id: item.id,
@@ -61,11 +74,7 @@ export default function QuestionsMain() {
           }))
         );
       });
-  }, []);
-
-  const handleCategorySelect = (categoryId: number | null) => {
-    setSelectedCategory(categoryId);
-  };
+  }, [tabIndex, categoryId]);
 
   return (
     <div className="flex flex-col w-4/5 gap-4">
@@ -99,7 +108,10 @@ export default function QuestionsMain() {
       </div>
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
         {tabIndex === 0 && (
-          <CategoryButton onCategorySelect={handleCategorySelect} />
+          <CategoryButton
+            categoryId={categoryId}
+            setCategoryId={setCategoryId}
+          />
         )}
         {postData.length > 0 ? (
           postData.map((item) => (
