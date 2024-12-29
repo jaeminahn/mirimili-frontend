@@ -17,8 +17,8 @@ export const postNewQuestion = (
       title,
       content,
       category_id: categoryId,
-      service_type_id: serviceTypeId,
       service_mos_id: serviceMosId,
+      service_type_id: serviceTypeId,
     },
     accessToken
   )

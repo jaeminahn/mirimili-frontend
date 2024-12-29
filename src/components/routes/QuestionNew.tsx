@@ -49,7 +49,7 @@ export default function QuestionNew() {
           form.title,
           form.content,
           form.categoryId,
-          form.serviceTypeId,
+          form.serviceMosId,
           form.serviceTypeId,
           JSON.stringify(at).slice(1, -1),
           () => navigate("/")
@@ -57,6 +57,10 @@ export default function QuestionNew() {
       });
     }
   };
+
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
 
   return (
     <main className="flex justify-center pt-6 bg-gray-100 ">

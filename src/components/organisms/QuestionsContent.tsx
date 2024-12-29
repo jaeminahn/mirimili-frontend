@@ -40,23 +40,19 @@ export default function QuestionsMain() {
   const [postData, setPostData] = useState<PostItemProps[]>([]);
 
   useEffect(() => {
-    console.log(
-      `/questions${
-        tabIndex !== 0
-          ? "?forme=true"
-          : categoryId !== 0
-          ? "?category=" + categoryId
-          : ""
-      }`
-    );
-    get(
-      `/questions${categoryId !== 0 ? "?category=" + categoryId : ""}${
-        tabIndex !== 0 ? "?forme=true" : ""
-      }`
-    )
+    // console.log(
+    //   `/questions${
+    //     tabIndex !== 0
+    //       ? "?forme=true"
+    //       : categoryId !== 0
+    //       ? "?category=" + categoryId
+    //       : ""
+    //   }`
+    // );
+    get(`/questions${categoryId !== 0 ? "?category=" + categoryId : ""}`)
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         setPostData(
           res.map((item: _PostItemProps) => ({
             id: item.id,

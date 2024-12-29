@@ -25,7 +25,8 @@ export default function QuestionWrite({
 }: QuestionWriteProps) {
   const [isAllType, setIsAllType] = useState(true);
   const [type, setType] = useState<number[]>(
-    serviceType.map((item) => item.id)
+    // serviceType.map((item) => item.id)
+    [1]
   );
   const [isAllMos, setIsAllMos] = useState(true);
   const [mosList, setMosList] = useState<number[]>([]);
@@ -157,21 +158,24 @@ export default function QuestionWrite({
       <div className="flex flex-col gap-2 p-4 bg-white rounded-lg">
         <p className="mb-2 text-lg font-semibold">카테고리 설정</p>
         <div className="flex flex-wrap gap-2 mb-2">
-          {category.map((item) => (
-            <button
-              key={item.id}
-              onClick={() =>
-                setForm((prev) => ({ ...prev, categoryId: item.id }))
-              }
-              className={`px-2 py-1 text-sm rounded-xl border-2 ${
-                form.categoryId === item.id
-                  ? "bg-emerald-100 border-emerald-600 font-semibold"
-                  : "bg-gray-100 border-gray-100 font-medium"
-              } cursor-pointer`}
-            >
-              {item.label}
-            </button>
-          ))}
+          {category.map(
+            (item) =>
+              item.id !== 0 && (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setForm((prev) => ({ ...prev, categoryId: item.id }))
+                  }
+                  className={`px-2 py-1 text-sm rounded-xl border-2 ${
+                    form.categoryId === item.id
+                      ? "bg-emerald-100 border-emerald-600 font-semibold"
+                      : "bg-gray-100 border-gray-100 font-medium"
+                  } cursor-pointer`}
+                >
+                  {item.label}
+                </button>
+              )
+          )}
         </div>
       </div>
 
