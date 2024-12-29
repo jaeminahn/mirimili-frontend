@@ -14,10 +14,13 @@ const Users: React.FC = () => {
   }, [location.state]);
 
   return (
-    <main className="flex justify-center pt-6 bg-gray-100">
-      <div className="flex w-3/4 max-w-5xl gap-6">
-        <UsersContent activeMenu={activeMenu} />
-        <UsersSide activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+    <main className="flex flex-col items-center pt-6 bg-gray-100">
+      <div className="w-3/4 max-w-5xl">
+        <p className="text-2xl font-bold mb-6">{activeMenu}</p>
+        <div className="flex gap-6">
+          <UsersContent activeMenu={activeMenu} />
+          <UsersSide activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+        </div>
       </div>
     </main>
   );

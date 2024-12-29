@@ -8,13 +8,10 @@ interface UsersSideProps {
 
 const UsersSide: React.FC<UsersSideProps> = ({ activeMenu, setActiveMenu }) => {
   const menuItems = [
-    { icon: "fluent:person-circle-24-filled", label: "프로필" },
+    { icon: "fluent:chat-24-filled", label: "내 활동" },
     { icon: "fluent:alert-24-filled", label: "알림" },
-    { icon: "fluent:bookmark-24-filled", label: "스크랩한 글" },
-    { icon: "fluent:chat-bubbles-question-24-filled", label: "질문&답변" },
-    { icon: "fluent:people-24-filled", label: "커뮤니티" },
-    { icon: "fluent:settings-24-filled", label: "설정" },
-    { icon: "fluent:person-circle-24-filled", label: "고객센터" },
+    { icon: "fluent:bookmark-24-filled", label: "스크랩" },
+    { icon: "fluent:settings-24-filled", label: "설정" }
   ];
 
   return (
