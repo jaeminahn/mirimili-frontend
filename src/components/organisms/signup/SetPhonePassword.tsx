@@ -40,7 +40,6 @@ export default function SetPhonePassword({
   useEffect(() => {
     if (step !== 2) return;
     setCanProceed(isCodeValid && isPasswordValid && isPasswordConfirmed);
-    console.log(isCodeValid, isPasswordValid, isPasswordConfirmed);
   }, [isCodeValid, isPasswordValid, isPasswordConfirmed, step]);
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +70,6 @@ export default function SetPhonePassword({
     post("/auth/join/send-code", { tel })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         if (result.message === "user exist") {
           setIsCodeSent(false);
           setPhoneError("동일한 전화번호의 사용자가 존재해요.");
@@ -96,7 +94,6 @@ export default function SetPhonePassword({
     post("/auth/join/validate-code", { tel, code })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         const _isCodeValid = result.message === "Validation Success";
         setIsCodeValid(_isCodeValid);
         setVerificationMessage(

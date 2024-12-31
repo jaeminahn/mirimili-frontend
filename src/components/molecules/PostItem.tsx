@@ -49,7 +49,7 @@ export default function PostItem({
             </div>
           </div>
         </div>
-        <p className="text-xs text-gray-500 ml-4">{createdAt}</p>
+        <p className="ml-4 text-xs text-gray-500">{createdAt}</p>
       </div>
     </Link>
   );

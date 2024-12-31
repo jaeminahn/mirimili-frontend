@@ -15,7 +15,6 @@ const Link: FC<LinkProps> = ({ className: _className, to, ...props }) => {
 
 export default function HeaderButtons() {
   const match = useMatch({ path: "/questions", end: true });
-  console.log(match);
 
   return (
     <div className="flex items-center gap-5 text-gray-900">

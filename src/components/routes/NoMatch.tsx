@@ -4,7 +4,6 @@ import { useAuth } from "../../contexts";
 
 export default function NoMatch() {
   const { loggedUser } = useAuth();
-  useEffect(() => console.log(loggedUser), []);
   const navigate = useNavigate();
   const goBack = useCallback(() => {
     navigate(-1);

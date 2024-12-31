@@ -37,7 +37,6 @@ export default function SetNickname({
     post("/auth/join/check-nick", { nickname })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         if (result.message === "Nick Exist") {
           setNicknameMessage("누가 이 닉네임을 이미 사용하고 있어요.");
           setIsNicknameAvailable(false);

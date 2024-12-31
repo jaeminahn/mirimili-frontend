@@ -79,9 +79,9 @@ export default function SignUp() {
   const goToNextStep = () => setStep((prev) => prev + 1);
   const goToPreviousStep = () => setStep((prev) => prev - 1);
 
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
+  // useEffect(() => {
+  //   console.log(form);
+  // }, [form]);
 
   return (
     <div className="flex flex-col items-center justify-start w-screen h-screen bg-gray-100">

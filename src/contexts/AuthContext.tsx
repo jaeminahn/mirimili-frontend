@@ -100,7 +100,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
           if (result.message === "join success") {
             const user: LoggedUser = {
               id: result.user.id,
@@ -128,7 +127,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       post("/auth/login", { tel, password })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
           if (result.message == "Login Success") {
             const user: LoggedUser = {
               id: result.user.id,
