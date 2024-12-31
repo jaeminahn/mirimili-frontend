@@ -8,6 +8,7 @@ import Logout from "./Auth/Logout";
 import Questions from "./Questions";
 import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
+import Users from "./Users";
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function RouterSetup() {
@@ -26,6 +27,7 @@ export default function RouterSetup() {
           }
         />
         <Route index path="/questions/:id" element={<QuestionPost />} />
+        <Route index path="/users" element={<Users/>} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />

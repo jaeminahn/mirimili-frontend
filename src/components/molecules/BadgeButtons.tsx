@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { Icon } from "@iconify/react";
@@ -13,21 +13,45 @@ export default function BadgeButtons() {
   }, []);
 
   return (
-    <div className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-2">
-      <Link to="/users/id/scrapped">
-        <Icon
-          icon="fluent:bookmark-24-filled"
-          className="text-lg text-gray-500"
-        />
+    <div className="flex items-center px-2 bg-gray-100 rounded-xl shrink-0 gap-x-1">
+      <Link to="/users" state={{ activeMenu: "스크랩" }}>
+        <div className="relative" data-headlessui-state="">
+          <button
+            className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
+            type="button"
+            aria-expanded="false"
+            data-headlessui-state=""
+            id="headlessui-popover-button-:r41:"
+          >
+            <Icon icon="fluent:bookmark-24-filled" className="mr-1 text-base" />
+          </button>
+        </div>
       </Link>
-      <Link to="/users/id/alert">
-        <Icon icon="fluent:alert-24-filled" className="text-lg text-gray-500" />
+      <Link to="/users" state={{ activeMenu: "알림" }}>
+        <div className="relative" data-headlessui-state="">
+          <button
+            className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
+            type="button"
+            aria-expanded="false"
+            data-headlessui-state=""
+            id="headlessui-popover-button-:r41:"
+          >
+            <Icon icon="fluent:alert-24-filled" className="mr-1 text-base" />
+          </button>
+        </div>
       </Link>
-      <Link to="/users/id">
-        <Icon
-          icon="fluent:person-28-filled"
-          className="text-lg text-gray-500"
-        />
+      <Link to="/users" state={{ activeMenu: "내 활동" }}>
+        <div className="relative" data-headlessui-state="">
+          <button
+            className="relative flex items-center justify-center w-6 h-8 my-1 text-gray-500 rounded-sm focus:outline-0 focus:ring-0"
+            type="button"
+            aria-expanded="false"
+            data-headlessui-state=""
+            id="headlessui-popover-button-:r41:"
+          >
+            <Icon icon="fluent:person-24-filled" className="mr-1 text-base" />
+          </button>
+        </div>
       </Link>
     </div>
   );

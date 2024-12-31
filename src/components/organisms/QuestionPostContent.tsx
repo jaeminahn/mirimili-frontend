@@ -101,7 +101,7 @@ export default function QuestionPostContent() {
 
   const getCategoryLabel = (id: number) => {
     const foundCategory = category.find((cat) => cat.id === id);
-    return foundCategory ? foundCategory.label : "카테고리 없음? <- 이게 맞나?";
+    return foundCategory ? foundCategory.label : null;
   };
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -133,12 +133,27 @@ export default function QuestionPostContent() {
       <p>post id : {params["id"]}</p>
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-2 text-sm">
-            <p className="font-semibold">{postData.writerNick}</p>
-            <p className="text-emerald-600">
-              {postData.writerType}∙{postData.writerLevel}
-            </p>
-            <p className="text-xs text-gray-600">{postData.createdAt}</p>
+          <div className="flex justify-between items-center text-sm">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold">{postData.writerNick}</p>
+              <p className="text-emerald-600">
+                {postData.writerType}∙{postData.writerLevel}
+              </p>
+              <p className="text-xs text-gray-600">{postData.createdAt}</p>
+            </div>
+            <div className="flex items-center gap-4 p-2 text-xs text-gray-500">
+              <div className="flex">
+                <Icon icon="fluent:eye-20-filled" className="mr-1 text-base" />
+                <p>{postData.view}</p>
+              </div>
+              <div className="flex">
+                <Icon
+                  icon="fluent:comment-24-filled"
+                  className="mr-1 text-base"
+                />
+                <p>{postData.answer}</p>
+              </div>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-emerald-600">
@@ -209,7 +224,7 @@ export default function QuestionPostContent() {
               >
                 {hideUnit ? "복무 부대 표시하기" : "복무 부대 숨기기"}
               </button>
-              <button className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600">
+              <button className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600 hover:bg-emerald-700">
                 답변 등록
               </button>
             </div>

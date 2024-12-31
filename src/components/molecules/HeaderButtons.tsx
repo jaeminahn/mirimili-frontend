@@ -27,11 +27,8 @@ export default function HeaderButtons() {
       <Link className=" hover:text-emerald-600" to="/articles">
         밀리Tip
       </Link>
-      {/* <Link className="text-gray-900 hover:text-emerald-500" href="">
-        베스트🔥
-      </Link> */}
       <div className="w-px h-3 bg-gray-900 shrink-0" />
-      <Link className=" hover:text-emerald-600" to="notices">
+      <Link className=" hover:text-emerald-600" to="/notices">
         공지
       </Link>
     </div>
