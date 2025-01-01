@@ -1,28 +1,13 @@
 import { Link } from "react-router-dom";
-import SideContents from "../organisms/SideContents";
-import SearchBar from "../molecules/SearchBar";
-import BadgeButtons from "../molecules/BadgeButtons";
-import LoginButton from "../molecules/LoginButton";
 import { useAuth } from "../../contexts";
+import Header from "../organisms/Header";
 
 export default function Home() {
   const { loggedUser } = useAuth();
 
   return (
     <div className="flex flex-col w-screen h-screen ">
-      <div className="flex items-center justify-center h-20 text-base font-semibold leading-6 bg-white border-b border-b-gray-500/30">
-        <div className="flex justify-between w-3/4 max-w-5xl">
-          <div className="flex gap-7">
-            <Link to="/">
-              <img src="/images/logo.png" alt="mirimili" width={100} />
-            </Link>
-          </div>
-          <div className="flex gap-3">
-            <SearchBar />
-            {loggedUser ? <BadgeButtons /> : <LoginButton />}
-          </div>
-        </div>
-      </div>
+      <Header />
       <main className="flex flex-col items-center justify-center flex-grow pt-6 bg-gray-100 ">
         <div className="flex flex-col w-3/4 max-w-5xl gap-4">
           <div className="flex flex-col gap-4">

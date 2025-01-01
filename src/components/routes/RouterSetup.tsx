@@ -27,7 +27,7 @@ export default function RouterSetup() {
           }
         />
         <Route index path="/questions/:id" element={<QuestionPost />} />
-        <Route index path="/users" element={<Users/>} />
+        <Route index path="/users/mypage" element={<Users />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />

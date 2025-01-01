@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
 import category from "../../data/category.json";
 
@@ -10,7 +10,7 @@ const postData = {
   writerNick: "김뚝딱",
   writerType: "공군",
   writerLevel: "훈련병",
-  categoryId: 0,
+  categoryId: 1,
   title: "일반차량운전 뭘 준비해야 할까요?",
   content:
     "안녕하십니까. 차량운전 예비입대자입니다. 자격요건과 1차 선발 등을 위한 준비 등은 모두 마쳤습니다. 조금 바보같은 질문일 수 있지만, 수동 연습을 하고 가는 게 도움이 될지 궁금합니다. 당연히 좋은 특기를 받으려면 운전을 잘 해야 할텐데, 오토기어로는 3년 정도 해봤어도 수동기어는 정말 하나도 기억이 안 납니다.. 본가에 있는 트럭이라도 조금 몰아봐야 할지, 그냥 들어가도 될지 궁금합니다.",
@@ -23,6 +23,18 @@ const postData = {
   isDisliked: false,
   isScrapped: false,
 };
+
+interface postDataProps {
+  id: number;
+  writerId: number;
+  categoryId: number;
+  title: string;
+  content: string;
+  view: number;
+  like: number;
+  dislike: number;
+  answer: number;
+}
 
 const answerData = [
   {
@@ -98,6 +110,17 @@ export default function QuestionPostContent() {
   const [answerText, setAnswerText] = useState("");
   const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // const [postData, setPostData] = useState<postDataProps>({
+  //   id: -1,
+  //   writerId: -1,
+  //   categoryId: -1,
+  //   title: "로딩 중...",
+  //   content: "로딩 중...",
+  //   view: -1,
+  //   like: -1,
+  //   dislike: -1,
+  //   answer: -1,
+  // });
 
   const getCategoryLabel = (id: number) => {
     const foundCategory = category.find((cat) => cat.id === id);
@@ -128,12 +151,14 @@ export default function QuestionPostContent() {
     />
   ));
 
+  // useEffect(() => {}, []);
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
       <p>post id : {params["id"]}</p>
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <p className="font-semibold">{postData.writerNick}</p>
               <p className="text-emerald-600">

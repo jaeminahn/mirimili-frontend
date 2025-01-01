@@ -49,8 +49,8 @@ export default function QuestionNew() {
           form.title,
           form.content,
           form.categoryId,
-          form.serviceMosId,
           form.serviceTypeId,
+          form.serviceMosId,
           JSON.stringify(at).slice(1, -1),
           () => navigate("/")
         );

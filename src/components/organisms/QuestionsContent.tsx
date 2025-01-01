@@ -3,6 +3,7 @@ import PostItem from "../molecules/PostItem";
 import { Icon } from "@iconify/react";
 import CategoryButton from "../molecules/CategoryButton";
 import { get } from "../../api/getAndDel";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 
 interface PostItemProps {
   id: number;
@@ -34,22 +35,29 @@ interface _PostItemProps {
   updatedAt: string;
 }
 
+const orderLabel = [
+  "최신순",
+  "오래된순",
+  "조회수많은순",
+  "조회수적은순",
+  "추천순",
+  "비추천순",
+  "답변많은순",
+  "답변적은순",
+];
+
 export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
   const [categoryId, setCategoryId] = useState<number>(0);
   const [postData, setPostData] = useState<PostItemProps[]>([]);
+  const [orderBy, setOrderBy] = useState(0);
 
   useEffect(() => {
-    // console.log(
-    //   `/questions${
-    //     tabIndex !== 0
-    //       ? "?forme=true"
-    //       : categoryId !== 0
-    //       ? "?category=" + categoryId
-    //       : ""
-    //   }`
-    // );
-    get(`/questions${categoryId !== 0 ? "?category=" + categoryId : ""}`)
+    get(
+      `/questions${`?order=${orderBy}`}${
+        categoryId !== 0 ? "&category=" + categoryId : ""
+      }`
+    )
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
@@ -70,7 +78,7 @@ export default function QuestionsMain() {
           }))
         );
       });
-  }, [tabIndex, categoryId]);
+  }, [tabIndex, categoryId, orderBy]);
 
   return (
     <div className="flex flex-col w-4/5 gap-4">
@@ -97,10 +105,23 @@ export default function QuestionsMain() {
             🙏 내 답변을 기다리는 질문
           </button>
         </div>
-        <button className="flex items-center gap-1 text-sm text-gray-600">
-          추천순
-          <Icon icon="fluent:chevron-down-24-regular" />
-        </button>
+        <Menu>
+          <MenuButton className="h-10 p-2 font-normal text-gray-600 rounded-lg focus:outline-none">
+            {orderLabel[orderBy]} ▾
+          </MenuButton>
+          <MenuItems anchor="left start" className="bg-white rounded-lg ">
+            {orderLabel.map((label, idx) => (
+              <MenuItem>
+                <button
+                  className="block h-10 p-2 font-medium text-gray-600 focus:outline-none"
+                  onClick={() => setOrderBy(idx)}
+                >
+                  {label}
+                </button>
+              </MenuItem>
+            ))}
+          </MenuItems>
+        </Menu>
       </div>
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
         {tabIndex === 0 && (
