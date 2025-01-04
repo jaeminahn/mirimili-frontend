@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
-import Questions from "../routes/Questions";
 
 interface PostItemProps {
   id: number;
@@ -26,7 +25,10 @@ export default function PostItem({
       to={`/questions/${id}`}
       className="flex flex-col gap-2 p-6 border border-gray-300 rounded-lg hover:cursor-pointer"
     >
-      <p className="text-lg font-semibold">{title}</p>
+      <div className="flex items-center">
+        <span className="mr-1 text-lg font-bold text-emerald-600">Q.</span>
+        <p className="text-lg font-semibold">{title}</p>
+      </div>
       <p className="text-sm text-gray-700 line-clamp-2">{content}</p>
       <div className="flex items-center mt-2">
         <div className="flex gap-2">
