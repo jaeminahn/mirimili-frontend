@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
 import category from "../../data/category.json";
+import { get } from "../../api";
 
 const postData = {
   id: 1,
@@ -26,7 +27,11 @@ const postData = {
 
 interface postDataProps {
   id: number;
-  writerId: number;
+  writerNick: string;
+  writerType: string;
+  writerLevel: string;
+  writerMos: string;
+  writerUnit: string;
   categoryId: number;
   title: string;
   content: string;
@@ -34,6 +39,10 @@ interface postDataProps {
   like: number;
   dislike: number;
   answer: number;
+  createdAt: string;
+  isLiked: boolean;
+  isDisliked: boolean;
+  isScrapped: boolean;
 }
 
 const answerData = [
@@ -110,17 +119,25 @@ export default function QuestionPostContent() {
   const [answerText, setAnswerText] = useState("");
   const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // const [postData, setPostData] = useState<postDataProps>({
-  //   id: -1,
-  //   writerId: -1,
-  //   categoryId: -1,
-  //   title: "로딩 중...",
-  //   content: "로딩 중...",
-  //   view: -1,
-  //   like: -1,
-  //   dislike: -1,
-  //   answer: -1,
-  // });
+  const [postData, setPostData] = useState<postDataProps>({
+    id: Number(params["id"]),
+    writerNick: "로딩중...",
+    writerType: "로딩중...",
+    writerLevel: "로딩중...",
+    writerMos: "로딩중...",
+    writerUnit: "로딩중...",
+    categoryId: -1,
+    title: "로딩중...",
+    content: "로딩중...",
+    view: -1,
+    like: -1,
+    dislike: -1,
+    answer: -1,
+    createdAt: "로딩중...",
+    isLiked: false,
+    isDisliked: false,
+    isScrapped: false,
+  });
 
   const getCategoryLabel = (id: number) => {
     const foundCategory = category.find((cat) => cat.id === id);
@@ -151,11 +168,29 @@ export default function QuestionPostContent() {
     />
   ));
 
-  // useEffect(() => {}, []);
+  useEffect(() => {
+    get(`/questions/${params["id"]}`)
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setPostData((prev) => ({
+          ...prev,
+          categoryId: res.category_id,
+          title: res.title,
+          content: res.content,
+          view: res.view,
+          like: res.like,
+          dislike: res.dislike,
+          createdAt: res.createdAt,
+        }));
+        get(`/users/${res.writer_id}`)
+          .then((res) => res.json())
+          .then((res) => console.log(res));
+      });
+  }, []);
 
   return (
     <div className="flex flex-col w-4/5 gap-4">
-      <p>post id : {params["id"]}</p>
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between text-sm">
