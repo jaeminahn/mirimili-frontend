@@ -1,17 +1,30 @@
+import { useState } from "react";
+import ChangePasswordModal from "./ChangePasswordModal";
+import ChangeDateModal from "./ChangeDateModal";
+
 const userData = {
   nick: "국방부택시운전사",
   tel: "010-9876-5432",
   service_type: "공군",
-  service_start: "2024년 2월 13일",
-  service_pfc: "2024년 2월 13일",
-  service_cpl: "2024년 2월 13일",
-  service_sgt: "2024년 2월 13일",
-  service_end: "2024년 2월 13일",
+  service_start: "2024-05-27",
+  service_pfc: "2024-08-01",
+  service_cpl: "2025-02-01",
+  service_sgt: "2025-08-01",
+  service_end: "2026-02-26",
   service_mos: "일반차량운전",
   service_unit: "제15특수전투비행단",
 };
 
-export default function ProfileSettings() {
+export default function Settings() {
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
+
+  const openPasswordModal = () => setIsPasswordModalOpen(true);
+  const closePasswordModal = () => setIsPasswordModalOpen(false);
+
+  const openDateModal = () => setIsDateModalOpen(true);
+  const closeDateModal = () => setIsDateModalOpen(false);
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
       <div className="flex flex-col h-full gap-2 p-6 bg-white rounded-lg">
@@ -28,7 +41,12 @@ export default function ProfileSettings() {
               <h3 className="text-sm text-gray-500">비밀번호</h3>
               <p className="mt-2">●●●●●●●</p>
             </div>
-            <button className="w-20 h-10 text-sm rounded-lg bg-gray-100">변경</button>
+            <button
+              onClick={openPasswordModal}
+              className="w-20 h-10 text-sm rounded-lg bg-gray-100"
+            >
+              변경
+            </button>
           </div>
 
           <div className="pt-4">
@@ -52,22 +70,20 @@ export default function ProfileSettings() {
 
           <div className="flex justify-between items-center py-4 border-b">
             <div>
-              <h3 className="text-sm text-gray-500">진급일</h3>
+              <h3 className="text-sm text-gray-500">진급일 및 전역예정일</h3>
               <p className="mt-2 flex gap-4">
                 <span>일병 {userData.service_pfc}</span>
                 <span>상병 {userData.service_cpl}</span>
                 <span>병장 {userData.service_sgt}</span>
               </p>
+              <p className="mt-2 font-bold">전역 {userData.service_end}</p>
             </div>
-            <button className="w-20 h-10 text-sm rounded-lg bg-gray-100">변경</button>
-          </div>
-
-          <div className="flex justify-between items-center py-4 border-b">
-            <div>
-              <h3 className="text-sm text-gray-500">전역예정일</h3>
-              <p className="mt-2">{userData.service_end}</p>
-            </div>
-            <button className="w-20 h-10 text-sm rounded-lg bg-gray-100">변경</button>
+            <button
+              onClick={openDateModal}
+              className="w-20 h-10 text-sm rounded-lg bg-gray-100"
+            >
+              변경
+            </button>
           </div>
 
           <div className="py-4 border-b">
@@ -91,6 +107,19 @@ export default function ProfileSettings() {
           </button>
         </div>
       </div>
+
+      {isPasswordModalOpen && <ChangePasswordModal closeModal={closePasswordModal} />}
+      {isDateModalOpen && (
+        <ChangeDateModal
+          closeModal={closeDateModal}
+          initialData={{
+            service_pfc: userData.service_pfc,
+            service_cpl: userData.service_cpl,
+            service_sgt: userData.service_sgt,
+            service_end: userData.service_end,
+          }}
+        />
+      )}
     </div>
   );
 }
