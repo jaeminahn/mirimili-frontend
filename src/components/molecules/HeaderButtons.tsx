@@ -13,24 +13,28 @@ const Link: FC<LinkProps> = ({ className: _className, to, ...props }) => {
   return <RRLink {...props} to={to} className={className} />;
 };
 
-export default function HeaderButtons() {
-  const match = useMatch({ path: "/questions", end: true });
+interface HeaderButtonsProps {
+  onItemClick?: () => void;
+}
 
+const HeaderButtons: FC<HeaderButtonsProps> = ({ onItemClick }) => {
   return (
-    <div className="flex items-center gap-5 text-gray-900">
-      <Link className=" hover:text-emerald-600" to="/questions">
+    <div className="flex flex-col items-center gap-4 md:flex-row md:gap-5 md:items-center">
+      <Link className="hover:text-emerald-600" to="/questions" onClick={onItemClick}>
         질문&답변
       </Link>
-      <Link className=" hover:text-emerald-600" to="/talks">
+      <Link className="hover:text-emerald-600" to="/talks" onClick={onItemClick}>
         커뮤니티
       </Link>
-      <Link className=" hover:text-emerald-600" to="/articles">
+      <Link className="hover:text-emerald-600" to="/articles" onClick={onItemClick}>
         밀리Tip
       </Link>
-      <div className="w-px h-3 bg-gray-900 shrink-0" />
-      <Link className=" hover:text-emerald-600" to="/notices">
+      <div className="hidden w-px h-3 bg-gray-900 shrink-0 md:block" />
+      <Link className="hover:text-emerald-600" to="/notices" onClick={onItemClick}>
         공지
       </Link>
     </div>
   );
-}
+};
+
+export default HeaderButtons;
