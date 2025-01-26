@@ -9,9 +9,9 @@ export default function Home() {
   return (
     <div className="flex flex-col w-screen h-screen ">
       <Header />
-      <main className="flex flex-col items-center justify-center flex-grow bg-gray-100 ">
+      <main className="flex flex-col items-center justify-center flex-grow bg-gray-100 py-4 pb-16">
         <div className="flex flex-col w-3/4 max-w-5xl gap-6">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="p-4 bg-white rounded-lg">
               <div className="flex justify-between items-center mb-4">
                 <p className="text-xl font-semibold">인기 질문&답변</p>
