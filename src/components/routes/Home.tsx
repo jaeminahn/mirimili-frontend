@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts";
+import { Icon } from "@iconify/react";
 import Header from "../organisms/Header";
 
 export default function Home() {
@@ -8,73 +9,55 @@ export default function Home() {
   return (
     <div className="flex flex-col w-screen h-screen ">
       <Header />
-      <main className="flex flex-col items-center justify-center flex-grow pt-6 bg-gray-100 ">
-        <div className="flex flex-col w-3/4 max-w-5xl gap-4">
-          <div className="flex flex-col gap-4">
-            <p className="text-2xl font-semibold text-gray-500">
-              똑똑한 입대, 후회없는 군생활
-            </p>
-            <p className="text-5xl font-get text-emerald-600">
-              미리밀리와 함께!
-            </p>
-          </div>
-          <div className="p-4 bg-white rounded-lg h-96">
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4 h-72">
-                <Link to="/questions">
-                  <div className="flex flex-col flex-1 h-full p-4 rounded-lg bg-emerald-100">
-                    <p className="text-2xl font-get text-emerald-600">
-                      질문&답변
-                    </p>
-                    <div>
-                      <p>물어볼 곳 없는 군생활 정보,</p>
-                      <div className="flex">
-                        <p className="font-semibold">정확하고 구체적인 답변</p>
-                        <p>이 필요하다면?</p>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="flex flex-col flex-1 h-full gap-4">
-                  <Link
-                    className="flex flex-col justify-center flex-grow p-4 rounded-lg bg-emerald-50"
-                    to="/talks"
-                  >
-                    <p className="text-xl font-get text-emerald-600">
-                      커뮤니티
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      미리밀리 가족들을 위한 익명 커뮤니티
-                    </p>
-                  </Link>
-                  <Link
-                    className="flex flex-col justify-center flex-grow p-4 rounded-lg bg-emerald-50"
-                    to="/articles"
-                  >
-                    <p className="text-xl font-get text-emerald-600">밀리Tip</p>
-                    <p className="text-sm text-gray-600">
-                      똑똑한 입대, 후회없는 군생활을 위한 모든 정보
-                    </p>
-                  </Link>
-                  <Link
-                    className="flex items-center h-12 gap-4 p-4 border-2 rounded-lg bg-emerald-50 border-emerald-600"
-                    to="/"
-                  >
-                    <p className="text-xl font-get text-emerald-600">
-                      미리밀리+
-                    </p>
-                    <p className="text-sm font-semibold text-emerald-700">
-                      프라이빗질문, 빠른답변, 부대선택
-                    </p>
-                  </Link>
-                </div>
+      <main className="flex flex-col items-center justify-center flex-grow bg-gray-100 ">
+        <div className="flex flex-col w-3/4 max-w-5xl gap-6">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-4 bg-white rounded-lg">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-xl font-semibold">인기 질문&답변</p>
+                <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
               </div>
-              <Link to="/notices">
-                <div className="flex items-center h-12 gap-4 px-4 bg-gray-100 rounded-lg">
-                  <p className="font-semibold text-gray-600">공지</p>
-                  <p className="text-gray-600">미리밀리 업데이트 안내</p>
+              <ul className="divide-y divide-gray-300 bg-gray-50 rounded-lg px-4">
+                <li className="py-2">2024/7/1 입대, 2026/3/31 전역이면 2026 칼복학 가능한가요?</li>
+                <li className="py-2">집이 수도권인데, 운항관제 특기의 경우 어디 자대로 가는 게 좋을까요?</li>
+                <li className="py-2">일반차량운전 뭘 준비해야 할까요?</li>
+                <li className="py-2">맞선임 부조리, 신고해야 할까요?</li>
+                <li className="py-2">대형면허까지 따면서 일반차량운전으로 특기 배정받을 메리트가 있을까요?</li>
+              </ul>
+            </div>
+
+            <div className="p-4 bg-white rounded-lg">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-xl font-semibold">내 답변을 기다리는 질문</p>
+                <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
+              </div>
+              <ul className="divide-y divide-gray-300 bg-gray-50 rounded-lg px-4">
+                <li className="py-2">2024/7/1 입대, 2026/3/31 전역이면 2026 칼복학 가능한가요?</li>
+                <li className="py-2">집이 수도권인데, 운항관제 특기의 경우 어디 자대로 가는 게 좋을까요?</li>
+                <li className="py-2">일반차량운전 뭘 준비해야 할까요?</li>
+                <li className="py-2">맞선임 부조리, 신고해야 할까요?</li>
+                <li className="py-2">대형면허까지 따면서 일반차량운전으로 특기 배정받을 메리트가 있을까요?</li>
+              </ul>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="p-4 bg-white rounded-lg">
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-xl font-semibold">밀리팁</p>
+                  <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
                 </div>
-              </Link>
+                <p className="text-sm text-gray-500 mt-2">입대 준비부터 전역 후까지,<br />군생활을 위한 모든 팁을 정리했어요.</p>
+              </div>
+
+              <div className="p-4 bg-white rounded-lg">
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-xl font-semibold">공지</p>
+                  <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
+                </div>
+                <ul className="divide-y divide-gray-300 bg-gray-50 rounded-lg px-4">
+                <li className="py-2">미리밀리 업데이트 안내(2024년 12월)</li>
+              </ul>
+              </div>
             </div>
           </div>
         </div>
