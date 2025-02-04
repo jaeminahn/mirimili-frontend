@@ -23,15 +23,8 @@ const HeaderButtons: FC<HeaderButtonsProps> = ({ onItemClick }) => {
       <Link className="hover:text-emerald-600" to="/questions" onClick={onItemClick}>
         질문&답변
       </Link>
-      <Link className="hover:text-emerald-600" to="/talks" onClick={onItemClick}>
-        커뮤니티
-      </Link>
       <Link className="hover:text-emerald-600" to="/articles" onClick={onItemClick}>
-        밀리Tip
-      </Link>
-      <div className="hidden w-px h-3 bg-gray-900 shrink-0 md:block" />
-      <Link className="hover:text-emerald-600" to="/notices" onClick={onItemClick}>
-        공지
+        밀리팁
       </Link>
     </div>
   );

@@ -10,9 +10,9 @@ export default function Home() {
     <div className="flex flex-col w-screen h-screen ">
       <Header />
       <main className="flex flex-col items-center justify-center flex-grow bg-gray-100 py-4 pb-16">
-        <div className="flex flex-col w-3/4 max-w-5xl gap-6">
+      <div className="flex flex-col w-full sm:w-4/5 max-w-5xl gap-6 px-4">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div className="p-4 bg-white rounded-lg">
+            <div className="p-6 bg-white rounded-3xl">
               <div className="flex justify-between items-center mb-4">
                 <p className="text-xl font-semibold">인기 질문&답변</p>
                 <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
@@ -26,7 +26,7 @@ export default function Home() {
               </ul>
             </div>
 
-            <div className="p-4 bg-white rounded-lg">
+            <div className="p-6 bg-white rounded-3xl">
               <div className="flex justify-between items-center mb-4">
                 <p className="text-xl font-semibold">내 답변을 기다리는 질문</p>
                 <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
@@ -41,7 +41,7 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-6 bg-white rounded-3xl">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-xl font-semibold">밀리팁</p>
                   <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
@@ -49,14 +49,14 @@ export default function Home() {
                 <p className="text-sm text-gray-500 mt-2">입대 준비부터 전역 후까지,<br />군생활을 위한 모든 팁을 정리했어요.</p>
               </div>
 
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-6 bg-white rounded-3xl">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-xl font-semibold">공지</p>
                   <Icon icon="fluent:arrow-right-24-filled" className="text-xl" />
                 </div>
                 <ul className="divide-y divide-gray-300 bg-gray-50 rounded-lg px-4">
-                <li className="py-2">미리밀리 업데이트 안내(2024년 12월)</li>
-              </ul>
+                  <li className="py-2">미리밀리 업데이트 안내(2024년 12월)</li>
+                </ul>
               </div>
             </div>
           </div>

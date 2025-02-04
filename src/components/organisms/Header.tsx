@@ -14,7 +14,7 @@ export default function Header() {
 
   return (
     <div className="sticky top-0 z-20 flex flex-col bg-white">
-      <div className="flex items-center justify-center h-20 text-base font-semibold leading-6 border-b border-b-gray-500/30">
+      <div className="flex items-center justify-center h-16 text-base font-semibold leading-6 border-b border-b-gray-500/30">
         <div className="flex justify-between w-full max-w-5xl px-4">
           <div className="flex items-center gap-4">
             <Link to="/">
@@ -25,7 +25,7 @@ export default function Header() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden lg:flex">
+            <div className="flex">
               <SearchBar />
             </div>
             {!loggedUser ? <BadgeButtons /> : <LoginButton />}
