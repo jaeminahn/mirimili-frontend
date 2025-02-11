@@ -5,6 +5,10 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
 import category from "../../data/category.json";
 import { get } from "../../api";
+import { calculateLevel, calculateTimeAgo } from "../../utils";
+import ServiceType from "../../data/serviceType.json";
+import ServiceMos from "../../data/serviceMos.json";
+import ServiceUnit from "../../data/serviceUnit.json";
 
 const postData = {
   id: 1,
@@ -172,7 +176,6 @@ export default function QuestionPostContent() {
     get(`/questions/${params["id"]}`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setPostData((prev) => ({
           ...prev,
           categoryId: res.category_id,
@@ -181,11 +184,24 @@ export default function QuestionPostContent() {
           view: res.view,
           like: res.like,
           dislike: res.dislike,
-          createdAt: res.createdAt,
+          createdAt: calculateTimeAgo(new Date(res.createdAt)),
         }));
         get(`/users/${res.writer_id}`)
-          .then((res) => res.json())
-          .then((res) => console.log(res));
+          .then((writer) => writer.json())
+          .then((writer) => {
+            setPostData((prev) => ({
+              ...prev,
+              id: writer.id,
+              writerNick: writer.nickname,
+              writerType:
+                ServiceType.find((val) => val.id == writer.service_type_id)
+                  ?.label || "에러",
+              writerLevel: calculateLevel(writer.service_start, new Date()),
+              writerMos: writer.service_mos_id,
+              writerUnit: writer.service_unit_id,
+            }));
+            console.log(writer);
+          });
       });
   }, []);
 
@@ -197,7 +213,8 @@ export default function QuestionPostContent() {
             <div className="flex items-center gap-2">
               <p className="font-semibold">{postData.writerNick}</p>
               <p className="text-emerald-600">
-                {postData.writerType}∙{postData.writerLevel}
+                {postData.writerType}∙{postData.writerLevel}∙
+                {postData.writerMos}∙{postData.writerUnit}
               </p>
               <p className="text-xs text-gray-600">{postData.createdAt}</p>
             </div>
