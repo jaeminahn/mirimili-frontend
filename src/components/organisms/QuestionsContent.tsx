@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import PostItem from "../molecules/PostItem";
-import { Icon } from "@iconify/react";
 import CategoryButton from "../molecules/CategoryButton";
 import { get } from "../../api/getAndDel";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -10,7 +9,7 @@ interface PostItemProps {
   writerId: number;
   title: string;
   content: string;
-  categoryId: number;
+  categoryId?: number;
   answer: number;
   like: number;
   dislike: number;
@@ -25,7 +24,7 @@ interface _PostItemProps {
   writer_id: number;
   title: string;
   content: string;
-  category_id: number;
+  category_id?: number;
   answer: number;
   like: number;
   dislike: number;
@@ -48,19 +47,16 @@ const orderLabel = [
 
 export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
-  const [categoryId, setCategoryId] = useState<number>(0);
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [postData, setPostData] = useState<PostItemProps[]>([]);
   const [orderBy, setOrderBy] = useState(0);
 
   useEffect(() => {
-    get(
-      `/questions${`?order=${orderBy}`}${
-        categoryId !== 0 ? "&category=" + categoryId : ""
-      }`
-    )
+    const categoryQuery = categoryId !== undefined ? `&category=${categoryId}` : "";
+
+    get(`/questions?order=${orderBy}${categoryQuery}`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setPostData(
           res.map((item: _PostItemProps) => ({
             id: item.id,
@@ -81,39 +77,47 @@ export default function QuestionsMain() {
   }, [tabIndex, categoryId, orderBy]);
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2 text-sm">
-          <button
-            className={`h-10 p-2 font-semibold rounded-lg border-2 ${
-              tabIndex === 0
-                ? "bg-emerald-100 border-emerald-600"
-                : "bg-white border-white"
-            } `}
-            onClick={() => setTabIndex(0)}
-          >
-            🙋‍♂️ 질문&답변
-          </button>
-          <button
-            className={`h-10 p-2 font-semibold rounded-lg border-2 ${
-              tabIndex === 1
-                ? "bg-emerald-100 border-emerald-600"
-                : "bg-white border-white"
-            } `}
-            onClick={() => setTabIndex(1)}
-          >
-            🙏 내 답변을 기다리는 질문
-          </button>
-        </div>
-        <Menu>
-          <MenuButton className="h-10 p-2 font-normal text-gray-600 rounded-lg focus:outline-none">
+    <div className="flex flex-col w-full lg:w-4/5 max-w-full gap-4">
+      <div className="flex gap-2 text-sm">
+        <button
+          className={`h-10 p-2 font-semibold rounded-lg border-2 ${
+            tabIndex === 0
+              ? "bg-emerald-100 border-emerald-600"
+              : "bg-white border-white"
+          }`}
+          onClick={() => setTabIndex(0)}
+        >
+          전체 질문
+        </button>
+        <button
+          className={`h-10 p-2 font-semibold rounded-lg border-2 ${
+            tabIndex === 1
+              ? "bg-emerald-100 border-emerald-600"
+              : "bg-white border-white"
+          }`}
+          onClick={() => setTabIndex(1)}
+        >
+          내 답변을 기다리는 질문
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2 p-4 bg-white rounded-lg">
+        <CategoryButton categoryId={categoryId} setCategoryId={setCategoryId} />
+      </div>
+
+      <div className="flex justify-end">
+        <Menu as="div" className="relative">
+          <MenuButton className="h-10 px-3 py-2 font-normal text-gray-600">
             {orderLabel[orderBy]} ▾
           </MenuButton>
-          <MenuItems anchor="left start" className="bg-white rounded-lg ">
+          <MenuItems
+            anchor="bottom start"
+            className="absolute mt-2 w-36 bg-white rounded-lg shadow-md"
+          >
             {orderLabel.map((label, idx) => (
-              <MenuItem>
+              <MenuItem key={idx}>
                 <button
-                  className="block h-10 p-2 font-medium text-gray-600 focus:outline-none"
+                  className="block w-full h-10 px-3 py-2 text-sm font-medium text-gray-600 focus:outline-none text-left"
                   onClick={() => setOrderBy(idx)}
                 >
                   {label}
@@ -123,13 +127,8 @@ export default function QuestionsMain() {
           </MenuItems>
         </Menu>
       </div>
+
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
-        {tabIndex === 0 && (
-          <CategoryButton
-            categoryId={categoryId}
-            setCategoryId={setCategoryId}
-          />
-        )}
         {postData.length > 0 ? (
           postData.map((item) => (
             <PostItem
@@ -144,9 +143,7 @@ export default function QuestionsMain() {
             />
           ))
         ) : (
-          <p className="p-4 text-gray-600">
-            선택한 카테고리에 해당하는 글이 없어요.
-          </p>
+          <p className="p-4 text-gray-600">선택한 카테고리에 해당하는 글이 없어요.</p>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import categories from "../../data/category.json";
 
 interface Category {
@@ -7,8 +7,8 @@ interface Category {
 }
 
 interface CategoryButtonProps {
-  categoryId: number;
-  setCategoryId: Dispatch<SetStateAction<number>>;
+  categoryId: number | undefined;
+  setCategoryId: Dispatch<SetStateAction<number | undefined>>;
 }
 
 const CategoryButton = ({ categoryId, setCategoryId }: CategoryButtonProps) => {
@@ -17,10 +17,12 @@ const CategoryButton = ({ categoryId, setCategoryId }: CategoryButtonProps) => {
       {categories.map((category: Category) => (
         <button
           key={category.id}
-          onClick={() => setCategoryId(category.id)}
+          onClick={() =>
+            setCategoryId(categoryId === category.id ? undefined : category.id)
+          }
           className={`px-2 py-1 text-sm rounded-xl border-2 ${
             categoryId === category.id
-              ? "bg-emerald-100 border-emerald-600 font-semibold"
+              ? "bg-emerald-100 border-emerald-100 font-semibold"
               : "bg-gray-100 border-gray-100 font-medium"
           } cursor-pointer`}
         >
