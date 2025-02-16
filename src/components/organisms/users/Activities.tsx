@@ -89,7 +89,7 @@ export default function Activities() {
   };
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
+    <div className="flex flex-col lg:w-4/5 gap-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-2 text-sm">
           <button
@@ -102,7 +102,7 @@ export default function Activities() {
           >
             질문&답변
           </button>
-          <button
+          {/*<button
             className={`h-10 p-2 font-semibold rounded-lg border-2 ${
               tabIndex === 1
                 ? "bg-emerald-100 border-emerald-600"
@@ -111,25 +111,25 @@ export default function Activities() {
             onClick={() => setTabIndex(1)}
           >
             커뮤니티
-          </button>
+          </button>*/}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg">
-        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-lg">
+      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-3xl">
+        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-xl">
           <p className="text-sm font-medium text-gray-600 mb-2">내 활동 점수</p>
           <div className="flex items-center text-2xl font-bold text-emerald-600">
             <Icon icon="fluent:trophy-24-filled" className="mr-1" />
             <p>476</p>
           </div>
         </div>
-        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-lg">
+        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-xl">
           <p className="text-sm font-medium text-gray-600 mb-2">랭킹</p>
           <p className="text-2xl font-bold text-emerald-600">1,564위</p>
         </div>
       </div>
 
-      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
+      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         <div className="relative flex gap-4 border-b-2 border-gray-200">
           <button
             className={`relative py-2 px-4 text-sm font-semibold ${

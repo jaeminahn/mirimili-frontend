@@ -10,7 +10,7 @@ export default function Home() {
     <div className="flex flex-col w-screen h-screen ">
       <Header />
       <main className="flex flex-col items-center justify-center flex-grow bg-gray-100 py-4 pb-16">
-      <div className="flex flex-col w-full sm:w-4/5 max-w-5xl gap-6 px-4">
+        <div className="flex flex-col w-full sm:w-4/5 max-w-5xl gap-6 px-4">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="p-6 bg-white rounded-3xl">
               <div className="flex justify-between items-center mb-4">

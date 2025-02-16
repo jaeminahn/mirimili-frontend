@@ -15,7 +15,7 @@ const UsersSide: React.FC<UsersSideProps> = ({ activeMenu, setActiveMenu }) => {
   ];
 
   return (
-    <div className="flex flex-col w-1/5 gap-4">
+    <div className="hidden lg:flex flex-col lg:w-1/5 gap-4">
       <div className="flex flex-col gap-2 p-4 bg-white rounded-lg text-gray-500">
         {menuItems.map((item) => (
           <div

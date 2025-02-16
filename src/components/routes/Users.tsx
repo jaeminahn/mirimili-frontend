@@ -15,9 +15,9 @@ const Users: React.FC = () => {
 
   return (
     <main className="flex flex-col items-center pt-6 bg-gray-100">
-      <div className="w-3/4 max-w-5xl">
+      <div className="lg:w-3/4 lg:max-w-5xl px-4">
         <p className="text-2xl font-bold mb-6">{activeMenu}</p>
-        <div className="flex gap-6">
+        <div className="flex lg:gap-6">
           <UsersContent activeMenu={activeMenu} />
           <UsersSide activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
         </div>

@@ -47,13 +47,13 @@ export default function Notifications() {
   ));
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
-      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
+    <div className="flex flex-col lg:w-4/5 gap-4">
+      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         <div className="flex justify-end mb-4">
           <button
             onClick={handleMarkAllAsRead}
             disabled={notifications.length === 0}
-            className={`w-24 h-8 text-sm font-bold rounded-lg ${
+            className={`w-24 h-8 text-sm font-bold rounded-xl ${
               notifications.length === 0 ? "bg-gray-200 text-gray-500" : "bg-gray-100"
             }`}
           >

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <div className="z-20 flex flex-col items-center gap-6 py-8 text-base bg-gray-100">
+    <div className="z-20 flex flex-col items-center gap-6 py-8 text-base bg-gray-100 pb-16">
       <div className="flex flex-col items-center w-full max-w-5xl gap-4 px-4 md:flex-row md:justify-between">
         <Link to="/">
           <img src="/images/logo.png" alt="mirimili" width={75} />

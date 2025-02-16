@@ -29,7 +29,7 @@ export default function ChangeDateModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-96 p-6 bg-white rounded-lg shadow-lg">
+      <div className="w-96 p-6 mx-2 bg-white rounded-lg shadow-lg">
         <h2 className="mb-4 text-lg font-bold text-gray-700">진급일 및 전역예정일 변경</h2>
 
         <div className="mb-4">

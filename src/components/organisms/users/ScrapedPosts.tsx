@@ -71,7 +71,7 @@ export default function ScrapedPosts() {
   ));
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
+    <div className="flex flex-col lg:w-4/5 gap-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-2 text-sm">
           <button
@@ -84,7 +84,7 @@ export default function ScrapedPosts() {
           >
             질문&답변
           </button>
-          <button
+          {/*<button
             className={`h-10 p-2 font-semibold rounded-lg border-2 ${
               tabIndex === 1
                 ? "bg-emerald-100 border-emerald-600"
@@ -103,10 +103,10 @@ export default function ScrapedPosts() {
             onClick={() => setTabIndex(2)}
           >
             밀리팁
-          </button>
+          </button>*/}
         </div>
       </div>
-      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
+      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         {postItemList.length > 0 ? (
           postItemList
         ) : (

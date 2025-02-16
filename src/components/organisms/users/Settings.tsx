@@ -26,8 +26,8 @@ export default function Settings() {
   const closeDateModal = () => setIsDateModalOpen(false);
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
-      <div className="flex flex-col h-full gap-2 p-6 bg-white rounded-lg">
+    <div className="flex flex-col lg:w-4/5 gap-4">
+      <div className="flex flex-col h-full gap-2 p-6 bg-white rounded-3xl">
         <h2 className="text-xl font-semibold pb-4">프로필 정보</h2>
 
         <div className="py-4 px-6 border rounded-lg">
@@ -71,12 +71,14 @@ export default function Settings() {
           <div className="flex justify-between items-center py-4 border-b">
             <div>
               <h3 className="text-sm text-gray-500">진급일 및 전역예정일</h3>
-              <p className="mt-2 flex gap-4">
+              <p className="mt-2 flex gap-4 lg:flex-row flex-col">
                 <span>일병 {userData.service_pfc}</span>
                 <span>상병 {userData.service_cpl}</span>
                 <span>병장 {userData.service_sgt}</span>
               </p>
-              <p className="mt-2 font-bold">전역 {userData.service_end}</p>
+              <p className="mt-4 flex lg:flex-row flex-col">
+                <span>전역 {userData.service_end}</span>
+              </p>
             </div>
             <button
               onClick={openDateModal}
