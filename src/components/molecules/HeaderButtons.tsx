@@ -13,24 +13,21 @@ const Link: FC<LinkProps> = ({ className: _className, to, ...props }) => {
   return <RRLink {...props} to={to} className={className} />;
 };
 
-export default function HeaderButtons() {
-  const match = useMatch({ path: "/questions", end: true });
+interface HeaderButtonsProps {
+  onItemClick?: () => void;
+}
 
+const HeaderButtons: FC<HeaderButtonsProps> = ({ onItemClick }) => {
   return (
-    <div className="flex items-center gap-5 text-gray-900">
-      <Link className=" hover:text-emerald-600" to="/questions">
+    <div className="flex flex-col items-center gap-4 md:flex-row md:gap-5 md:items-center">
+      <Link className="hover:text-emerald-600" to="/questions" onClick={onItemClick}>
         질문&답변
       </Link>
-      <Link className=" hover:text-emerald-600" to="/talks">
-        커뮤니티
-      </Link>
-      <Link className=" hover:text-emerald-600" to="/articles">
-        밀리Tip
-      </Link>
-      <div className="w-px h-3 bg-gray-900 shrink-0" />
-      <Link className=" hover:text-emerald-600" to="/notices">
-        공지
+      <Link className="hover:text-emerald-600" to="/articles" onClick={onItemClick}>
+        밀리팁
       </Link>
     </div>
   );
-}
+};
+
+export default HeaderButtons;
