@@ -28,7 +28,7 @@ export default function Header() {
             <div className="flex">
               <SearchBar />
             </div>
-            {loggedUser ? <BadgeButtons /> : <LoginButton />}
+            {!loggedUser ? <BadgeButtons /> : <LoginButton />}
           </div>
         </div>
       </div>

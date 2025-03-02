@@ -1,4 +1,22 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function SearchBar() {
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div>
       <div className="hidden md:flex">
@@ -7,8 +25,14 @@ export default function SearchBar() {
             className="w-full pl-3 text-sm font-medium text-gray-900 placeholder-gray-500 bg-transparent border-none focus:outline-none focus:ring-0"
             type="text"
             placeholder="검색어를 입력하세요"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          <button className="-my-0.5 -ml-1.5 flex h-8 w-8 flex-shrink-0 items-center justify-center transition duration-300">
+          <button
+            onClick={handleSearch}
+            className="-my-0.5 -ml-1.5 flex h-8 w-8 flex-shrink-0 items-center justify-center transition duration-300"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -30,7 +54,10 @@ export default function SearchBar() {
       </div>
 
       <div className="flex md:hidden">
-        <button className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+        <button
+          onClick={handleSearch}
+          className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

@@ -9,6 +9,7 @@ import Questions from "./Questions";
 import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
 import Users from "./Users";
+import SearchResults from "./SearchResults";
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function RouterSetup() {
@@ -28,6 +29,7 @@ export default function RouterSetup() {
         />
         <Route index path="/questions/:id" element={<QuestionPost />} />
         <Route index path="/users/mypage" element={<Users />} />
+        <Route index path="/search" element={<SearchResults />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
       <Route path="/auth/login" element={<Login />} />
