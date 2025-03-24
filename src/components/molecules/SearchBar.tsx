@@ -4,15 +4,20 @@ import { useNavigate } from "react-router-dom";
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const isMobile = window.innerWidth < 768;
 
   const handleSearch = () => {
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query)}`);
+    if (isMobile) {
+      navigate("/search-input");
+    } else {
+      if (query.trim()) {
+        navigate(`/search?q=${encodeURIComponent(query)}`);
+      }
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (!isMobile && e.key === "Enter") {
       handleSearch();
     }
   };
@@ -52,7 +57,6 @@ export default function SearchBar() {
           </button>
         </div>
       </div>
-
       <div className="flex md:hidden">
         <button
           onClick={handleSearch}

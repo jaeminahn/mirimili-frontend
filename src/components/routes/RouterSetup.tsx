@@ -10,12 +10,15 @@ import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
 import Users from "./Users";
 import SearchResults from "./SearchResults";
+import MobileSearchPage from "./MobileSearchPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function RouterSetup() {
   return (
     <Routes>
       <Route index path="/" element={<Home />} />
+
+      {/* Layout이 필요한 페이지 그룹 */}
       <Route path="/" element={<Layout />}>
         <Route index path="/questions" element={<Questions />} />
         <Route
@@ -32,6 +35,9 @@ export default function RouterSetup() {
         <Route index path="/search" element={<SearchResults />} />
         <Route path="*" element={<NoMatch />} />
       </Route>
+
+      <Route path="/search-input" element={<MobileSearchPage />} />
+
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/logout" element={<Logout />} />
       <Route path="/auth/signup" element={<SignUp />} />
@@ -39,3 +45,4 @@ export default function RouterSetup() {
     </Routes>
   );
 }
+
