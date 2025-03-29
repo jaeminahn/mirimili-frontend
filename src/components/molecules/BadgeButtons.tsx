@@ -4,8 +4,8 @@ import { Icon } from "@iconify/react";
 
 const menuItems = [
   { icon: "fluent:chat-24-filled", label: "내 활동" },
-  { icon: "fluent:alert-24-filled", label: "알림" },
-  { icon: "fluent:bookmark-24-filled", label: "스크랩" },
+  //{ icon: "fluent:alert-24-filled", label: "알림" },
+  //{ icon: "fluent:bookmark-24-filled", label: "스크랩" },
   { icon: "fluent:settings-24-filled", label: "설정" }
 ];
 
@@ -22,6 +22,7 @@ export default function BadgeButtons() {
 
   return (
     <div className="flex items-center py-2 text-gray-500 gap-x-3">
+      {/*
       <Link
         to="/users/mypage"
         state={{ activeMenu: "스크랩" }}
@@ -37,6 +38,7 @@ export default function BadgeButtons() {
       >
         <Icon icon="fluent:alert-24-filled" className="text-lg" />
       </Link>
+      */}
 
       <button
         onClick={toggleMenu}

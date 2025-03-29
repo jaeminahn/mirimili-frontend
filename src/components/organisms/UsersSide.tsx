@@ -9,8 +9,8 @@ interface UsersSideProps {
 const UsersSide: React.FC<UsersSideProps> = ({ activeMenu, setActiveMenu }) => {
   const menuItems = [
     { icon: "fluent:chat-24-filled", label: "내 활동" },
-    { icon: "fluent:alert-24-filled", label: "알림" },
-    { icon: "fluent:bookmark-24-filled", label: "스크랩" },
+    //{ icon: "fluent:alert-24-filled", label: "알림" },
+    //{ icon: "fluent:bookmark-24-filled", label: "스크랩" },
     { icon: "fluent:settings-24-filled", label: "설정" }
   ];
 

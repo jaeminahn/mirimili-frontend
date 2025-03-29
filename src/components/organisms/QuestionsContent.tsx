@@ -101,7 +101,7 @@ export default function QuestionsMain() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 p-4 bg-white rounded-lg">
+      <div className="flex flex-col gap-2 p-4 bg-white rounded-3xl">
         <CategoryButton categoryId={categoryId} setCategoryId={setCategoryId} />
       </div>
 
@@ -128,7 +128,7 @@ export default function QuestionsMain() {
         </Menu>
       </div>
 
-      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-lg">
+      <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         {postData.length > 0 ? (
           postData.map((item) => (
             <PostItem
