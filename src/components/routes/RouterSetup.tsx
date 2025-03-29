@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Home from "./Home";
 import NoMatch from "./NoMatch";
 import Layout from "./Layout";
@@ -16,19 +16,19 @@ import ProtectedRoute from "./ProtectedRoute";
 export default function RouterSetup() {
   return (
     <Routes>
-      <Route index path="/" element={<Home />} />
+      <Route index element={<Navigate to="/questions" replace />} />
 
-      {/* Layout이 필요한 페이지 그룹 */}
       <Route path="/" element={<Layout />}>
         <Route index path="/questions" element={<Questions />} />
         <Route
           index
           path="/questions/new"
-          element={
+          element={<QuestionNew />}
+          /*element={
             <ProtectedRoute>
               <QuestionNew />
             </ProtectedRoute>
-          }
+          }*/
         />
         <Route index path="/questions/:id" element={<QuestionPost />} />
         <Route index path="/users/mypage" element={<Users />} />
@@ -45,4 +45,3 @@ export default function RouterSetup() {
     </Routes>
   );
 }
-

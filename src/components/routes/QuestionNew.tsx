@@ -23,7 +23,7 @@ const initialFormState: QuestionFormType = {
 
 export default function QuestionNew() {
   const [form, setForm] = useState<QuestionFormType>(initialFormState);
-  const { loggedUser } = useAuth();
+  //const { loggedUser } = useAuth();
   const navigate = useNavigate();
 
   const changed =
@@ -34,7 +34,7 @@ export default function QuestionNew() {
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
     };
 
-  const onSubmit = () => {
+  /*const onSubmit = () => {
     if (form.title === "") window.alert("제목을 입력해주세요.");
     else if (form.content === "") window.alert("내용을 입력해주세요.");
     else if (form.categoryId === 0) window.alert("카테고리를 지정해주세요.");
@@ -56,7 +56,7 @@ export default function QuestionNew() {
         );
       });
     }
-  };
+  };*/
 
   useEffect(() => {
     console.log(form);
@@ -69,7 +69,7 @@ export default function QuestionNew() {
         <div className="flex flex-col w-1/5 gap-2">
           <button
             className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
-            onClick={onSubmit}
+            //onClick={onSubmit}
           >
             질문 등록하기
           </button>

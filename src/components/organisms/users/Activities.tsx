@@ -115,6 +115,7 @@ export default function Activities() {
         </div>
       </div>
 
+      {/*
       <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-3xl">
         <div className="flex flex-col items-center p-6 bg-gray-100 rounded-xl">
           <p className="text-sm font-medium text-gray-600 mb-2">내 활동 점수</p>
@@ -128,6 +129,7 @@ export default function Activities() {
           <p className="text-2xl font-bold text-emerald-600">1,564위</p>
         </div>
       </div>
+      */}
 
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         <div className="relative flex gap-4 border-b-2 border-gray-200">
