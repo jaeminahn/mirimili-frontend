@@ -21,7 +21,7 @@ export default function SetNickname({
   const [nicknameMessage, setNicknameMessage] = useState("");
 
   const handleCheckNickname = () => {
-    const nickname = form.nickname;
+    const nickname = form.nick;
 
     if (nickname === "") {
       setNicknameMessage("닉네임을 입력해주세요.");
@@ -34,7 +34,7 @@ export default function SetNickname({
       return;
     }
 
-    post("/auth/join/check-nick", { nickname })
+    post("/auth/join/check-nick", { nick: nickname })
       .then((res) => res.json())
       .then((result) => {
         if (result.message === "Nick Exist") {
@@ -59,16 +59,16 @@ export default function SetNickname({
         <input
           type="text"
           placeholder="닉네임 입력"
-          value={form.nickname}
-          onChange={changed("nickname")}
+          value={form.nick}
+          onChange={changed("nick")}
           className="w-full p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
         />
         <button
           onClick={handleCheckNickname}
           className={`absolute right-2 p-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 ${
-            !form.nickname.trim() ? "cursor-not-allowed opacity-50" : ""
+            !form.nick.trim() ? "cursor-not-allowed opacity-50" : ""
           }`}
-          disabled={!form.nickname.trim()}
+          disabled={!form.nick.trim()}
         >
           중복 확인
         </button>

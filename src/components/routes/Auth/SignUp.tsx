@@ -17,7 +17,7 @@ import {
 export type SignUpFormType = {
   tel: string;
   password: string;
-  nickname: string;
+  nick: string;
   serviceType: number;
   serviceStartDate: Date;
   serviceEndDate: Date;
@@ -32,7 +32,7 @@ const today = new Date();
 const initialFormState: SignUpFormType = {
   tel: "",
   password: "",
-  nickname: "",
+  nick: "",
   serviceType: 1,
   serviceStartDate: today,
   serviceEndDate: calculateEndDate(today),
@@ -63,7 +63,7 @@ export default function SignUp() {
     signup(
       form.tel,
       form.password,
-      form.nickname,
+      form.nick,
       form.serviceType,
       form.serviceStartDate,
       form.servicePfcDate,

@@ -1,4 +1,4 @@
 export const getApiUrl = (path: string) => {
-  const host = "http://localhost:8002";
+  const host = "https://wjrc33-8002.csb.app";
   return [host, path].join("");
 };

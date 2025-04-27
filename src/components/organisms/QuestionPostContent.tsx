@@ -255,7 +255,7 @@ export default function QuestionPostContent() {
           <div className="flex flex-col gap-4 pt-2">
             <div className="flex flex-col gap-2 p-4 mt-4 bg-gray-100 rounded-lg">
               <div className="flex items-center gap-2 p-1 text-sm">
-                <p className="font-semibold">{loggedUser?.nickname}</p>
+                <p className="font-semibold">{loggedUser?.nick}</p>
                 <p className="text-emerald-600">
                   {typeId2Label(loggedUser.serviceType)}∙
                   {calculateLevel(loggedUser.serviceStartDate, new Date())}

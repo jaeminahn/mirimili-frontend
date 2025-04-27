@@ -6,7 +6,7 @@ import { post } from "../api";
 export type LoggedUser = {
   id: number;
   tel: string;
-  nickname: string;
+  nick: string;
   serviceType: number;
   serviceStartDate: Date;
   servicePfcDate: Date;
@@ -24,7 +24,7 @@ type ContextType = {
   signup: (
     tel: string,
     password: string,
-    nickname: string,
+    nick: string,
     serviceType: number,
     serviceStartDate: Date,
     servicePfcDate: Date,
@@ -43,7 +43,7 @@ export const AuthContext = createContext<ContextType>({
   signup: (
     tel: string,
     password: string,
-    nickname: string,
+    nick: string,
     serviceType: number,
     serviceStartDate: Date,
     servicePfcDate: Date,
@@ -74,7 +74,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
     (
       tel: string,
       password: string,
-      nickname: string,
+      nick: string,
       serviceType: number,
       serviceStartDate: Date,
       servicePfcDate: Date,
@@ -88,7 +88,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       post("/auth/join", {
         tel,
         password,
-        nickname,
+        nick,
         service_type_id: serviceType,
         service_start: serviceStartDate,
         service_pfc: servicePfcDate,
@@ -104,7 +104,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
             const user: LoggedUser = {
               id: result.user.id,
               tel,
-              nickname,
+              nick,
               serviceType,
               serviceStartDate,
               servicePfcDate,
@@ -131,7 +131,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
             const user: LoggedUser = {
               id: result.user.id,
               tel,
-              nickname: result.user.nickname,
+              nick: result.user.nick,
               serviceType: result.user.service_type_id,
               serviceStartDate: result.user.service_start,
               servicePfcDate: result.user.service_pfc,
