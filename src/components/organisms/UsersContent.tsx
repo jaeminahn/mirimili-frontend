@@ -3,6 +3,7 @@ import Activities from "./users/Activities";
 import Notifications from "./users/Notifications";
 import ScrapedPosts from "./users/ScrapedPosts";
 import Settings from "./users/Settings";
+import Logout from "./users/logout";
 
 interface UsersContentProps {
   activeMenu: string;
@@ -19,6 +20,8 @@ const UsersContent: React.FC<UsersContentProps> = ({ activeMenu }) => {
         return <ScrapedPosts />;
       case "설정":
         return <Settings />;
+      case "로그아웃":
+        return <Logout />;
       default:
         return <>"NO MATCH"</>;
     }
