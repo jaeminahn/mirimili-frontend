@@ -6,7 +6,8 @@ const menuItems = [
   { icon: "fluent:chat-24-filled", label: "내 활동" },
   //{ icon: "fluent:alert-24-filled", label: "알림" },
   //{ icon: "fluent:bookmark-24-filled", label: "스크랩" },
-  { icon: "fluent:settings-24-filled", label: "설정" }
+  { icon: "fluent:settings-24-filled", label: "설정" },
+  { icon: "fluent:sign-out-24-filled", label: "로그아웃" },
 ];
 
 export default function BadgeButtons() {
@@ -42,13 +43,13 @@ export default function BadgeButtons() {
 
       <button
         onClick={toggleMenu}
-        className="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg md:hidden"
+        className="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg lg:hidden"
       >
         <Icon icon="fluent:person-24-filled" className="text-lg" />
       </button>
 
       {isMenuOpen && (
-        <div className="fixed top-16 left-0 w-full bg-white shadow-lg rounded-b-lg py-2 z-10 md:hidden">
+        <div className="fixed top-16 left-0 w-full bg-white shadow-lg rounded-b-lg py-2 z-10 lg:hidden">
           <ul className="font-normal">
             {menuItems.map((item, index) => (
               <li
@@ -73,7 +74,7 @@ export default function BadgeButtons() {
       <Link
         to="/users/mypage"
         state={{ activeMenu: "내 활동" }}
-        className="hidden md:flex md:items-center md:justify-center md:w-10 md:h-10 md:bg-gray-100 md:hover:bg-gray-200 md:rounded-lg"
+        className="hidden lg:flex lg:items-center lg:justify-center lg:w-10 lg:h-10 lg:bg-gray-100 lg:hover:bg-gray-200 lg:rounded-lg"
       >
         <Icon icon="fluent:person-24-filled" className="text-lg" />
       </Link>

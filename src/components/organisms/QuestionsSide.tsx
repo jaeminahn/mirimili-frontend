@@ -5,7 +5,7 @@ export default function QuestionsSide() {
   return (
     <>
       <div className="hidden lg:flex flex-col lg:w-1/5 gap-4">
-        <div className="flex flex-col gap-1 p-4 bg-white rounded-3xl">
+        {/* <div className="flex flex-col gap-1 p-4 bg-white rounded-3xl">
           <p className="text-base font-semibold font-get">내 활동</p>
           <div className="flex justify-center gap-2 text-xs">
             <div className="flex gap-1 p-2 bg-gray-100 rounded-lg">
@@ -45,6 +45,8 @@ export default function QuestionsSide() {
             ))}
           </ul>
         </div>
+
+          */}
 
         <Link to="/questions/new" className="hidden lg:block">
           <div className="flex items-center justify-center h-12 gap-2 font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700">

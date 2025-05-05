@@ -1,13 +1,24 @@
+import { useRef } from "react";
 import { BrowserRouter } from "react-router-dom";
-import RouterSetup from "./components/routes/RouterSetup";
 import { AuthProvider } from "./contexts";
+import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
+import RouterSetup from "./components/routes/RouterSetup";
+import RouterTransition from "./components/routes/RouterTransition";
+import { ErrorBoundary } from "./components/routes/ErrorBoundary";
 
 function App() {
+  const { stop } = useLoading();
+
   return (
     <div className="font-nsk">
       <BrowserRouter>
         <AuthProvider>
-          <RouterSetup />
+          <LoadingProvider>
+            <RouterTransition />
+            <ErrorBoundary onError={() => stop()}>
+              <RouterSetup />
+            </ErrorBoundary>
+          </LoadingProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>
