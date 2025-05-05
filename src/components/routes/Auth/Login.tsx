@@ -30,6 +30,10 @@ export default function Login() {
     []
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") loginAccount();
+  };
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -70,6 +74,7 @@ export default function Login() {
             placeholder="비밀번호"
             value={password}
             onChange={changed("password")}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="flex flex-col items-center gap-2">
@@ -78,7 +83,7 @@ export default function Login() {
             onClick={loginAccount}
             className="w-64 p-2 text-base text-white rounded-xl bg-emerald-600"
           >
-            로그인하기
+            로그인
           </button>
           <Link
             to="/auth/signup"
