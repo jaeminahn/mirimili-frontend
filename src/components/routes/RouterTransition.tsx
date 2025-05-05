@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
+import { useEffect } from "react";
 import Spinner from "../molecules/Spinner";
+import { useLoading } from "../../contexts/LoadingContext";
 
 export default function RouterTransition() {
   const location = useLocation();
   const navigationType = useNavigationType();
-  const [loading, setLoading] = useState(false);
+  const { loading, start, stop } = useLoading();
 
   useEffect(() => {
     if (navigationType === "PUSH" || navigationType === "POP") {
-      setLoading(true);
-      const timeout = setTimeout(() => setLoading(false), 500);
+      start();
+      const timeout = setTimeout(() => stop(), 400);
       return () => clearTimeout(timeout);
     }
-  }, [location, navigationType]);
+  }, [location, navigationType, start, stop]);
 
   return loading ? <Spinner /> : null;
 }
