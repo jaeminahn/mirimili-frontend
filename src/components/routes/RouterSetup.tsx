@@ -16,7 +16,7 @@ import ProtectedRoute from "./ProtectedRoute";
 export default function RouterSetup() {
   return (
     <Routes>
-      <Route index element={<Navigate to="/questions" replace />} />
+      <Route index element={<Home />} />
 
       <Route path="/" element={<Layout />}>
         <Route index path="/questions" element={<Questions />} />

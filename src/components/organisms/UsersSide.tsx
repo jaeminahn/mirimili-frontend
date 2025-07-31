@@ -11,7 +11,7 @@ const UsersSide: React.FC<UsersSideProps> = ({ activeMenu, setActiveMenu }) => {
     { icon: "fluent:chat-24-filled", label: "내 활동" },
     //{ icon: "fluent:alert-24-filled", label: "알림" },
     //{ icon: "fluent:bookmark-24-filled", label: "스크랩" },
-    { icon: "fluent:settings-24-filled", label: "설정" }
+    { icon: "fluent:settings-24-filled", label: "설정" },
   ];
 
   return (
@@ -22,7 +22,9 @@ const UsersSide: React.FC<UsersSideProps> = ({ activeMenu, setActiveMenu }) => {
             key={item.label}
             onClick={() => setActiveMenu(item.label)}
             className={`flex items-center gap-1 px-4 py-2 text-sm rounded-lg cursor-pointer ${
-              activeMenu === item.label ? "bg-emerald-100 text-emerald-700 font-bold" : "bg-gray-100"
+              activeMenu === item.label
+                ? "bg-emerald-100 text-emerald-700 font-bold"
+                : "bg-gray-100"
             }`}
           >
             <Icon icon={item.icon} className="mr-1" />
