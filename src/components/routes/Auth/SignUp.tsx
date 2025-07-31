@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts";
+import TermsandConditions from "../../organisms/signup/TermsandConditions";
 import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
@@ -15,6 +16,7 @@ import {
 } from "../../../utils/calculateDate";
 
 export type SignUpFormType = {
+  memberType: number;
   tel: string;
   password: string;
   nick: string;
@@ -30,6 +32,7 @@ export type SignUpFormType = {
 
 const today = new Date();
 const initialFormState: SignUpFormType = {
+  memberType: -1,
   tel: "",
   password: "",
   nick: "",
@@ -84,18 +87,16 @@ export default function SignUp() {
   // }, [form]);
 
   return (
-    <div className="flex flex-col items-center justify-start w-screen h-screen bg-gray-100">
-      <div className="flex items-center gap-2 mt-20 mb-4">
-        <p className="text-base text-gray-500 font-get">
-          똑똑한 입대, 후회없는 군생활
-        </p>
-        <p className="text-2xl text-emerald-600 font-get">미리밀리</p>
-      </div>
+    <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
       <div className={`${step === 1 ? "" : "hidden"}`}>
-        <SetMember form={form} changed={changed} goToNextStep={goToNextStep} />
+        <TermsandConditions
+          form={form}
+          changed={changed}
+          goToNextStep={goToNextStep}
+        />
       </div>
       <div className={`${step === 2 ? "" : "hidden"}`}>
-        <SetPhonePassword
+        <SetMember
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
@@ -103,7 +104,7 @@ export default function SignUp() {
         />
       </div>
       <div className={`${step === 3 ? "" : "hidden"}`}>
-        <SetNickname
+        <SetPhonePassword
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
@@ -111,6 +112,14 @@ export default function SignUp() {
         />
       </div>
       <div className={`${step === 4 ? "" : "hidden"}`}>
+        <SetNickname
+          form={form}
+          changed={changed}
+          setCanProceed={setCanProceed}
+          step={step}
+        />
+      </div>
+      <div className={`${step === 5 ? "" : "hidden"}`}>
         <SetTypeAndStartDate
           form={form}
           changed={changed}
@@ -119,7 +128,7 @@ export default function SignUp() {
           step={step}
         />
       </div>
-      <div className={`${step === 5 ? "" : "hidden"}`}>
+      <div className={`${step === 6 ? "" : "hidden"}`}>
         <SetDetailDate
           form={form}
           changed={changed}
@@ -128,7 +137,7 @@ export default function SignUp() {
           step={step}
         />
       </div>
-      <div className={`${step === 6 ? "" : "hidden"}`}>
+      <div className={`${step === 7 ? "" : "hidden"}`}>
         <SetMosAndUnit
           form={form}
           changed={changed}
@@ -136,9 +145,9 @@ export default function SignUp() {
           step={step}
         />
       </div>
-      {step > 1 && (
+      {step >= 1 && (
         <div className="flex items-center justify-between mt-4 w-80">
-          {step > 1 && (
+          {step >= 1 && (
             <button
               onClick={goToPreviousStep}
               className="w-24 py-2 text-lg font-semibold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-300"
@@ -146,7 +155,7 @@ export default function SignUp() {
               이전
             </button>
           )}
-          {step < 6 ? (
+          {step < 7 ? (
             <button
               onClick={goToNextStep}
               className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
