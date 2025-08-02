@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
-import SelectModal from "../SelectModal";
+import TermsModal from "../TermsModal";
 import { Icon } from "@iconify/react";
 
 type SetMemberProps = {
@@ -48,7 +48,6 @@ export default function TermsAndConditions({
   return (
     <div className="flex flex-col p-6 bg-white rounded-lg w-96">
       <h2 className="mb-6 text-lg font-bold text-gray-700">약관 동의</h2>
-
       <div
         className="flex items-center gap-3 mb-6 cursor-pointer"
         onClick={toggleAgreeAll}
@@ -63,9 +62,7 @@ export default function TermsAndConditions({
           약관 전체동의
         </span>
       </div>
-
       <div className="border-t border-gray-200 mb-4" />
-
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div
@@ -124,20 +121,17 @@ export default function TermsAndConditions({
           </span>
         </div>
       </div>
-
-      <SelectModal
-        title="이용약관"
+      <TermsModal
+        title="미리밀리 서비스 이용 약관"
         isOpen={useModalOpen}
         onClose={() => setUseModalOpen(false)}
-        DataList={[]} // 추후 내용 삽입
-        onSelect={() => {}}
+        filePath="/terms.txt"
       />
-      <SelectModal
+      <TermsModal
         title="개인정보 수집 및 이용동의"
         isOpen={privacyModalOpen}
         onClose={() => setPrivacyModalOpen(false)}
-        DataList={[]} // 추후 내용 삽입
-        onSelect={() => {}}
+        filePath="/privacy.txt"
       />
     </div>
   );
