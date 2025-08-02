@@ -1,6 +1,11 @@
 import type { FC, PropsWithChildren } from "react";
-import { createContext, useContext, useState, useCallback } from "react";
-import * as U from "../utils";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import { post } from "../api";
 
 export type LoggedUser = {
@@ -40,35 +45,29 @@ type ContextType = {
 };
 
 export const AuthContext = createContext<ContextType>({
-  signup: (
-    tel: string,
-    password: string,
-    nick: string,
-    serviceType: number,
-    serviceStartDate: Date,
-    servicePfcDate: Date,
-    serviceCplDate: Date,
-    serviceSgtDate: Date,
-    serviceEndDate: Date,
-    serviceMos: number,
-    serviceUnit: number,
-    callback?: Callback
-  ) => {},
-  login: (tel: string, password: string, callback?: Callback) => {},
-  logout: (callback?: Callback) => {},
+  signup: () => {},
+  login: () => {},
+  logout: () => {},
 });
 
-type AuthProviderProps = {};
-
-export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
-  children,
-}) => {
+export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<LoggedUser | undefined>(
     undefined
   );
   const [accessToken, setAccessToken] = useState<string>("");
   const [refreshToken, setRefreshToken] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedAccessToken = localStorage.getItem("accessToken");
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+
+    if (storedUser && storedAccessToken) {
+      setLoggedUser(JSON.parse(storedUser));
+      setAccessToken(storedAccessToken || "");
+      setRefreshToken(storedRefreshToken || "");
+    }
+  }, []);
 
   const signup = useCallback(
     (
@@ -115,8 +114,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
               serviceUnit,
             };
             setLoggedUser(user);
-            U.writeObjectP("user", user).finally(() => callback && callback());
+            localStorage.setItem("user", JSON.stringify(user));
+            callback?.();
+          } else {
+            alert(result.message);
           }
+        })
+        .catch((err) => {
+          console.error("Signup error:", err);
+          alert("회원가입 중 오류가 발생했습니다.");
         });
     },
     []
@@ -127,7 +133,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
       post("/auth/login", { tel, password })
         .then((res) => res.json())
         .then((result) => {
-          if (result.message == "Login Success") {
+          if (result.message === "Login Success") {
             const user: LoggedUser = {
               id: result.user.id,
               tel,
@@ -142,10 +148,21 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
               serviceUnit: result.user.service_unit_id,
             };
             setLoggedUser(user);
-            U.writeObjectP("accessToken", result.accessToken);
-            U.writeObjectP("refreshToken", result.refreshToken);
-            U.writeObjectP("user", user).finally(() => callback && callback());
-          } else alert(result.message);
+            setAccessToken(result.accessToken);
+            setRefreshToken(result.refreshToken);
+
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("accessToken", result.accessToken);
+            localStorage.setItem("refreshToken", result.refreshToken);
+
+            callback?.();
+          } else {
+            alert(result.message);
+          }
+        })
+        .catch((err) => {
+          console.error("Login error:", err);
+          alert("로그인 중 오류가 발생했습니다.");
         });
     },
     []
@@ -155,7 +172,12 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
     setLoggedUser(undefined);
     setAccessToken("");
     setRefreshToken("");
-    callback && callback();
+
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    callback?.();
   }, []);
 
   const value = {
@@ -168,6 +190,4 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

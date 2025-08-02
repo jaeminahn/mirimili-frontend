@@ -3,31 +3,47 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts";
 import * as U from "../../../utils";
 
-type LoginFormType = Record<"email" | "password", string>;
-const initialFormState = { email: "", password: "" };
+type LoginFormType = Record<"tel" | "password", string>;
+const initialFormState = { tel: "", password: "" };
+
+const formatTel = (value: string) => {
+  const onlyNumbers = value.replace(/\D/g, "");
+  if (onlyNumbers.length <= 3) return onlyNumbers;
+  if (onlyNumbers.length <= 7)
+    return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3)}`;
+  return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(
+    3,
+    7
+  )}-${onlyNumbers.slice(7, 11)}`;
+};
 
 export default function Login() {
-  const [{ email, password }, setForm] =
+  const [{ tel, password }, setForm] =
     useState<LoginFormType>(initialFormState);
+
   const changed = useCallback(
     (key: string) => (e: ChangeEvent<HTMLInputElement>) => {
-      setForm((obj) => ({ ...obj, [key]: e.target.value }));
+      let value = e.target.value;
+      if (key === "tel") value = formatTel(value);
+      setForm((prev) => ({ ...prev, [key]: value }));
     },
     []
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") loginAccount();
+  };
+
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const loginAccount = useCallback(() => {
-    login(email, password, () => navigate("/"));
-  }, [email, password, navigate, login]);
+    const pureTel = tel.replace(/-/g, "");
+    login(pureTel, password, () => navigate("/"));
+  }, [tel, password, navigate, login]);
 
   useEffect(() => {
-    U.readObjectP<LoginFormType>("user")
-      .then((user) => {
-        if (user) setForm(user);
-      })
-      .catch((e) => {});
+    setForm(initialFormState);
   }, []);
 
   return (
@@ -46,18 +62,19 @@ export default function Login() {
           <input
             type="text"
             className="w-64 p-2 px-4 border-2 border-gray-200 focus:border-emerald-600 focus:ring-emerald-600 focus:outline-none rounded-xl"
-            name="email"
-            placeholder="이메일"
-            value={email}
-            onChange={changed("email")}
+            name="tel"
+            placeholder="전화번호"
+            value={tel}
+            onChange={changed("tel")}
           />
           <input
-            type="text"
+            type="password"
             className="w-64 p-2 px-4 border-2 border-gray-200 focus:border-emerald-600 focus:ring-emerald-600 focus:outline-none rounded-xl"
             name="password"
             placeholder="비밀번호"
             value={password}
             onChange={changed("password")}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="flex flex-col items-center gap-2">
@@ -66,7 +83,7 @@ export default function Login() {
             onClick={loginAccount}
             className="w-64 p-2 text-base text-white rounded-xl bg-emerald-600"
           >
-            로그인하기
+            로그인
           </button>
           <Link
             to="/auth/signup"

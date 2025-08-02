@@ -52,7 +52,8 @@ export default function QuestionsMain() {
   const [orderBy, setOrderBy] = useState(0);
 
   useEffect(() => {
-    const categoryQuery = categoryId !== undefined ? `&category=${categoryId}` : "";
+    const categoryQuery =
+      categoryId !== undefined ? `&category=${categoryId}` : "";
 
     get(`/questions?order=${orderBy}${categoryQuery}`)
       .then((res) => res.json())
@@ -143,7 +144,9 @@ export default function QuestionsMain() {
             />
           ))
         ) : (
-          <p className="p-4 text-gray-600">선택한 카테고리에 해당하는 글이 없어요.</p>
+          <p className="p-4 text-gray-600">
+            선택한 카테고리에 해당하는 글이 없어요.
+          </p>
         )}
       </div>
     </div>
