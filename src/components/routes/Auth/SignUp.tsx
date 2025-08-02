@@ -16,6 +16,9 @@ import {
 } from "../../../utils/calculateDate";
 
 export type SignUpFormType = {
+  serviceAgreed: boolean;
+  privacyPolicyAgreed: boolean;
+  marketingConsentAgreed: boolean;
   memberType: number;
   tel: string;
   password: string;
@@ -32,6 +35,9 @@ export type SignUpFormType = {
 
 const today = new Date();
 const initialFormState: SignUpFormType = {
+  serviceAgreed: false,
+  privacyPolicyAgreed: false,
+  marketingConsentAgreed: false,
   memberType: -1,
   tel: "",
   password: "",
@@ -92,7 +98,8 @@ export default function SignUp() {
         <TermsandConditions
           form={form}
           changed={changed}
-          goToNextStep={goToNextStep}
+          setCanProceed={setCanProceed}
+          step={step}
         />
       </div>
       <div className={`${step === 2 ? "" : "hidden"}`}>
