@@ -73,7 +73,7 @@ export default function SetDetailDate({
   ]);
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
+    <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <h2 className="mb-4 text-lg font-bold text-gray-700">전역예정일</h2>
       <DatePicker date={endDate} setDate={setEndDate} />
 

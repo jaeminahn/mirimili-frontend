@@ -86,7 +86,13 @@ export default function SignUp() {
   };
 
   const goToNextStep = () => setStep((prev) => prev + 1);
-  const goToPreviousStep = () => setStep((prev) => prev - 1);
+  const goToPreviousStep = () => {
+    if (step === 1) {
+      navigate("/auth/login");
+    } else {
+      setStep((prev) => prev - 1);
+    }
+  };
 
   // useEffect(() => {
   //   console.log(form);
@@ -153,11 +159,11 @@ export default function SignUp() {
         />
       </div>
       {step >= 1 && (
-        <div className="flex items-center justify-between mt-4 w-80">
+        <div className="flex items-center justify-between mt-4 w-[360px]">
           {step >= 1 && (
             <button
               onClick={goToPreviousStep}
-              className="w-24 py-2 text-lg font-semibold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-300"
+              className="w-[112px] py-2 text-base font-semibold rounded-3xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
             >
               이전
             </button>
@@ -165,7 +171,7 @@ export default function SignUp() {
           {step < 7 ? (
             <button
               onClick={goToNextStep}
-              className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
+              className={`w-[224px] py-2 text-base font-semibold text-white rounded-3xl ${
                 canProceed
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
@@ -177,7 +183,7 @@ export default function SignUp() {
           ) : (
             <button
               onClick={createAccount}
-              className={`w-48 py-2 text-lg font-semibold text-white rounded-lg ${
+              className={`w-[224px] py-2 text-base font-semibold text-white rounded-3xl ${
                 canProceed
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"

@@ -46,7 +46,7 @@ export default function TermsAndConditions({
     "w-4 h-4 rounded-full border border-gray-400 appearance-none checked:bg-[url('./images/checked.png')] bg-cover bg-no-repeat bg-center checked:border-emerald-600";
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
+    <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <h2 className="mb-6 text-lg font-bold text-gray-700">약관 동의</h2>
       <div
         className="flex items-center gap-3 mb-6 cursor-pointer"

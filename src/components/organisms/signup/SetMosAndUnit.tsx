@@ -64,7 +64,7 @@ export default function SetMosAndUnit({
   }, [form.serviceMos, form.serviceUnit, step]);
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
+    <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <div className="flex items-center justify-between mb-4">
         <p className="text-lg font-bold text-gray-700">군사특기</p>
         <div

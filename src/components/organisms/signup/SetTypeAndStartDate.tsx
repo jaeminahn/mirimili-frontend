@@ -49,7 +49,7 @@ export default function SetTypeAndStartDate({
   };
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
+    <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <h2 className="mb-4 text-lg font-bold text-gray-700">복무 형태 설정</h2>
       <div className="flex flex-wrap gap-2 mb-6">
         {ServiceType.map((type) => (

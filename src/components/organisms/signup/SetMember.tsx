@@ -37,7 +37,7 @@ export default function SetMember({
   const emeraldText = "text-emerald-700";
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-lg w-96">
+    <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <h2 className="mb-6 text-lg font-bold text-gray-700">회원종류 선택</h2>
 
       <button
