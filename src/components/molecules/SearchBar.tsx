@@ -25,9 +25,9 @@ export default function SearchBar() {
   return (
     <div>
       <div className="hidden md:flex">
-        <div className="flex items-center transition-colors bg-gray-100 h-9 rounded-xl focus-within:border-emerald-600 focus-within:ring-1 focus-within:ring-emerald-600">
+        <div className="flex px-3 items-center transition-colors bg-gray-100 h-9 rounded-xl w-60 focus-within:border-emerald-600 focus-within:ring-1 focus-within:ring-emerald-600">
           <input
-            className="w-full pl-3 text-sm font-medium text-gray-900 placeholder-gray-500 bg-transparent border-none focus:outline-none focus:ring-0"
+            className="w-full text-sm font-medium text-gray-900 placeholder-gray-500 bg-transparent border-none focus:outline-none focus:ring-0"
             type="text"
             placeholder="검색어를 입력하세요"
             value={query}
@@ -46,7 +46,7 @@ export default function SearchBar() {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              className="h-3.5 w-3.5 text-emerald-600"
+              className="h-5 w-5 text-emerald-600"
             >
               <path
                 strokeLinecap="round"
