@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect } from "react";
+import { Icon } from "@iconify/react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 
 type SetMemberProps = {
@@ -32,55 +33,44 @@ export default function SetMember({
   const isSelected = (value: number) => form.memberType === value;
 
   const baseStyle =
-    "flex items-center justify-between p-4 mb-4 text-xl font-normal rounded-lg bg-white border border-gray-300";
+    "flex items-center justify-between p-6 mb-6 text-xl font-normal rounded-lg bg-white border transition-all";
   const grayText = "text-gray-400";
-  const emeraldText = "text-emerald-700";
+  const emeraldText = "text-emerald-600";
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
-      <h2 className="mb-6 text-lg font-bold text-gray-700">회원종류 선택</h2>
+      <h2 className="mb-6 text-lg font-bold text-gray-700">회원타입</h2>
 
-      <button
-        onClick={() => handleSelect(0)}
-        className={`${baseStyle} ${
-          isSelected(0) ? "bg-emerald-50 border-emerald-500" : ""
-        }`}
-      >
-        <div className={`flex flex-col w-3/4 text-left ${grayText}`}>
-          <div className={`font-get ${isSelected(0) ? emeraldText : ""}`}>
-            입대 전이에요
-          </div>
-          <div className="text-xs">입대 전 회원</div>
-        </div>
-      </button>
-
-      <button
-        onClick={() => handleSelect(1)}
-        className={`${baseStyle} ${
-          isSelected(1) ? "bg-emerald-50 border-emerald-500" : ""
-        }`}
-      >
-        <div className={`flex flex-col w-3/4 text-left ${grayText}`}>
-          <div className={`font-get ${isSelected(1) ? emeraldText : ""}`}>
-            입대했어요
-          </div>
-          <div className="text-xs">현역 군인 회원</div>
-        </div>
-      </button>
-
-      <button
-        onClick={() => handleSelect(2)}
-        className={`${baseStyle} ${
-          isSelected(2) ? "bg-emerald-50 border-emerald-500" : ""
-        }`}
-      >
-        <div className={`flex flex-col w-3/4 text-left ${grayText}`}>
-          <div className={`font-get ${isSelected(2) ? emeraldText : ""}`}>
-            전역했어요
-          </div>
-          <div className="text-xs">예비군·민방위</div>
-        </div>
-      </button>
+      {[0, 1, 2].map((value) => {
+        const titles = ["입대 전이에요", "입대했어요", "전역했어요"];
+        const subtitles = ["입대 전 회원", "현역 군인 회원", "예비역 · 민방위"];
+        return (
+          <button
+            key={value}
+            onClick={() => handleSelect(value)}
+            className={`${baseStyle} ${
+              isSelected(value)
+                ? "bg-emerald-50 border-emerald-600"
+                : "border-gray-300"
+            }`}
+          >
+            <div
+              className={`flex flex-col w-3/4 text-left ${
+                isSelected(value) ? emeraldText : grayText
+              }`}
+            >
+              <div className="font-get">{titles[value]}</div>
+              <div className="text-xs text-gray-400">{subtitles[value]}</div>
+            </div>
+            {isSelected(value) && (
+              <Icon
+                icon="ic:round-check-circle"
+                className="text-emerald-600 text-2xl"
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
