@@ -94,10 +94,6 @@ export default function SignUp() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(form);
-  // }, [form]);
-
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
       <div className={`${step === 1 ? "" : "hidden"}`}>
@@ -176,7 +172,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              disabled={!canProceed}
+              //disabled={!canProceed}
             >
               다음
             </button>
