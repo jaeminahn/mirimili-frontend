@@ -1,26 +1,20 @@
 import { post } from "./postAndPut";
 
-export const postNewAnswer = (
-  writerId: number,
+export async function postNewAnswer(
   questionId: number,
   content: string,
-  accessToken: string,
-  callback?: () => void
-) => {
-  post(
-    `/answers/${questionId}`,
-    {
-      writer_id: writerId,
-      content,
-    },
-    accessToken
-  )
-    .then((res) => res.json())
-    .then((result) => {
-      if (result.code === 401 || result.code === 419)
-        window.alert(result.message);
-      else {
-        callback && callback();
+  accessToken: string
+): Promise<void> {
+  const res = await post(`/answers/${questionId}`, { content }, accessToken);
+
+  if (!res.ok) {
+    let msg = `postNewAnswer failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+      if (j?.code === 401 || j?.code === 419) {
       }
-    });
-};
+    } catch {}
+    throw new Error(msg);
+  }
+}

@@ -6,20 +6,11 @@ import {
   useCallback,
   useEffect,
 } from "react";
-import { post } from "../api";
+import { post } from "../api/postAndPut";
 
 export type LoggedUser = {
-  id: number;
   tel: string;
   nick: string;
-  serviceType: number;
-  serviceStartDate: Date;
-  servicePfcDate: Date;
-  serviceCplDate: Date;
-  serviceSgtDate: Date;
-  serviceEndDate: Date;
-  serviceMos: number;
-  serviceUnit: number;
 };
 
 type Callback = () => void;
@@ -63,7 +54,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const storedRefreshToken = localStorage.getItem("refreshToken");
 
     if (storedUser && storedAccessToken) {
-      setLoggedUser(JSON.parse(storedUser));
+      try {
+        setLoggedUser(JSON.parse(storedUser) as LoggedUser);
+      } catch {}
       setAccessToken(storedAccessToken || "");
       setRefreshToken(storedRefreshToken || "");
     }
@@ -99,25 +92,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       })
         .then((res) => res.json())
         .then((result) => {
-          if (result.message === "join success") {
-            const user: LoggedUser = {
-              id: result.user.id,
-              tel,
-              nick,
-              serviceType,
-              serviceStartDate,
-              servicePfcDate,
-              serviceCplDate,
-              serviceSgtDate,
-              serviceEndDate,
-              serviceMos,
-              serviceUnit,
-            };
+          if (result?.success === true || result?.message === "join success") {
+            const user: LoggedUser = { tel, nick };
             setLoggedUser(user);
             localStorage.setItem("user", JSON.stringify(user));
             callback?.();
           } else {
-            alert(result.message);
+            alert(result?.message ?? "회원가입에 실패했습니다.");
           }
         })
         .catch((err) => {
@@ -130,34 +111,26 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const login = useCallback(
     (tel: string, password: string, callback?: Callback) => {
-      post("/auth/login", { tel, password })
+      post("/auth/login", { phoneNumber: tel, password })
         .then((res) => res.json())
         .then((result) => {
-          if (result.message === "Login Success") {
-            const user: LoggedUser = {
-              id: result.user.id,
-              tel,
-              nick: result.user.nick,
-              serviceType: result.user.service_type_id,
-              serviceStartDate: result.user.service_start,
-              servicePfcDate: result.user.service_pfc,
-              serviceCplDate: result.user.service_cpl,
-              serviceSgtDate: result.user.service_sgt,
-              serviceEndDate: result.user.service_end,
-              serviceMos: result.user.service_mos_id,
-              serviceUnit: result.user.service_unit_id,
-            };
+          if (result?.success === true) {
+            const access = result?.data?.accessToken ?? "";
+            const refresh = result?.data?.refreshToken ?? "";
+            const nickname = result?.data?.nickname ?? "";
+
+            const user: LoggedUser = { tel, nick: nickname };
             setLoggedUser(user);
-            setAccessToken(result.accessToken);
-            setRefreshToken(result.refreshToken);
+            setAccessToken(access);
+            setRefreshToken(refresh);
 
             localStorage.setItem("user", JSON.stringify(user));
-            localStorage.setItem("accessToken", result.accessToken);
-            localStorage.setItem("refreshToken", result.refreshToken);
+            localStorage.setItem("accessToken", access);
+            localStorage.setItem("refreshToken", refresh);
 
             callback?.();
           } else {
-            alert(result.message);
+            alert(result?.message ?? "로그인 실패");
           }
         })
         .catch((err) => {

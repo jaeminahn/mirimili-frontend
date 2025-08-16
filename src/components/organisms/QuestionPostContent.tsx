@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
 import category from "../../data/category.json";
-import { get, post } from "../../api";
+import { get } from "../../api/getAndDel";
 import {
   calculateLevel,
   calculateTimeAgo,
@@ -104,15 +104,21 @@ export default function QuestionPostContent() {
     }
   };
 
+  // 토큰 인증 기반으로 userId 없이 전송
   const newAnswer = () => {
+    if (!answerText.trim()) return;
     readObjectP("accessToken").then((at) => {
-      postNewAnswer(
-        loggedUser!.id,
-        Number(params["id"]),
-        answerText,
-        JSON.stringify(at).slice(1, -1),
-        () => navigate("/")
-      );
+      const accessToken = String(at ?? "").replace(/^"|"$/g, ""); // JSON.stringify 제거 대응
+      if (!accessToken) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+      postNewAnswer(Number(params["id"]), answerText, accessToken)
+        .then(() => navigate("/"))
+        .catch((e) => {
+          console.error(e);
+          alert("답변 등록 중 오류가 발생했습니다.");
+        });
     });
   };
 
@@ -132,25 +138,24 @@ export default function QuestionPostContent() {
           answer: res.answer,
           createdAt: calculateTimeAgo(new Date(res.createdAt)),
         }));
-        get(`/users/${res.writer_id}`)
-          .then((writer) => writer.json())
-          .then((writer) => {
-            setPostData((prev) => ({
-              ...prev,
-              id: writer.id,
-              writerNick: writer.nickname,
-              writerType: typeId2Label(writer.service_type_id),
-              writerLevel: calculateLevel(writer.service_start, new Date()),
-              writerMos: mosId2Label(writer.service_mos_id),
-              writerUnit: unitId2Label(writer.service_unit_id),
-            }));
-            console.log(writer);
-          });
+        return get(`/users/${res.writer_id}`).then((w) => w.json());
+      })
+      .then((writer) => {
+        setPostData((prev) => ({
+          ...prev,
+          writerNick: writer.nickname,
+          writerType: typeId2Label(writer.service_type_id),
+          writerLevel: calculateLevel(writer.service_start, new Date()),
+          writerMos: mosId2Label(writer.service_mos_id),
+          writerUnit: unitId2Label(writer.service_unit_id),
+        }));
       });
+
+    // 답변 목록
     get(`/answers/${params["id"]}`)
       .then((res) => res.json())
       .then(async (res) => {
-        const answerData = await Promise.all(
+        const mapped = await Promise.all(
           res.map(async (item: _answerDataProps) => {
             const writerResponse = await get(`/users/${item.writer_id}`);
             const writer = await writerResponse.json();
@@ -166,15 +171,18 @@ export default function QuestionPostContent() {
               like: item.like,
               dislike: item.dislike,
               createdAt: calculateTimeAgo(new Date(item.createdAt)),
+              isLiked: false,
+              isDisliked: false,
+              isScrapped: false,
             };
           })
         );
-        setAnswerData(answerData);
+        setAnswerData(mapped);
       })
       .catch((error) => {
         console.error("Error fetching answers:", error);
       });
-  }, []);
+  }, [params["id"]]);
 
   return (
     <div className="flex flex-col w-4/5 gap-4">
@@ -250,17 +258,12 @@ export default function QuestionPostContent() {
             </div>
           </div>
         </div>
-        {/* postData.writerId != loggedUser.id 배포 시 이 조건 추가*/}
+
         {loggedUser && (
           <div className="flex flex-col gap-4 pt-2">
             <div className="flex flex-col gap-2 p-4 mt-4 bg-gray-100 rounded-lg">
               <div className="flex items-center gap-2 p-1 text-sm">
-                <p className="font-semibold">{loggedUser?.nick}</p>
-                <p className="text-emerald-600">
-                  {typeId2Label(loggedUser.serviceType)}∙
-                  {calculateLevel(loggedUser.serviceStartDate, new Date())}
-                  {hideUnit ? null : `∙${unitId2Label(loggedUser.serviceUnit)}`}
-                </p>
+                <p className="font-semibold">{loggedUser.nick}</p>
               </div>
               <textarea
                 ref={textareaRef}
@@ -279,6 +282,7 @@ export default function QuestionPostContent() {
                 <button
                   className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
                   onClick={newAnswer}
+                  disabled={!answerText.trim()}
                 >
                   답변 등록
                 </button>
@@ -287,6 +291,7 @@ export default function QuestionPostContent() {
           </div>
         )}
       </div>
+
       {answerData.map((answer) => (
         <AnswerItem
           key={answer.id}
