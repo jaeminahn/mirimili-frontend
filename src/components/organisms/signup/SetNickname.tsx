@@ -35,9 +35,9 @@ export default function SetNickname({
 
     try {
       const path = withQuery("/auth/checkNickname", { nickname });
-      const r = await getJSON<{ code?: string; message?: string }>(path);
+      const r = await getJSON<{ success?: boolean }>(path);
 
-      if (r.status === 409 || r.data?.code === "COMMON409") {
+      if (r.data?.success === false) {
         setNicknameMessage("누가 이 닉네임을 이미 사용하고 있어요.");
         setIsNicknameAvailable(false);
         return;
@@ -48,8 +48,7 @@ export default function SetNickname({
         return;
       }
 
-      const code = r.data?.code ?? r.data?.message;
-      if (code === "COMMON200") {
+      if (r.data?.success === true) {
         setNicknameMessage("사용 가능한 닉네임이에요.");
         setIsNicknameAvailable(true);
       } else {
