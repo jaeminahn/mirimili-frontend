@@ -34,7 +34,7 @@ export default function SetNickname({
       return;
     }
 
-    post("/auth/checkNickname", { nick: nickname })
+    post("/auth/checkNickname", { nickname: nickname })
       .then((res) => res.json())
       .then((result) => {
         if (result.code === "COMMON409") {
