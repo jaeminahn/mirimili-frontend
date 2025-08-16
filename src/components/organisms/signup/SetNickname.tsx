@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
-import { post } from "../../../api";
+import { getJSON, withQuery } from "../../../api/getAndDel";
 
 type SetNicknameProps = {
   form: SignUpFormType;
@@ -20,10 +20,9 @@ export default function SetNickname({
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(false);
   const [nicknameMessage, setNicknameMessage] = useState("");
 
-  const handleCheckNickname = () => {
-    const nickname = form.nick;
-
-    if (nickname === "") {
+  const handleCheckNickname = async () => {
+    const nickname = form.nick.trim();
+    if (!nickname) {
       setNicknameMessage("닉네임을 입력해주세요.");
       setIsNicknameAvailable(false);
       return;
@@ -34,23 +33,39 @@ export default function SetNickname({
       return;
     }
 
-    post("/auth/checkNickname", { nickname: nickname })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.code === "COMMON409") {
-          setNicknameMessage("누가 이 닉네임을 이미 사용하고 있어요.");
-          setIsNicknameAvailable(false);
-        } else if (result.message === "COMMON200") {
-          setNicknameMessage("사용 가능한 닉네임이에요.");
-          setIsNicknameAvailable(true);
-        }
-      });
+    try {
+      const path = withQuery("/auth/checkNickname", { nickname });
+      const r = await getJSON<{ code?: string; message?: string }>(path);
+
+      if (r.status === 409 || r.data?.code === "COMMON409") {
+        setNicknameMessage("누가 이 닉네임을 이미 사용하고 있어요.");
+        setIsNicknameAvailable(false);
+        return;
+      }
+      if (!r.ok) {
+        setNicknameMessage(`오류(${r.status}). 잠시 후 다시 시도해주세요.`);
+        setIsNicknameAvailable(false);
+        return;
+      }
+
+      const code = r.data?.code ?? r.data?.message;
+      if (code === "COMMON200") {
+        setNicknameMessage("사용 가능한 닉네임이에요.");
+        setIsNicknameAvailable(true);
+      } else {
+        setNicknameMessage("응답 형식을 확인해주세요.");
+        setIsNicknameAvailable(false);
+      }
+    } catch {
+      setNicknameMessage("네트워크 오류가 발생했어요.");
+      setIsNicknameAvailable(false);
+    }
   };
 
   useEffect(() => {
     if (step !== 3) return;
     setCanProceed(isNicknameAvailable);
-  }, [isNicknameAvailable, step]);
+  }, [isNicknameAvailable, step, setCanProceed]);
 
   return (
     <div className="flex flex-col px-6 py-9 bg-white rounded-3xl w-[360px]">
