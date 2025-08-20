@@ -7,12 +7,13 @@ import {
   useEffect,
 } from "react";
 import { post } from "../api/postAndPut";
+import {
+  setTokens,
+  clearTokens,
+  subscribeAccessToken,
+} from "../api/tokenStore";
 
-export type LoggedUser = {
-  tel: string;
-  nick: string;
-};
-
+export type LoggedUser = { tel: string; nick: string };
 type Callback = () => void;
 
 type ContextType = {
@@ -52,7 +53,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const storedUser = localStorage.getItem("user");
     const storedAccessToken = localStorage.getItem("accessToken");
     const storedRefreshToken = localStorage.getItem("refreshToken");
-
     if (storedUser && storedAccessToken) {
       try {
         setLoggedUser(JSON.parse(storedUser) as LoggedUser);
@@ -60,6 +60,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       setAccessToken(storedAccessToken || "");
       setRefreshToken(storedRefreshToken || "");
     }
+    subscribeAccessToken((t) => setAccessToken(t));
   }, []);
 
   const signup = useCallback(
@@ -118,16 +119,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             const access = result?.data?.accessToken ?? "";
             const refresh = result?.data?.refreshToken ?? "";
             const nickname = result?.data?.nickname ?? "";
-
             const user: LoggedUser = { tel, nick: nickname };
             setLoggedUser(user);
             setAccessToken(access);
             setRefreshToken(refresh);
-
             localStorage.setItem("user", JSON.stringify(user));
-            localStorage.setItem("accessToken", access);
-            localStorage.setItem("refreshToken", refresh);
-
+            setTokens(access, refresh);
             callback?.();
           } else {
             alert(result?.message ?? "로그인 실패");
@@ -145,21 +142,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     setLoggedUser(undefined);
     setAccessToken("");
     setRefreshToken("");
-
     localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-
+    clearTokens();
     callback?.();
   }, []);
 
-  const value = {
-    loggedUser,
-    signup,
-    login,
-    logout,
-  };
-
+  const value = { loggedUser, signup, login, logout };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

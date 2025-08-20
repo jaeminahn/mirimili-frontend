@@ -65,7 +65,7 @@ export default function SetPhonePassword({
       setSuccessMessage("");
       return;
     }
-    post("/auth/join/send-code", { tel })
+    post("/sms/send", { tel })
       .then((res) => res.json())
       .then((result) => {
         if (result.message === "user exist") {
@@ -89,7 +89,7 @@ export default function SetPhonePassword({
       setVerificationMessage("인증번호 6자리를 입력해주세요");
       return;
     }
-    post("/auth/join/validate-code", { tel, code })
+    post("/sms/verify", { tel, code })
       .then((res) => res.json())
       .then((result) => {
         const _isCodeValid = result.message === "Validation Success";
