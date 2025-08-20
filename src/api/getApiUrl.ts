@@ -1,2 +1,2 @@
 export const getApiUrl = (path: string) =>
-  "/api/" + String(path || "").replace(/^\/+/, "");
+  "https://13.124.245.214.sslip.io/" + String(path || "").replace(/^\/+/, "");
