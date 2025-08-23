@@ -1,32 +1,38 @@
 import { getApiUrl } from "./getApiUrl";
-import {
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-  clearTokens,
-} from "./tokenStore";
+import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./tokenStore";
 
 let refreshPromise: Promise<string> | null = null;
 
+function isAuthEndpoint(path: string) {
+  const base = getApiUrl("");
+  const url = path.replace(base, "");
+  return /^\/?auth\/(login|join)$/i.test(url);
+}
+
 async function reissueAccessToken(expiredAccess: string): Promise<string> {
-  if (!getRefreshToken()) throw new Error("no refresh");
+  const refresh = getRefreshToken();
+  if (!refresh) throw new Error("no refresh");
   if (refreshPromise) return refreshPromise;
+
   refreshPromise = (async () => {
     const res = await fetch(getApiUrl("/auth/reissue"), {
       method: "POST",
-      headers: new Headers({
+      headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${expiredAccess}`,
-      }),
-      body: JSON.stringify({ refreshToken: getRefreshToken() }),
+      },
+      body: JSON.stringify({ refreshToken: refresh }),
     });
     if (!res.ok) throw new Error("reissue failed");
+
     const json = await res.json();
-    const newAccess = json?.data?.accessToken;
+    const newAccess = json?.data?.accessToken as string | undefined;
     if (!json?.success || !newAccess) throw new Error("reissue invalid");
+
     setTokens(newAccess);
     return newAccess;
   })();
+
   try {
     return await refreshPromise;
   } finally {
@@ -34,33 +40,26 @@ async function reissueAccessToken(expiredAccess: string): Promise<string> {
   }
 }
 
-async function doFetch(
-  path: string,
-  init: RequestInit = {},
-  retry = false
-): Promise<Response> {
+async function doFetch(path: string, init: RequestInit = {}, retry = false): Promise<Response> {
   const access = getAccessToken();
   const headers = new Headers(init.headers);
-  const isAuthEndpoint = /^\/?auth\/(login|join)$/i.test(
-    path.replace(getApiUrl(""), "")
-  );
 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
-  if (access && !isAuthEndpoint)
+  if (!headers.has("Authorization") && access && !isAuthEndpoint(path)) {
     headers.set("Authorization", `Bearer ${access}`);
+  }
 
   const res = await fetch(getApiUrl(path), { ...init, headers });
   if (res.status !== 401 || retry) return res;
-
   if (!access) return res;
 
   try {
     const newAccess = await reissueAccessToken(access);
     const retryHeaders = new Headers(init.headers);
-    if (!retryHeaders.has("Accept"))
-      retryHeaders.set("Accept", "application/json");
-    if (!isAuthEndpoint)
+    if (!retryHeaders.has("Accept")) retryHeaders.set("Accept", "application/json");
+    if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
       retryHeaders.set("Authorization", `Bearer ${newAccess}`);
+    }
     return await fetch(getApiUrl(path), { ...init, headers: retryHeaders });
   } catch {
     clearTokens();

@@ -104,22 +104,18 @@ export default function QuestionPostContent() {
     }
   };
 
-  // 토큰 인증 기반으로 userId 없이 전송
   const newAnswer = () => {
     if (!answerText.trim()) return;
-    readObjectP("accessToken").then((at) => {
-      const accessToken = String(at ?? "").replace(/^"|"$/g, ""); // JSON.stringify 제거 대응
-      if (!accessToken) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
-      postNewAnswer(Number(params["id"]), answerText, accessToken)
-        .then(() => navigate("/"))
-        .catch((e) => {
-          console.error(e);
-          alert("답변 등록 중 오류가 발생했습니다.");
-        });
-    });
+    if (!loggedUser) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    postNewAnswer(Number(params["id"]), answerText)
+      .then(() => navigate("/"))
+      .catch((e) => {
+        console.error(e);
+        alert("답변 등록 중 오류가 발생했습니다.");
+      });
   };
 
   useEffect(() => {

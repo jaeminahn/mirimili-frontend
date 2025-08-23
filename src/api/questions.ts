@@ -7,27 +7,22 @@ export const postNewQuestion = (
   categoryId: number,
   serviceTypeId: number[],
   serviceMosId: number[],
-  accessToken: string,
   callback?: () => void
 ) => {
-  post(
-    "/questions/",
-    {
-      writer_id: writerId,
-      title,
-      content,
-      category_id: categoryId,
-      service_mos_id: serviceMosId,
-      service_type_id: serviceTypeId,
-    },
-    accessToken
-  )
-    .then((res) => res.json())
-    .then((result) => {
-      if (result.code === 401 || result.code === 419)
-        window.alert(result.message);
-      else {
-        callback && callback();
+  return post("/questions", {
+    writer_id: writerId,
+    title,
+    content,
+    category_id: categoryId,
+    service_mos_id: serviceMosId,
+    service_type_id: serviceTypeId,
+  })
+    .then((res: Response) => res.json())
+    .then((result: any) => {
+      if (result?.code === 401 || result?.code === 419) {
+        window.alert(result.message ?? "권한이 없습니다.");
+      } else {
+        callback?.();
       }
     });
 };
