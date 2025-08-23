@@ -65,19 +65,19 @@ export default function SetPhonePassword({
       setSuccessMessage("");
       return;
     }
-    post("/sms/send", { tel })
+    post("/sms/send", { phoneNumber: tel })
       .then((res) => res.json())
       .then((result) => {
-        if (result.message === "user exist") {
+        if (result.success === false) {
           setIsCodeSent(false);
           setPhoneError("동일한 전화번호의 사용자가 존재해요");
           setVerificationMessage("");
-        } else if (result.message === "Send Success") {
+        } else if (result.success === true) {
           setIsCodeSent(true);
           setPhoneError("");
           setSuccessMessage("인증번호가 전송되었어요");
           setVerificationMessage("");
-        } else alert(result.message);
+        } else alert(result.success);
       });
   };
 
@@ -89,10 +89,10 @@ export default function SetPhonePassword({
       setVerificationMessage("인증번호 6자리를 입력해주세요");
       return;
     }
-    post("/sms/verify", { tel, code })
+    post("/sms/verify", { phoneNumber: tel, certificationCode: code })
       .then((res) => res.json())
       .then((result) => {
-        const _isCodeValid = result.message === "Validation Success";
+        const _isCodeValid = result.success === true;
         setIsCodeValid(_isCodeValid);
         setVerificationMessage(
           _isCodeValid ? "인증번호가 일치해요" : "인증번호가 일치하지 않아요"
