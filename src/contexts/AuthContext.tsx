@@ -66,30 +66,27 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     subscribeAccessToken((t) => setAccessToken(t));
   }, []);
 
+  const normalizePhone = (v: string) =>
+    (v ?? "").toString().replace(/[^0-9]/g, "");
+  const normalizePwd = (v: string) => (v ?? "").toString().trim();
+
   const signup = useCallback((data: SignupPayload, callback?: Callback) => {
-    const {
-      serviceAgreed,
-      privacyPolicyAgreed,
-      marketingConsentAgreed,
-      tel,
-      password,
-      nick,
-      serviceType,
-    } = data;
+    const phoneNumber = normalizePhone(data.tel);
+    const password = normalizePwd(data.password);
 
     post("/auth/signup", {
-      phoneNumber: tel,
+      phoneNumber,
       password,
-      nickname: nick,
-      serviceAgreed,
-      privacyPolicyAgreed,
-      marketingConsentAgreed,
-      ...(serviceType ? { miliStatus: serviceType } : {}),
+      nickname: data.nick,
+      serviceAgreed: data.serviceAgreed,
+      privacyPolicyAgreed: data.privacyPolicyAgreed,
+      marketingConsentAgreed: data.marketingConsentAgreed,
+      ...(data.serviceType ? { miliStatus: data.serviceType } : {}),
     })
       .then((res) => res.json())
       .then((result) => {
         if (result?.success === true) {
-          const user: LoggedUser = { tel, nick };
+          const user: LoggedUser = { tel: phoneNumber, nick: data.nick };
           setLoggedUser(user);
           localStorage.setItem("user", JSON.stringify(user));
           callback?.();
@@ -97,22 +94,28 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           alert(result?.message ?? "회원가입에 실패했습니다.");
         }
       })
-      .catch((err) => {
-        console.error("Signup error:", err);
+      .catch(() => {
         alert("회원가입 중 오류가 발생했습니다.");
       });
   }, []);
 
   const login = useCallback(
     (tel: string, password: string, callback?: Callback) => {
-      post("/auth/login", { phoneNumber: tel, password })
-        .then((res) => res.json())
-        .then((result) => {
+      const phoneNumber = normalizePhone(tel);
+      const pwd = normalizePwd(password);
+
+      post("/auth/login", { phoneNumber, password: pwd })
+        .then(async (res) => {
+          const result = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            alert(result?.message ?? `로그인 실패 (HTTP ${res.status})`);
+            return;
+          }
           if (result?.success === true) {
             const access = result?.data?.accessToken ?? "";
             const refresh = result?.data?.refreshToken ?? "";
             const nickname = result?.data?.nickname ?? "";
-            const user: LoggedUser = { tel, nick: nickname };
+            const user: LoggedUser = { tel: phoneNumber, nick: nickname };
             setLoggedUser(user);
             setAccessToken(access);
             setRefreshToken(refresh);
@@ -123,8 +126,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             alert(result?.message ?? "로그인 실패");
           }
         })
-        .catch((err) => {
-          console.error("Login error:", err);
+        .catch(() => {
           alert("로그인 중 오류가 발생했습니다.");
         });
     },

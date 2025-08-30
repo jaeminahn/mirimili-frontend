@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
+import { ServiceTypeE } from "../../../contexts/AuthContext";
 
 type SetMemberProps = {
   form: SignUpFormType;
@@ -22,12 +23,30 @@ export default function SetMember({
     setCanProceed(form.memberType !== -1);
   }, [form.memberType, step, setCanProceed]);
 
+  const mapMemberToService = (v: number): ServiceTypeE | undefined =>
+    v === 0
+      ? ServiceTypeE.PRE_ENLISTED
+      : v === 1
+      ? ServiceTypeE.ENLISTED
+      : v === 2
+      ? ServiceTypeE.DISCHARGED
+      : undefined;
+
   const handleSelect = (value: number) => {
     const nextValue = form.memberType === value ? -1 : value;
-    const syntheticEvent = {
+    changed("memberType")({
       target: { value: nextValue },
-    } as unknown as ChangeEvent<HTMLInputElement>;
-    changed("memberType")(syntheticEvent);
+    } as unknown as ChangeEvent<HTMLInputElement>);
+    const s = mapMemberToService(nextValue);
+    if (s) {
+      changed("serviceType")({
+        target: { value: s },
+      } as unknown as ChangeEvent<HTMLInputElement>);
+    } else {
+      changed("serviceType")({
+        target: { value: "" },
+      } as unknown as ChangeEvent<HTMLInputElement>);
+    }
   };
 
   const isSelected = (value: number) => form.memberType === value;

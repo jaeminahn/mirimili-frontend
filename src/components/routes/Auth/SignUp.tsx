@@ -68,7 +68,18 @@ export default function SignUp() {
       return setField(key, t.value as any);
     };
 
+  const memberToService = (v: number): ServiceTypeE | undefined =>
+    v === 0
+      ? ServiceTypeE.PRE_ENLISTED
+      : v === 1
+      ? ServiceTypeE.ENLISTED
+      : v === 2
+      ? ServiceTypeE.DISCHARGED
+      : undefined;
+
   const createAccount = () => {
+    const resolvedService =
+      form.serviceType ?? memberToService(form.memberType);
     signup(
       {
         serviceAgreed: form.serviceAgreed,
@@ -77,7 +88,7 @@ export default function SignUp() {
         tel: form.tel,
         password: form.password,
         nick: form.nick,
-        serviceType: form.serviceType,
+        serviceType: resolvedService,
       },
       () => setDone(true)
     );
@@ -112,7 +123,7 @@ export default function SignUp() {
         </div>
         <button
           onClick={() => navigate("/auth/login")}
-          className="w-[360px] h-[48px] mt-6 rounded-3xl px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition"
+          className="w-[360px] h-[48px] mt-6 rounded-xl px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition"
         >
           로그인
         </button>
@@ -173,7 +184,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              disabled={!canProceed}
+              //disabled={!canProceed}
             >
               다음
             </button>
@@ -185,7 +196,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              disabled={!canProceed}
+              //disabled={!canProceed}
             >
               완료
             </button>
