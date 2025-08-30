@@ -1,19 +1,13 @@
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts";
+import { useAuth, ServiceTypeE } from "../../../contexts/AuthContext";
+
 import TermsandConditions from "../../organisms/signup/TermsandConditions";
 import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
-import SetTypeAndStartDate from "../../organisms/signup/SetTypeAndStartDate";
-import SetDetailDate from "../../organisms/signup/SetDetailDate";
-import SetMosAndUnit from "../../organisms/signup/SetMosAndUnit";
-import {
-  calculateCplDate,
-  calculateEndDate,
-  calculatePfcDate,
-  calculateSgtDate,
-} from "../../../utils/calculateDate";
+
+import partyImg from "../../../images/party.png";
 
 export type SignUpFormType = {
   serviceAgreed: boolean;
@@ -23,17 +17,9 @@ export type SignUpFormType = {
   tel: string;
   password: string;
   nick: string;
-  serviceType: number;
-  serviceStartDate: Date;
-  serviceEndDate: Date;
-  servicePfcDate: Date;
-  serviceCplDate: Date;
-  serviceSgtDate: Date;
-  serviceMos: number;
-  serviceUnit: number;
+  serviceType?: ServiceTypeE;
 };
 
-const today = new Date();
 const initialFormState: SignUpFormType = {
   serviceAgreed: false,
   privacyPolicyAgreed: false,
@@ -42,46 +28,58 @@ const initialFormState: SignUpFormType = {
   tel: "",
   password: "",
   nick: "",
-  serviceType: 1,
-  serviceStartDate: today,
-  serviceEndDate: calculateEndDate(today),
-  servicePfcDate: calculatePfcDate(today),
-  serviceCplDate: calculateCplDate(today),
-  serviceSgtDate: calculateSgtDate(today),
-  serviceMos: -1,
-  serviceUnit: -1,
+  serviceType: undefined,
 };
 
 export default function SignUp() {
   const [form, setForm] = useState<SignUpFormType>(initialFormState);
   const [step, setStep] = useState(1);
   const [canProceed, setCanProceed] = useState(false);
+  const [done, setDone] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
+
+  const setField = <K extends keyof SignUpFormType>(
+    key: K,
+    value: SignUpFormType[K]
+  ) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const changed =
     (key: keyof SignUpFormType) =>
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
-    };
+      const t = e.target as HTMLInputElement;
 
-  const changedDate = (key: keyof SignUpFormType, date: Date) =>
-    setForm((prev) => ({ ...prev, [key]: date }));
+      if (
+        key === "serviceAgreed" ||
+        key === "privacyPolicyAgreed" ||
+        key === "marketingConsentAgreed"
+      ) {
+        return setField(key, t.checked as any);
+      }
+
+      if (key === "memberType") {
+        return setField(key, Number(t.value) as any);
+      }
+
+      if (key === "serviceType") {
+        return setField(key, t.value as ServiceTypeE as any);
+      }
+
+      return setField(key, t.value as any);
+    };
 
   const createAccount = () => {
     signup(
-      form.tel,
-      form.password,
-      form.nick,
-      form.serviceType,
-      form.serviceStartDate,
-      form.servicePfcDate,
-      form.serviceCplDate,
-      form.serviceSgtDate,
-      form.serviceEndDate,
-      form.serviceMos,
-      form.serviceUnit,
-      () => navigate("/")
+      {
+        serviceAgreed: form.serviceAgreed,
+        privacyPolicyAgreed: form.privacyPolicyAgreed,
+        marketingConsentAgreed: form.marketingConsentAgreed,
+        tel: form.tel,
+        password: form.password,
+        nick: form.nick,
+        serviceType: form.serviceType,
+      },
+      () => setDone(true)
     );
   };
 
@@ -93,6 +91,34 @@ export default function SignUp() {
       setStep((prev) => prev - 1);
     }
   };
+
+  if (done) {
+    return (
+      <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
+        <div className="w-[360px] h-[348px] bg-white rounded-3xl pt-9 pb-9 px-6 flex flex-col items-center justify-center text-center">
+          <img
+            src={partyImg}
+            alt="축하 폭죽"
+            className="w-[100px] h-[100px] mb-6"
+          />
+          <h2 className="text-xl font-extrabold text-gray-800 mb-6">
+            회원가입 완료!
+          </h2>
+          <p className="text-sm text-gray-500">
+            미리밀리와 똑똑한 입대,
+            <br />
+            후회없는 군생활 하세요😊
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/auth/login")}
+          className="w-[360px] h-[48px] mt-6 rounded-3xl px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition"
+        >
+          로그인
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
@@ -128,32 +154,7 @@ export default function SignUp() {
           step={step}
         />
       </div>
-      <div className={`${step === 5 ? "" : "hidden"}`}>
-        <SetTypeAndStartDate
-          form={form}
-          changed={changed}
-          changedDate={changedDate}
-          setCanProceed={setCanProceed}
-          step={step}
-        />
-      </div>
-      <div className={`${step === 6 ? "" : "hidden"}`}>
-        <SetDetailDate
-          form={form}
-          changed={changed}
-          changedDate={changedDate}
-          setCanProceed={setCanProceed}
-          step={step}
-        />
-      </div>
-      <div className={`${step === 7 ? "" : "hidden"}`}>
-        <SetMosAndUnit
-          form={form}
-          changed={changed}
-          setCanProceed={setCanProceed}
-          step={step}
-        />
-      </div>
+
       {step >= 1 && (
         <div className="flex items-center justify-between mt-4 w-[360px]">
           {step >= 1 && (
@@ -164,7 +165,7 @@ export default function SignUp() {
               이전
             </button>
           )}
-          {step < 7 ? (
+          {step < 4 ? (
             <button
               onClick={goToNextStep}
               className={`w-[224px] py-2 text-base font-semibold text-white rounded-3xl ${
@@ -172,7 +173,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              //disabled={!canProceed}
+              disabled={!canProceed}
             >
               다음
             </button>

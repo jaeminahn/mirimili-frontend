@@ -62,7 +62,7 @@ export default function SetNickname({
   };
 
   useEffect(() => {
-    if (step !== 3) return;
+    if (step !== 4) return;
     setCanProceed(isNicknameAvailable);
   }, [isNicknameAvailable, step, setCanProceed]);
 

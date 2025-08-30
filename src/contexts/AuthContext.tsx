@@ -16,22 +16,25 @@ import {
 export type LoggedUser = { tel: string; nick: string };
 type Callback = () => void;
 
+export enum ServiceTypeE {
+  PRE_ENLISTED = "PRE_ENLISTED",
+  ENLISTED = "ENLISTED",
+  DISCHARGED = "DISCHARGED",
+}
+
+export type SignupPayload = {
+  serviceAgreed: boolean;
+  privacyPolicyAgreed: boolean;
+  marketingConsentAgreed: boolean;
+  tel: string;
+  password: string;
+  nick: string;
+  serviceType?: ServiceTypeE;
+};
+
 type ContextType = {
   loggedUser?: LoggedUser;
-  signup: (
-    tel: string,
-    password: string,
-    nick: string,
-    serviceType: number,
-    serviceStartDate: Date,
-    servicePfcDate: Date,
-    serviceCplDate: Date,
-    serviceSgtDate: Date,
-    serviceEndDate: Date,
-    serviceMos: number,
-    serviceUnit: number,
-    callback?: Callback
-  ) => void;
+  signup: (data: SignupPayload, callback?: Callback) => void;
   login: (tel: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => void;
 };
@@ -63,52 +66,42 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     subscribeAccessToken((t) => setAccessToken(t));
   }, []);
 
-  const signup = useCallback(
-    (
-      tel: string,
-      password: string,
-      nick: string,
-      serviceType: number,
-      serviceStartDate: Date,
-      servicePfcDate: Date,
-      serviceCplDate: Date,
-      serviceSgtDate: Date,
-      serviceEndDate: Date,
-      serviceMos: number,
-      serviceUnit: number,
-      callback?: Callback
-    ) => {
-      post("/auth/join", {
-        tel,
-        password,
-        nick,
-        service_type_id: serviceType,
-        service_start: serviceStartDate,
-        service_pfc: servicePfcDate,
-        service_cpl: serviceCplDate,
-        service_sgt: serviceSgtDate,
-        service_end: serviceEndDate,
-        service_mos_id: serviceMos,
-        service_unit_id: serviceUnit,
+  const signup = useCallback((data: SignupPayload, callback?: Callback) => {
+    const {
+      serviceAgreed,
+      privacyPolicyAgreed,
+      marketingConsentAgreed,
+      tel,
+      password,
+      nick,
+      serviceType,
+    } = data;
+
+    post("/auth/signup", {
+      phoneNumber: tel,
+      password,
+      nickname: nick,
+      serviceAgreed,
+      privacyPolicyAgreed,
+      marketingConsentAgreed,
+      ...(serviceType ? { miliStatus: serviceType } : {}),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result?.success === true) {
+          const user: LoggedUser = { tel, nick };
+          setLoggedUser(user);
+          localStorage.setItem("user", JSON.stringify(user));
+          callback?.();
+        } else {
+          alert(result?.message ?? "회원가입에 실패했습니다.");
+        }
       })
-        .then((res) => res.json())
-        .then((result) => {
-          if (result?.success === true || result?.message === "join success") {
-            const user: LoggedUser = { tel, nick };
-            setLoggedUser(user);
-            localStorage.setItem("user", JSON.stringify(user));
-            callback?.();
-          } else {
-            alert(result?.message ?? "회원가입에 실패했습니다.");
-          }
-        })
-        .catch((err) => {
-          console.error("Signup error:", err);
-          alert("회원가입 중 오류가 발생했습니다.");
-        });
-    },
-    []
-  );
+      .catch((err) => {
+        console.error("Signup error:", err);
+        alert("회원가입 중 오류가 발생했습니다.");
+      });
+  }, []);
 
   const login = useCallback(
     (tel: string, password: string, callback?: Callback) => {

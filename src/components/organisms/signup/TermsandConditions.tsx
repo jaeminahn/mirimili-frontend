@@ -12,7 +12,7 @@ type SetMemberProps = {
   step: number;
 };
 
-export default function TermsAndConditions({
+export default function TermsandConditions({
   form,
   changed,
   setCanProceed,
@@ -26,13 +26,26 @@ export default function TermsAndConditions({
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   useEffect(() => {
-    if (step !== 1) return;
-    setCanProceed(agreeUse && agreePrivacy);
-  }, [agreeUse, agreePrivacy, step]);
-
-  useEffect(() => {
     setAgreeAll(agreeUse && agreePrivacy && agreeMarketing);
   }, [agreeUse, agreePrivacy, agreeMarketing]);
+
+  useEffect(() => {
+    if (step !== 1) return;
+    setCanProceed(agreeUse && agreePrivacy);
+  }, [agreeUse, agreePrivacy, step, setCanProceed]);
+
+  useEffect(() => {
+    if (step !== 1) return;
+    changed("serviceAgreed")({
+      target: { checked: agreeUse },
+    } as ChangeEvent<HTMLInputElement>);
+    changed("privacyPolicyAgreed")({
+      target: { checked: agreePrivacy },
+    } as ChangeEvent<HTMLInputElement>);
+    changed("marketingConsentAgreed")({
+      target: { checked: agreeMarketing },
+    } as ChangeEvent<HTMLInputElement>);
+  }, [agreeUse, agreePrivacy, agreeMarketing, step]);
 
   const toggleAgreeAll = () => {
     const newValue = !agreeAll;
@@ -40,6 +53,15 @@ export default function TermsAndConditions({
     setAgreeUse(newValue);
     setAgreePrivacy(newValue);
     setAgreeMarketing(newValue);
+    changed("serviceAgreed")({
+      target: { checked: newValue },
+    } as ChangeEvent<HTMLInputElement>);
+    changed("privacyPolicyAgreed")({
+      target: { checked: newValue },
+    } as ChangeEvent<HTMLInputElement>);
+    changed("marketingConsentAgreed")({
+      target: { checked: newValue },
+    } as ChangeEvent<HTMLInputElement>);
   };
 
   const checkboxStyle =
@@ -48,6 +70,7 @@ export default function TermsAndConditions({
   return (
     <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <h2 className="mb-6 text-lg font-bold text-gray-700">약관 동의</h2>
+
       <div
         className="flex items-center gap-3 mb-6 cursor-pointer"
         onClick={toggleAgreeAll}
@@ -62,7 +85,9 @@ export default function TermsAndConditions({
           약관 전체동의
         </span>
       </div>
+
       <div className="border-t border-gray-200 mb-4" />
+
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div
@@ -121,6 +146,7 @@ export default function TermsAndConditions({
           </span>
         </div>
       </div>
+
       <TermsModal
         title="미리밀리 서비스 이용 약관"
         isOpen={useModalOpen}

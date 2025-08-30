@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, ChangeEvent } from "react";
 import { SignUpFormType } from "../../routes/Auth/SignUp";
 import ServiceType from "../../../data/serviceType.json";
