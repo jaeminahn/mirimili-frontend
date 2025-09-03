@@ -13,7 +13,7 @@ import {
   subscribeAccessToken,
 } from "../api/tokenStore";
 
-export type LoggedUser = { tel: string; nick: string };
+export type LoggedUser = { id: number; tel: string; nick: string };
 type Callback = () => void;
 
 export enum ServiceTypeE {
@@ -86,7 +86,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       .then((res) => res.json())
       .then((result) => {
         if (result?.success === true) {
-          const user: LoggedUser = { tel: phoneNumber, nick: data.nick };
+          const memberId =
+            Number(result?.data?.memberId ?? result?.data?.id ?? 0) || 0;
+          const user: LoggedUser = {
+            id: memberId,
+            tel: phoneNumber,
+            nick: data.nick,
+          };
           setLoggedUser(user);
           localStorage.setItem("user", JSON.stringify(user));
           callback?.();
@@ -115,7 +121,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             const access = result?.data?.accessToken ?? "";
             const refresh = result?.data?.refreshToken ?? "";
             const nickname = result?.data?.nickname ?? "";
-            const user: LoggedUser = { tel: phoneNumber, nick: nickname };
+            const memberId =
+              Number(result?.data?.memberId ?? result?.data?.id ?? 0) || 0;
+            const user: LoggedUser = {
+              id: memberId,
+              tel: phoneNumber,
+              nick: nickname,
+            };
             setLoggedUser(user);
             setAccessToken(access);
             setRefreshToken(refresh);

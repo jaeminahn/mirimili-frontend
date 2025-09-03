@@ -3,7 +3,6 @@ import QuestionWrite from "../organisms/QuestionWrite";
 import { useAuth } from "../../contexts";
 import { postNewQuestion } from "../../api/questions";
 import { useNavigate } from "react-router-dom";
-import * as U from "../../utils";
 
 export type QuestionFormType = {
   title: string;
@@ -23,7 +22,7 @@ const initialFormState: QuestionFormType = {
 
 export default function QuestionNew() {
   const [form, setForm] = useState<QuestionFormType>(initialFormState);
-  //const { loggedUser } = useAuth();
+  const { loggedUser } = useAuth();
   const navigate = useNavigate();
 
   const changed =
@@ -31,10 +30,14 @@ export default function QuestionNew() {
     (
       e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+      const value = e.target.value;
+      setForm((prev) => {
+        if (key === "categoryId") return { ...prev, categoryId: Number(value) };
+        return { ...prev, [key]: value as any };
+      });
     };
 
-  /*const onSubmit = () => {
+  const onSubmit = () => {
     if (form.title === "") window.alert("제목을 입력해주세요.");
     else if (form.content === "") window.alert("내용을 입력해주세요.");
     else if (form.categoryId === 0) window.alert("카테고리를 지정해주세요.");
@@ -43,20 +46,21 @@ export default function QuestionNew() {
     else if (form.serviceMosId.length === 0)
       window.alert("답변자의 군특기를 지정해주세요.");
     else {
-      U.readObjectP("accessToken").then((at) => {
-        postNewQuestion(
-          loggedUser!.id,
-          form.title,
-          form.content,
-          form.categoryId,
-          form.serviceTypeId,
-          form.serviceMosId,
-          JSON.stringify(at).slice(1, -1),
-          () => navigate("/")
-        );
-      });
+      if (!loggedUser?.id) {
+        window.alert("로그인이 필요합니다.");
+        return;
+      }
+      postNewQuestion(
+        loggedUser.id,
+        form.title,
+        form.content,
+        form.categoryId,
+        form.serviceTypeId,
+        form.serviceMosId,
+        () => navigate("/")
+      );
     }
-  };*/
+  };
 
   useEffect(() => {
     console.log(form);
@@ -68,13 +72,10 @@ export default function QuestionNew() {
         <QuestionWrite form={form} setForm={setForm} changed={changed} />
         <div className="flex flex-col w-1/5 gap-2">
           <button
-            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
-            //onClick={onSubmit}
+            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700"
+            onClick={onSubmit}
           >
             질문 등록하기
-          </button>
-          <button className="flex justify-center px-6 py-3 text-sm font-semibold text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">
-            임시 저장하기
           </button>
         </div>
       </div>
