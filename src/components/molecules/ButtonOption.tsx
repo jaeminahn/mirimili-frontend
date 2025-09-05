@@ -11,10 +11,8 @@ interface ButtonOptionProps {
 }
 
 const getButtonClasses = (isActive: boolean): string =>
-  `px-2 py-1 text-sm rounded-xl border-2 ${
-    isActive
-      ? "bg-emerald-100 border-emerald-600"
-      : "bg-gray-100 text-gray-500 border-gray-100"
+  `px-2 py-1 text-sm rounded-xl ${
+    isActive ? "bg-emerald-100 font-semibold" : "bg-gray-100 text-gray-500"
   }`;
 
 const ButtonOption = ({

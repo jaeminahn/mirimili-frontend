@@ -1,26 +1,23 @@
 import { post } from "./postAndPut";
 
+type NewQuestionPayload = {
+  title: string;
+  body: string;
+  imagesUrl: string[];
+  targetMiliType: "AIR_FORCE";
+  categoryIds: number[];
+  specialtyIds: number[];
+};
+
 export const postNewQuestion = (
-  writerId: number,
-  title: string,
-  content: string,
-  categoryId: number,
-  serviceTypeId: number[],
-  serviceMosId: number[],
+  payload: NewQuestionPayload,
   callback?: () => void
 ) => {
-  return post("/questions", {
-    writer_id: writerId,
-    title,
-    content,
-    category_id: categoryId,
-    service_mos_id: serviceMosId,
-    service_type_id: serviceTypeId,
-  })
+  return post("/questions", payload)
     .then((res: Response) => res.json())
     .then((result: any) => {
       if (result?.code === 401 || result?.code === 419) {
-        window.alert(result.message ?? "권한이 없습니다.");
+        window.alert(result.message);
       } else {
         callback?.();
       }

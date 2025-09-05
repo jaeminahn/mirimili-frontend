@@ -10,14 +10,20 @@ export type QuestionFormType = {
   categoryId: number;
   serviceTypeId: number[];
   serviceMosId: number[];
+  imagesUrl: string[];
 };
 
 const initialFormState: QuestionFormType = {
   title: "",
   content: "",
-  categoryId: 1,
+  categoryId: 0,
   serviceTypeId: [],
   serviceMosId: [],
+  imagesUrl: [],
+};
+
+const MILI_TYPE_MAP: Record<number, "AIR_FORCE"> = {
+  1: "AIR_FORCE",
 };
 
 export default function QuestionNew() {
@@ -31,35 +37,49 @@ export default function QuestionNew() {
       e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
       const value = e.target.value;
-      setForm((prev) => {
-        if (key === "categoryId") return { ...prev, categoryId: Number(value) };
-        return { ...prev, [key]: value as any };
-      });
+      if (key === "categoryId") {
+        setForm((prev) => ({ ...prev, categoryId: Number(value) }));
+      } else {
+        setForm((prev) => ({ ...prev, [key]: value as any }));
+      }
     };
 
   const onSubmit = () => {
-    if (form.title === "") window.alert("제목을 입력해주세요.");
-    else if (form.content === "") window.alert("내용을 입력해주세요.");
-    else if (form.categoryId === 0) window.alert("카테고리를 지정해주세요.");
-    else if (form.serviceTypeId.length === 0)
-      window.alert("답변자의 군복무 종류를 지정해주세요.");
-    else if (form.serviceMosId.length === 0)
-      window.alert("답변자의 군특기를 지정해주세요.");
-    else {
-      if (!loggedUser?.id) {
-        window.alert("로그인이 필요합니다.");
-        return;
-      }
-      postNewQuestion(
-        loggedUser.id,
-        form.title,
-        form.content,
-        form.categoryId,
-        form.serviceTypeId,
-        form.serviceMosId,
-        () => navigate("/")
-      );
+    if (form.title.trim() === "") {
+      window.alert("제목을 입력해주세요.");
+      return;
     }
+    if (form.content.trim() === "") {
+      window.alert("내용을 입력해주세요.");
+      return;
+    }
+    if (form.categoryId === null || form.categoryId === undefined) {
+      window.alert("카테고리를 지정해주세요.");
+      return;
+    }
+    if (form.serviceTypeId.length === 0) {
+      window.alert("답변자의 군복무 종류를 지정해주세요.");
+      return;
+    }
+    if (form.serviceMosId.length === 0) {
+      window.alert("답변자의 군특기를 지정해주세요.");
+      return;
+    }
+
+    const firstTypeId = form.serviceTypeId[0];
+    const targetMiliType = MILI_TYPE_MAP[firstTypeId] ?? "ETC";
+
+    postNewQuestion(
+      {
+        title: form.title,
+        body: form.content,
+        imagesUrl: form.imagesUrl,
+        targetMiliType,
+        categoryIds: [form.categoryId],
+        specialtyIds: form.serviceMosId,
+      },
+      () => navigate("/")
+    );
   };
 
   useEffect(() => {
