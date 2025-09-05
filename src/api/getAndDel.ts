@@ -1,5 +1,10 @@
 import { getApiUrl } from "./getApiUrl";
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./tokenStore";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+} from "./tokenStore";
 
 let refreshPromise: Promise<string> | null = null;
 
@@ -19,7 +24,7 @@ async function reissueAccessToken(expiredAccess: string): Promise<string> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${expiredAccess}`,
+        Authorization: `${expiredAccess}`,
       },
       body: JSON.stringify({ refreshToken: refresh }),
     });
@@ -40,13 +45,17 @@ async function reissueAccessToken(expiredAccess: string): Promise<string> {
   }
 }
 
-async function doFetch(path: string, init: RequestInit = {}, retry = false): Promise<Response> {
+async function doFetch(
+  path: string,
+  init: RequestInit = {},
+  retry = false
+): Promise<Response> {
   const access = getAccessToken();
   const headers = new Headers(init.headers);
 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (!headers.has("Authorization") && access && !isAuthEndpoint(path)) {
-    headers.set("Authorization", `Bearer ${access}`);
+    headers.set("Authorization", `${access}`);
   }
 
   const res = await fetch(getApiUrl(path), { ...init, headers });
@@ -56,9 +65,10 @@ async function doFetch(path: string, init: RequestInit = {}, retry = false): Pro
   try {
     const newAccess = await reissueAccessToken(access);
     const retryHeaders = new Headers(init.headers);
-    if (!retryHeaders.has("Accept")) retryHeaders.set("Accept", "application/json");
+    if (!retryHeaders.has("Accept"))
+      retryHeaders.set("Accept", "application/json");
     if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
-      retryHeaders.set("Authorization", `Bearer ${newAccess}`);
+      retryHeaders.set("Authorization", `${newAccess}`);
     }
     return await fetch(getApiUrl(path), { ...init, headers: retryHeaders });
   } catch {

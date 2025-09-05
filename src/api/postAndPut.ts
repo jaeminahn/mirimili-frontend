@@ -1,5 +1,10 @@
 import { getApiUrl } from "./getApiUrl";
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./tokenStore";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+} from "./tokenStore";
 
 export type JsonResult<T> = { ok: boolean; status: number; data: T | null };
 
@@ -42,13 +47,17 @@ async function reissueAccessToken(expiredAccess: string): Promise<string> {
   }
 }
 
-async function doFetch(path: string, init: RequestInit = {}, retry = false): Promise<Response> {
+async function doFetch(
+  path: string,
+  init: RequestInit = {},
+  retry = false
+): Promise<Response> {
   const headers = new Headers(init.headers);
   const access = getAccessToken();
 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (!headers.has("Authorization") && access && !isAuthEndpoint(path)) {
-    headers.set("Authorization", `Bearer ${access}`);
+    headers.set("Authorization", `${access}`);
   }
 
   const res = await fetch(getApiUrl(path), { ...init, headers });
@@ -60,7 +69,7 @@ async function doFetch(path: string, init: RequestInit = {}, retry = false): Pro
     const retryHeaders = new Headers(init.headers);
     retryHeaders.set("Accept", "application/json");
     if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
-      retryHeaders.set("Authorization", `Bearer ${newAccess}`);
+      retryHeaders.set("Authorization", `${newAccess}`);
     }
     return await fetch(getApiUrl(path), { ...init, headers: retryHeaders });
   } catch {
