@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts";
 
 const ProtectedRoute = ({
@@ -8,7 +8,11 @@ const ProtectedRoute = ({
   children: ReactNode;
 }): ReactElement | null => {
   const { loggedUser } = useAuth();
-  if (!loggedUser) return <Navigate to="/auth/login" replace />;
+  const location = useLocation();
+
+  if (!loggedUser) {
+    return <Navigate to="/auth/login" replace state={{ from: location }} />;
+  }
   return <>{children}</>;
 };
 
