@@ -1,7 +1,8 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useAuth } from "../../../contexts";
+import { getAccessToken } from "../../../api/tokenStore";
 
 type LoginFormType = Record<"tel" | "password", string>;
 const initialFormState = { tel: "", password: "" };
@@ -21,7 +22,9 @@ export default function Login() {
   const [{ tel, password }, setForm] =
     useState<LoginFormType>(initialFormState);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const from = (location.state as any)?.from?.pathname || "/";
+  const { login, loggedUser } = useAuth();
 
   const changed = useCallback(
     (key: keyof LoginFormType) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -34,8 +37,8 @@ export default function Login() {
 
   const loginAccount = useCallback(() => {
     const pureTel = tel.replace(/-/g, "");
-    login(pureTel, password, () => navigate("/"));
-  }, [tel, password, navigate, login]);
+    login(pureTel, password, () => navigate(from, { replace: true }));
+  }, [tel, password, navigate, login, from]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tel && password) loginAccount();
@@ -44,6 +47,13 @@ export default function Login() {
   useEffect(() => {
     setForm(initialFormState);
   }, []);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (loggedUser || token) {
+      navigate(from, { replace: true });
+    }
+  }, [loggedUser, navigate, from]);
 
   const canProceed = tel.trim() !== "" && password.trim() !== "";
 
