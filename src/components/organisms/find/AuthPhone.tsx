@@ -55,21 +55,19 @@ export default function AuthPhone({
       setSuccessMessage("");
       return;
     }
-    post("/sms/send", { phoneNumber: raw })
+    post("/sms/send-pwd", { phoneNumber: raw })
       .then((res) => res.json())
       .then((result) => {
-        if (result.success === false) {
-          setIsCodeSent(false);
-          setPhoneError("동일한 전화번호의 사용자가 존재해요");
-          setVerificationMessage("");
-          setSuccessMessage("");
-        } else if (result.success === true) {
+        if (result?.success === true) {
           setIsCodeSent(true);
           setPhoneError("");
           setSuccessMessage("인증번호가 전송되었어요");
           setVerificationMessage("");
         } else {
-          alert(result.success);
+          setIsCodeSent(false);
+          setSuccessMessage("");
+          setPhoneError(result?.message || "인증번호 발송에 실패했어요");
+          setVerificationMessage("");
         }
       })
       .catch(() => {
@@ -90,7 +88,7 @@ export default function AuthPhone({
     post("/sms/verify", { phoneNumber: raw, certificationCode: code })
       .then((res) => res.json())
       .then((result) => {
-        const ok = result.success === true;
+        const ok = result?.success === true;
         setIsCodeValid(ok);
         setVerificationMessage(
           ok ? "인증번호가 일치해요" : "인증번호가 일치하지 않아요"
