@@ -86,15 +86,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       .then((res) => res.json())
       .then((result) => {
         if (result?.success === true) {
-          const memberId =
-            Number(result?.data?.memberId ?? result?.data?.id ?? 0) || 0;
-          const user: LoggedUser = {
-            id: memberId,
-            tel: phoneNumber,
-            nick: data.nick,
-          };
-          setLoggedUser(user);
-          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.removeItem("user");
           callback?.();
         } else {
           alert(result?.message ?? "회원가입에 실패했습니다.");

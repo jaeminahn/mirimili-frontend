@@ -24,7 +24,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || "/";
-  const { login, loggedUser } = useAuth();
+  const { login } = useAuth();
 
   const changed = useCallback(
     (key: keyof LoginFormType) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +50,10 @@ export default function Login() {
 
   useEffect(() => {
     const token = getAccessToken();
-    if (loggedUser || token) {
+    if (token) {
       navigate(from, { replace: true });
     }
-  }, [loggedUser, navigate, from]);
+  }, [navigate, from]);
 
   const canProceed = tel.trim() !== "" && password.trim() !== "";
 
@@ -82,13 +82,13 @@ export default function Login() {
           />
         </div>
 
-        <div className="flex items-center gap-1 text-sm text-black self-center">
-          <Icon
-            icon="fluent:question-circle-24-filled"
-            className="w-4 h-4 text-black"
-          />
+        <Link
+          to="/auth/findpassword"
+          className="flex items-center gap-1 text-sm self-center"
+        >
+          <Icon icon="fluent:question-circle-24-filled" className="w-4 h-4" />
           <span>비밀번호를 잊으셨나요?</span>
-        </div>
+        </Link>
       </div>
 
       <div className="flex items-center justify-between w-[360px]">

@@ -1,6 +1,5 @@
 import { ReactElement, ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../contexts";
 import { getAccessToken } from "../../api/tokenStore";
 
 const ProtectedRoute = ({
@@ -8,13 +7,12 @@ const ProtectedRoute = ({
 }: {
   children: ReactNode;
 }): ReactElement | null => {
-  const { loggedUser } = useAuth();
   const location = useLocation();
   const token = getAccessToken();
-  const isAuthed = !!loggedUser || !!token;
+  const isAuthed = !!token;
 
   if (!isAuthed) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/auth/login" replace state={{ from: location }} />;
   }
   return <>{children}</>;
 };
