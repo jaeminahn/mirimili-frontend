@@ -1,89 +1,126 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PostItem from "../../molecules/PostItem";
 import MyAnswerItem from "../../molecules/MyAnswerItem";
 import { Icon } from "@iconify/react";
+import { getJSON } from "../../../api/getAndDel";
+import { calculateTimeAgo } from "../../../utils/calculateTime";
 
-const postData = [
-  {
-    id: 1,
-    title: "일반차량운전 뭘 준비해야 할까요?",
-    content:
-      "안녕하십니까. 차량운전 예비입대자입니다. 자격요건과 1차 선발 등을 위한 준비 등은 모두 마쳤습니다. 조금 바보같은 질문일 수 있지만, 수동 연습을 하고 가는 게 도움이 될지 궁금합니다.",
-    createdAt: "1시간 전",
-    view: 156,
-    like: 2,
-    answer: 3,
-  },
-  {
-    id: 2,
-    title: "군대 훈련소 입소 준비물 관련 질문",
-    content:
-      "안녕하세요. 훈련소에 처음 입소하는데 어떤 준비물이 필요한지 궁금합니다. 특히 겨울이라서 보온과 관련된 준비물도 고민이 되네요.",
-    createdAt: "2시간 전",
-    view: 120,
-    like: 4,
-    answer: 5,
-  },
-];
+type ApiEnvelope<T> = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: T;
+};
 
-const answerData = [
-  {
-    id: 1,
-    question_id: 1,
-    title: "일반차량운전 뭘 준비해야 할까요?",
-    content:
-      "운전 특기는 수동 운전 능력이 있으면 더욱 유리합니다. 본가의 트럭으로 기본적인 수동 기어 조작에 익숙해지면 자신감도 생기고 시험 시에도 도움이 될 겁니다.",
-    like: 2,
-    createdAt: "1시간 전",
-  },
-  {
-    id: 2,
-    question_id: 1,
-    title: "일반차량운전 뭘 준비해야 할까요?",
-    content:
-      "기본적인 수동 운전이 가능하다면 좋겠지만, 훈련소에서도 차근차근 배우게 됩니다. 입대 전에 간단한 연습만 해도 충분합니다.",
-    like: 5,
-    createdAt: "2시간 전",
-  },
-];
+type MyPost = {
+  id: number;
+  title: string;
+  body: string;
+  commentCount: number;
+  likeCount: number;
+  viewCount: number;
+  createdAt: string;
+};
+
+type MyAnswer = {
+  postId: number;
+  postTitle: string;
+  myCommentBody: string;
+  createdAt?: string;
+  likeCount?: number;
+};
 
 export default function Activities() {
   const [tabIndex, setTabIndex] = useState(0);
   const [qnaIndex, setQnaIndex] = useState(0);
 
-  const renderPosts = () => {
-    if (postData.length === 0) {
-      return <p className="text-gray-600">게시글이 없습니다.</p>;
-    }
+  const [posts, setPosts] = useState<MyPost[]>([]);
+  const [answers, setAnswers] = useState<MyAnswer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState<string>("");
 
-    return postData.map((post) => (
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      setErrMsg("");
+      const [pRes, aRes] = await Promise.all([
+        getJSON<ApiEnvelope<MyPost[]>>("/mypage/posts"),
+        getJSON<ApiEnvelope<MyAnswer[]>>("/mypage/answers"),
+      ]);
+
+      if (pRes.status === 401 || aRes.status === 401) {
+        navigate("/auth/login", { replace: true });
+        return;
+      }
+
+      if (!mounted) return;
+
+      if (pRes.ok && pRes.data?.success) {
+        setPosts(pRes.data.data ?? []);
+      } else {
+        setErrMsg(
+          pRes.data?.message || "게시글을 불러오는 중 오류가 발생했습니다."
+        );
+      }
+
+      if (aRes.ok && aRes.data?.success) {
+        setAnswers(aRes.data.data ?? []);
+      } else {
+        setErrMsg(
+          (prev) =>
+            prev ||
+            aRes.data?.message ||
+            "답변을 불러오는 중 오류가 발생했습니다."
+        );
+      }
+
+      setLoading(false);
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
+
+  const renderPosts = () => {
+    if (loading) return <p className="text-gray-500">불러오는 중…</p>;
+    if (errMsg) return <p className="text-red-600">{errMsg}</p>;
+    if (!posts.length)
+      return <p className="text-gray-600">게시글이 없습니다.</p>;
+
+    return posts.map((p) => (
       <PostItem
-        key={post.id}
-        id={post.id}
-        title={post.title}
-        content={post.content}
-        createdAt={post.createdAt}
-        view={post.view}
-        like={post.like}
-        answer={post.answer}
+        key={p.id}
+        id={p.id}
+        title={p.title}
+        content={p.body}
+        createdAt={calculateTimeAgo(new Date(p.createdAt))}
+        view={p.viewCount}
+        like={p.likeCount}
+        answer={p.commentCount}
       />
     ));
   };
 
   const renderAnswers = () => {
-    if (answerData.length === 0) {
+    if (loading) return <p className="text-gray-500">불러오는 중…</p>;
+    if (errMsg) return <p className="text-red-600">{errMsg}</p>;
+    if (!answers.length)
       return <p className="text-gray-600">답변이 없습니다.</p>;
-    }
 
-    return answerData.map((answer) => (
+    return answers.map((a, idx) => (
       <MyAnswerItem
-        key={answer.id}
-        id={answer.id}
-        questionId={answer.question_id}
-        title={answer.title}
-        content={answer.content}
-        createdAt={answer.createdAt}
-        like={answer.like}
+        key={`${a.postId}-${idx}`}
+        id={a.postId}
+        questionId={a.postId}
+        title={a.postTitle}
+        content={a.myCommentBody}
+        like={a.likeCount ?? 0}
+        createdAt={a.createdAt ? calculateTimeAgo(new Date(a.createdAt)) : ""}
       />
     ));
   };
@@ -102,34 +139,8 @@ export default function Activities() {
           >
             질문&답변
           </button>
-          {/*<button
-            className={`h-10 p-2 font-semibold rounded-lg border-2 ${
-              tabIndex === 1
-                ? "bg-emerald-100 border-emerald-600"
-                : "bg-white border-white"
-            }`}
-            onClick={() => setTabIndex(1)}
-          >
-            커뮤니티
-          </button>*/}
         </div>
       </div>
-
-      {/*
-      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-3xl">
-        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-xl">
-          <p className="text-sm font-medium text-gray-600 mb-2">내 활동 점수</p>
-          <div className="flex items-center text-2xl font-bold text-emerald-600">
-            <Icon icon="fluent:trophy-24-filled" className="mr-1" />
-            <p>476</p>
-          </div>
-        </div>
-        <div className="flex flex-col items-center p-6 bg-gray-100 rounded-xl">
-          <p className="text-sm font-medium text-gray-600 mb-2">랭킹</p>
-          <p className="text-2xl font-bold text-emerald-600">1,564위</p>
-        </div>
-      </div>
-      */}
 
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         <div className="relative flex gap-4 border-b-2 border-gray-200">

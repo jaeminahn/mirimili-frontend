@@ -184,7 +184,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              //disabled={!canProceed}
+              disabled={!canProceed}
             >
               다음
             </button>
@@ -196,7 +196,7 @@ export default function SignUp() {
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              //disabled={!canProceed}
+              disabled={!canProceed}
             >
               완료
             </button>
