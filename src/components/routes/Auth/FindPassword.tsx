@@ -2,7 +2,7 @@ import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthPhone from "../../organisms/find/AuthPhone";
 import ResetPassword from "../../organisms/find/ResetPassword";
-import { post } from "../../../api/postAndPut";
+import { patchJSON } from "../../../api/postAndPut";
 
 type FindPasswordFormType = {
   tel: string;
@@ -41,24 +41,25 @@ export default function FindPassword() {
 
   const resetPassword = () => {
     const tel = form.tel.replace(/-/g, "");
-    post("/auth/reset-password", {
+    patchJSON("/member/password", {
       phoneNumber: tel,
       newPassword: form.password,
     })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result?.success === true) setDone(true);
-        else alert(result?.message ?? "비밀번호 재설정에 실패했습니다.");
+      .then(({ ok, data, status }) => {
+        if (!ok || data?.success === false) {
+          throw new Error((data as any)?.message || `HTTP ${status}`);
+        }
+        setDone(true);
       })
-      .catch(() => {
-        alert("비밀번호 재설정 중 오류가 발생했습니다.");
+      .catch((err) => {
+        alert(err?.message || "비밀번호 재설정에 실패했습니다.");
       });
   };
 
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
-        <div className="w-[360px] h-[348px] bg-white rounded-3xl pt-9 pb-9 px-6 flex flex-col items-center justify-center text-center">
+        <div className="w-[360px] h-[150px] bg-white rounded-3xl pt-9 pb-9 px-6 flex flex-col items-center justify-center text-center">
           <h2 className="text-xl font-extrabold text-gray-800 mb-6">
             비밀번호 재설정 완료!
           </h2>

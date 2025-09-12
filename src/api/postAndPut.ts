@@ -13,7 +13,7 @@ let refreshPromise: Promise<string> | null = null;
 function isAuthEndpoint(path: string) {
   const base = getApiUrl("");
   const url = path.replace(base, "");
-  return /^\/?auth\/(login|join)$/i.test(url);
+  return /^\/?auth\/(login|join|signup)$/i.test(url);
 }
 
 async function reissueAccessToken(expiredAccess: string): Promise<string> {
@@ -67,7 +67,8 @@ async function doFetch(
   try {
     const newAccess = await reissueAccessToken(access);
     const retryHeaders = new Headers(init.headers);
-    retryHeaders.set("Accept", "application/json");
+    if (!retryHeaders.has("Accept"))
+      retryHeaders.set("Accept", "application/json");
     if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
       retryHeaders.set("Authorization", `${newAccess}`);
     }
@@ -87,8 +88,8 @@ async function toJsonResult<T>(res: Response): Promise<JsonResult<T>> {
   return { ok: res.ok, status: res.status, data };
 }
 
-const postOrPut =
-  (methodName: "POST" | "PUT") =>
+const withBodyMethod =
+  (methodName: "POST" | "PUT" | "PATCH") =>
   (path: string, data?: any, init?: RequestInit) => {
     const headers = new Headers(init?.headers);
     if (!headers.has("Accept")) headers.set("Accept", "application/json");
@@ -105,8 +106,9 @@ const postOrPut =
     return doFetch(path, { ...init, method: methodName, headers, body });
   };
 
-export const post = postOrPut("POST");
-export const put = postOrPut("PUT");
+export const post = withBodyMethod("POST");
+export const put = withBodyMethod("PUT");
+export const patch = withBodyMethod("PATCH");
 
 export async function postJSON<T = any>(
   path: string,
@@ -123,5 +125,14 @@ export async function putJSON<T = any>(
   init?: RequestInit
 ): Promise<JsonResult<T>> {
   const res = await put(path, body, init);
+  return toJsonResult<T>(res);
+}
+
+export async function patchJSON<T = any>(
+  path: string,
+  body?: any,
+  init?: RequestInit
+): Promise<JsonResult<T>> {
+  const res = await patch(path, body, init);
   return toJsonResult<T>(res);
 }
