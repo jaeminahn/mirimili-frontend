@@ -74,7 +74,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const phoneNumber = normalizePhone(data.tel);
     const password = normalizePwd(data.password);
 
-    post("/auth/signup", {
+    post("/member/signup", {
       phoneNumber,
       password,
       nickname: data.nick,
