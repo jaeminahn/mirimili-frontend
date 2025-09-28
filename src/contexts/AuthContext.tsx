@@ -7,11 +7,13 @@ import {
   useEffect,
 } from "react";
 import { post } from "../api/postAndPut";
+import { patchJSON } from "../api/postAndPut";
 import {
   setTokens,
   clearTokens,
   subscribeAccessToken,
 } from "../api/tokenStore";
+import { getRefreshToken } from "../api/tokenStore";
 
 export type LoggedUser = { id: number; tel: string; nick: string };
 type Callback = () => void;
@@ -36,13 +38,13 @@ type ContextType = {
   loggedUser?: LoggedUser;
   signup: (data: SignupPayload, callback?: Callback) => void;
   login: (tel: string, password: string, callback?: Callback) => void;
-  logout: (callback?: Callback) => void;
+  logout: (callback?: Callback) => Promise<void>;
 };
 
 export const AuthContext = createContext<ContextType>({
   signup: () => {},
   login: () => {},
-  logout: () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -137,13 +139,21 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     []
   );
 
-  const logout = useCallback((callback?: Callback) => {
-    setLoggedUser(undefined);
-    setAccessToken("");
-    setRefreshToken("");
-    localStorage.removeItem("user");
-    clearTokens();
-    callback?.();
+  const logout = useCallback(async (callback?: Callback) => {
+    try {
+      const refresh = getRefreshToken();
+      if (refresh) {
+        await patchJSON("/auth/logout", { refreshToken: refresh });
+      }
+    } catch {
+    } finally {
+      setLoggedUser(undefined);
+      setAccessToken("");
+      setRefreshToken("");
+      localStorage.removeItem("user");
+      clearTokens();
+      callback?.();
+    }
   }, []);
 
   const value = { loggedUser, signup, login, logout };

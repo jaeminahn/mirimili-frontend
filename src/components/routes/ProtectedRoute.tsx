@@ -7,12 +7,11 @@ const ProtectedRoute = ({
 }: {
   children: ReactNode;
 }): ReactElement | null => {
-  const location = useLocation();
   const token = getAccessToken();
   const isAuthed = !!token;
 
   if (!isAuthed) {
-    return <Navigate to="/auth/login" replace state={{ from: location }} />;
+    return <Navigate to="/auth/login" />;
   }
   return <>{children}</>;
 };

@@ -5,7 +5,6 @@ import Layout from "./Layout";
 import SignUp from "./Auth/SignUp";
 import FindPassword from "./Auth/FindPassword";
 import Login from "./Auth/Login";
-import Logout from "./Auth/Logout";
 import Questions from "./Questions";
 import QuestionPost from "./QuestionPost";
 import QuestionNew from "./QuestionNew";
@@ -39,7 +38,6 @@ export default function RouterSetup() {
       <Route path="/search-input" element={<MobileSearchPage />} />
 
       <Route path="/auth/login" element={<Login />} />
-      <Route path="/auth/logout" element={<Logout />} />
       <Route path="/auth/signup" element={<SignUp />} />
       <Route path="/auth/findpassword" element={<FindPassword />} />
       <Route path="/auth/*" element={<NoMatch />} />

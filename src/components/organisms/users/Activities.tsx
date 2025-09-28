@@ -60,7 +60,11 @@ export default function Activities() {
       if (!mounted) return;
 
       if (pRes.ok && pRes.data?.success) {
-        setPosts(pRes.data.data ?? []);
+        const sortedPosts = [...(pRes.data.data ?? [])].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setPosts(sortedPosts);
       } else {
         setErrMsg(
           pRes.data?.message || "게시글을 불러오는 중 오류가 발생했습니다."
@@ -68,7 +72,12 @@ export default function Activities() {
       }
 
       if (aRes.ok && aRes.data?.success) {
-        setAnswers(aRes.data.data ?? []);
+        const sortedAnswers = [...(aRes.data.data ?? [])].sort(
+          (a, b) =>
+            new Date(b.createdAt ?? "").getTime() -
+            new Date(a.createdAt ?? "").getTime()
+        );
+        setAnswers(sortedAnswers);
       } else {
         setErrMsg(
           (prev) =>
@@ -90,7 +99,7 @@ export default function Activities() {
     if (loading) return <p className="text-gray-500">불러오는 중…</p>;
     if (errMsg) return <p className="text-red-600">{errMsg}</p>;
     if (!posts.length)
-      return <p className="text-gray-600">게시글이 없습니다.</p>;
+      return <p className="text-gray-600">게시글이 존재하지 않아요.</p>;
 
     return posts.map((p) => (
       <PostItem
@@ -110,7 +119,7 @@ export default function Activities() {
     if (loading) return <p className="text-gray-500">불러오는 중…</p>;
     if (errMsg) return <p className="text-red-600">{errMsg}</p>;
     if (!answers.length)
-      return <p className="text-gray-600">답변이 없습니다.</p>;
+      return <p className="text-gray-600">답변이 존재하지 않아요.</p>;
 
     return answers.map((a, idx) => (
       <MyAnswerItem
