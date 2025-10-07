@@ -7,6 +7,7 @@ type NewQuestionPayload = {
   targetMiliType: "AIR_FORCE";
   categoryIds: number[];
   specialtyIds: number[];
+  imageKeys?: string[];
 };
 
 type ApiResponse<T> = {
@@ -21,8 +22,16 @@ export const postNewQuestion = (
   callback?: () => void
 ) => {
   const url = "/posts";
+  const serverPayload = {
+    title: payload.title,
+    body: payload.body,
+    imageKeys: payload.imageKeys ?? payload.imagesUrl ?? [],
+    targetMiliType: payload.targetMiliType,
+    categoryIds: payload.categoryIds,
+    specialtyIds: payload.specialtyIds,
+  };
 
-  return post(url, payload)
+  return post(url, serverPayload)
     .then(async (res: Response) => {
       const text = await res.text();
       if (!res.ok) {

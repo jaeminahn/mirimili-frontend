@@ -7,6 +7,11 @@ import category from "../../data/category.json";
 import serviceType from "../../data/serviceType.json";
 import serviceMos from "../../data/serviceMos.json";
 import { QuestionFormType } from "../routes/QuestionNew";
+import {
+  presignImage,
+  putToPresignedUrl,
+  getViewUrls,
+} from "../../api/uploads";
 
 interface QuestionWriteProps {
   form: QuestionFormType;
@@ -32,6 +37,7 @@ export default function QuestionWrite({
   const [fileInputKey, setFileInputKey] = useState<string>(
     Date.now().toString()
   );
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, categoryId: prev.categoryId ?? 0 }));
@@ -45,22 +51,59 @@ export default function QuestionWrite({
     setIsMosModalOpen(false);
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const acceptTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+  const maxSize = 10 * 1024 * 1024;
+  const maxCount = 5;
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (!event.target.files) return;
     const files = Array.from(event.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setForm((prev) => ({
-      ...prev,
-      imagesUrl: [...prev.imagesUrl, ...newImages],
-    }));
-    setFileInputKey(Date.now().toString());
+    const remain = Math.max(0, maxCount - (form.imagesUrl?.length || 0));
+    const selected = files
+      .filter((f) => acceptTypes.has(f.type) && f.size <= maxSize)
+      .slice(0, remain);
+    if (!selected.length) {
+      setFileInputKey(Date.now().toString());
+      return;
+    }
+    setUploading(true);
+    try {
+      const presigned = [];
+      for (const file of selected) {
+        const p = await presignImage(file.type, file.size);
+        await putToPresignedUrl(p.url, file);
+        presigned.push({ key: p.key, file });
+      }
+      const keys = presigned.map((p) => p.key);
+      const urlMap = await getViewUrls(keys);
+      const urls = keys.map((k) => urlMap[k]).filter(Boolean);
+      setForm((prev: any) => ({
+        ...prev,
+        imagesUrl: [...(prev.imagesUrl || []), ...urls],
+        imageKeys: [...(prev.imageKeys || []), ...keys],
+      }));
+    } catch (e) {
+      console.error(e);
+      window.alert("이미지 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setUploading(false);
+      setFileInputKey(Date.now().toString());
+    }
   };
 
   const handleRemoveImage = (image: string) => {
-    setForm((prev) => ({
-      ...prev,
-      imagesUrl: prev.imagesUrl.filter((img) => img !== image),
-    }));
+    setForm((prev: any) => {
+      const idx = (prev.imagesUrl || []).indexOf(image);
+      const nextImages = (prev.imagesUrl || []).filter(
+        (img: string) => img !== image
+      );
+      const nextKeys = Array.isArray(prev.imageKeys)
+        ? prev.imageKeys.filter((_: string, i: number) => i !== idx)
+        : prev.imageKeys;
+      return { ...prev, imagesUrl: nextImages, imageKeys: nextKeys || [] };
+    });
   };
 
   useEffect(() => {
@@ -149,6 +192,7 @@ export default function QuestionWrite({
               multiple
               className="hidden"
               onChange={handleImageUpload}
+              disabled={uploading}
             />
           </label>
         </div>
