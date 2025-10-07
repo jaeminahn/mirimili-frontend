@@ -13,7 +13,7 @@ import {
   typeId2Label,
   unitId2Label,
 } from "../../utils";
-import { postNewAnswer } from "../../api/answers";
+import { postNewAnswer, fetchAnswers, likeQuestion } from "../../api/answers";
 
 interface postDataProps {
   id: number;
@@ -53,15 +53,6 @@ interface answerDataProps {
   isScrapped: boolean;
 }
 
-interface _answerDataProps {
-  id: number;
-  writer_id: number;
-  content: string;
-  like: number;
-  dislike: number;
-  createdAt: string;
-}
-
 export default function QuestionPostContent() {
   const params = useParams();
   const { loggedUser } = useAuth();
@@ -80,8 +71,8 @@ export default function QuestionPostContent() {
     title: "로딩중...",
     content: "로딩중...",
     view: -1,
-    like: -1,
-    dislike: -1,
+    like: 0,
+    dislike: 0,
     answer: -1,
     createdAt: "로딩중...",
     isLiked: false,
@@ -104,6 +95,21 @@ export default function QuestionPostContent() {
     }
   };
 
+  const handleLike = async () => {
+    if (postData.isLiked) return;
+    try {
+      await likeQuestion(Number(params["id"]));
+      setPostData((prev) => ({
+        ...prev,
+        isLiked: true,
+        like: (prev.like ?? 0) + 1,
+      }));
+    } catch (e) {
+      console.error(e);
+      alert("좋아요 처리 중 오류가 발생했습니다.");
+    }
+  };
+
   const newAnswer = () => {
     if (!answerText.trim()) return;
     if (!loggedUser) {
@@ -111,73 +117,83 @@ export default function QuestionPostContent() {
       return;
     }
     postNewAnswer(Number(params["id"]), answerText)
-      .then(() => navigate("/"))
+      .then(async () => {
+        setAnswerText("");
+        await loadAnswers();
+        setPostData((prev) => ({ ...prev, answer: prev.answer + 1 }));
+      })
       .catch((e) => {
         console.error(e);
         alert("답변 등록 중 오류가 발생했습니다.");
       });
   };
 
-  useEffect(() => {
-    get(`/questions/${params["id"]}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setPostData((prev) => ({
-          ...prev,
-          writerId: res.writer_id,
-          categoryId: res.category_id,
-          title: res.title,
-          content: res.content,
-          view: res.view,
-          like: res.like,
-          dislike: res.dislike,
-          answer: res.answer,
-          createdAt: calculateTimeAgo(new Date(res.createdAt)),
-        }));
-        return get(`/users/${res.writer_id}`).then((w) => w.json());
-      })
-      .then((writer) => {
-        setPostData((prev) => ({
-          ...prev,
-          writerNick: writer.nickname,
-          writerType: typeId2Label(writer.service_type_id),
-          writerLevel: calculateLevel(writer.service_start, new Date()),
-          writerMos: mosId2Label(writer.service_mos_id),
-          writerUnit: unitId2Label(writer.service_unit_id),
-        }));
-      });
+  const loadPost = async () => {
+    const res = await get(`/posts/${params["id"]}`);
+    if (!res.ok) {
+      console.error("loadPost failed", res.status);
+      return;
+    }
+    const txt = await res.text();
+    if (!txt) return;
+    let j: any = null;
+    try {
+      j = JSON.parse(txt);
+    } catch {}
+    const d = j?.data ?? j;
+    if (!d) return;
+    setPostData((prev) => ({
+      ...prev,
+      id: d.id,
+      writerId: -1,
+      writerNick: d.writerNickname,
+      writerType: d.writerStatus,
+      writerLevel: d.writerSpecialty,
+      writerMos: d.targetMiliType ?? "",
+      writerUnit:
+        Array.isArray(d.targetSpecialties) && d.targetSpecialties.length
+          ? d.targetSpecialties[0]
+          : "",
+      categoryId: -1,
+      title: d.title,
+      content: d.body,
+      view: d.viewCount,
+      answer: d.commentCount,
+      createdAt: calculateTimeAgo(new Date(d.createdAt)),
+    }));
+  };
 
-    // 답변 목록
-    get(`/answers/${params["id"]}`)
-      .then((res) => res.json())
-      .then(async (res) => {
-        const mapped = await Promise.all(
-          res.map(async (item: _answerDataProps) => {
-            const writerResponse = await get(`/users/${item.writer_id}`);
-            const writer = await writerResponse.json();
-            return {
-              id: item.id,
-              writerId: item.writer_id,
-              writerNick: writer.nickname,
-              writerType: typeId2Label(writer.service_type_id),
-              writerLevel: calculateLevel(writer.service_start, new Date()),
-              writerMos: mosId2Label(writer.service_mos_id),
-              writerUnit: unitId2Label(writer.service_unit_id),
-              content: item.content,
-              like: item.like,
-              dislike: item.dislike,
-              createdAt: calculateTimeAgo(new Date(item.createdAt)),
-              isLiked: false,
-              isDisliked: false,
-              isScrapped: false,
-            };
-          })
-        );
-        setAnswerData(mapped);
-      })
-      .catch((error) => {
-        console.error("Error fetching answers:", error);
-      });
+  const loadAnswers = async () => {
+    const list = await fetchAnswers(Number(params["id"]));
+    const mapped = (list ?? []).map((c: any) => {
+      return {
+        id: c.id,
+        writerId: -1,
+        writerNick: c.writerNickname,
+        writerType: c.writerStatus,
+        writerLevel: c.writerMiliType,
+        writerMos: "",
+        writerUnit: "",
+        content: c.content ?? c.body,
+        like: c.likeCount ?? 0,
+        dislike: c.dislikeCount ?? 0,
+        createdAt: calculateTimeAgo(new Date(c.createdAt)),
+        isLiked: false,
+        isDisliked: false,
+        isScrapped: false,
+      };
+    });
+    setAnswerData(mapped);
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await Promise.all([loadPost(), loadAnswers()]);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   }, [params["id"]]);
 
   return (
@@ -209,7 +225,9 @@ export default function QuestionPostContent() {
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-emerald-600">
-              {getCategoryLabel(postData.categoryId)}
+              {Array.isArray((readObjectP as any)?.categories)
+                ? ""
+                : getCategoryLabel(postData.categoryId)}
             </p>
             <p className="text-2xl font-semibold">{postData.title}</p>
           </div>
@@ -222,6 +240,7 @@ export default function QuestionPostContent() {
                     ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
                     : "text-gray-600 bg-gray-100"
                 }`}
+                onClick={handleLike}
               >
                 <Icon icon="fluent:thumb-like-24-filled" />
                 <p>{postData.like}</p>
