@@ -78,7 +78,7 @@ export default function QuestionNew() {
         <QuestionWrite form={form} setForm={setForm} changed={changed} />
         <div className="flex flex-col w-1/5 gap-2">
           <button
-            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60"
+            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300"
             onClick={onSubmit}
             disabled={!form.canSubmit}
           >
