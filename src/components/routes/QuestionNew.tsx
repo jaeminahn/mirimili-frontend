@@ -11,6 +11,9 @@ export type QuestionFormType = {
   serviceTypeId: number[];
   serviceMosId: number[];
   imagesUrl: string[];
+  imageKeys?: string[];
+  isUploading?: boolean;
+  canSubmit?: boolean;
 };
 
 const initialFormState: QuestionFormType = {
@@ -20,6 +23,9 @@ const initialFormState: QuestionFormType = {
   serviceTypeId: [],
   serviceMosId: [],
   imagesUrl: [],
+  imageKeys: [],
+  isUploading: false,
+  canSubmit: false,
 };
 
 const MILI_TYPE_MAP: Record<number, "AIR_FORCE"> = {
@@ -44,32 +50,11 @@ export default function QuestionNew() {
       }
     };
 
-  const onSubmit = () => {
-    if (form.title.trim() === "") {
-      window.alert("제목을 입력해주세요.");
-      return;
-    }
-    if (form.content.trim() === "") {
-      window.alert("내용을 입력해주세요.");
-      return;
-    }
-    if (form.categoryId === null || form.categoryId === undefined) {
-      window.alert("카테고리를 지정해주세요.");
-      return;
-    }
-    if (form.serviceTypeId.length === 0) {
-      window.alert("답변자의 군복무 종류를 지정해주세요.");
-      return;
-    }
-    if (form.serviceMosId.length === 0) {
-      window.alert("답변자의 군특기를 지정해주세요.");
-      return;
-    }
-
+  const onSubmit = async () => {
+    if (!form.canSubmit) return;
     const firstTypeId = form.serviceTypeId[0];
-    const targetMiliType = MILI_TYPE_MAP[firstTypeId] ?? "ETC";
-
-    postNewQuestion(
+    const targetMiliType = MILI_TYPE_MAP[firstTypeId] ?? "AIR_FORCE";
+    await postNewQuestion(
       {
         title: form.title,
         body: form.content,
@@ -77,6 +62,7 @@ export default function QuestionNew() {
         targetMiliType,
         categoryIds: [form.categoryId],
         specialtyIds: form.serviceMosId,
+        imageKeys: form.imageKeys,
       },
       () => navigate("/")
     );
@@ -92,8 +78,9 @@ export default function QuestionNew() {
         <QuestionWrite form={form} setForm={setForm} changed={changed} />
         <div className="flex flex-col w-1/5 gap-2">
           <button
-            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700"
+            className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60"
             onClick={onSubmit}
+            disabled={!form.canSubmit}
           >
             질문 등록하기
           </button>

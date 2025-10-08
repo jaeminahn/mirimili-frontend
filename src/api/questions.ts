@@ -8,6 +8,7 @@ type NewQuestionPayload = {
   categoryIds: number[];
   specialtyIds: number[];
   imageKeys?: string[];
+  isUploading?: boolean;
 };
 
 type ApiResponse<T> = {
@@ -17,27 +18,53 @@ type ApiResponse<T> = {
   data: T | null;
 };
 
+function extractKey(u: string): string | null {
+  try {
+    const url = new URL(u);
+    const p = url.pathname.replace(/^\/+/, "");
+    return p || null;
+  } catch {
+    const noQuery = u.split("?")[0];
+    const m = noQuery.match(/https?:\/\/[^/]+\/(.+)/i);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+}
+
 export const postNewQuestion = (
   payload: NewQuestionPayload,
   callback?: () => void
 ) => {
   const url = "/posts";
-  const serverPayload = {
+
+  if ((payload as any)?.isUploading) {
+    const e = new Error("이미지 업로드가 아직 완료되지 않았습니다.");
+    return Promise.reject(e);
+  }
+
+  let keys: string[] = Array.isArray(payload.imageKeys)
+    ? payload.imageKeys.filter(Boolean)
+    : [];
+  if (
+    (!keys || keys.length === 0) &&
+    Array.isArray(payload.imagesUrl) &&
+    payload.imagesUrl.length > 0
+  ) {
+    keys = payload.imagesUrl.map(extractKey).filter((k): k is string => !!k);
+  }
+
+  const serverPayload: any = {
     title: payload.title,
     body: payload.body,
-    imageKeys: payload.imageKeys ?? payload.imagesUrl ?? [],
     targetMiliType: payload.targetMiliType,
     categoryIds: payload.categoryIds,
     specialtyIds: payload.specialtyIds,
   };
+  if (keys.length > 0) serverPayload.imageKeys = keys;
 
   return post(url, serverPayload)
     .then(async (res: Response) => {
       const text = await res.text();
-      if (!res.ok) {
-        console.error("[POST]", url, res.status, text);
-        throw new Error(text || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
       const json: ApiResponse<number> = text
         ? JSON.parse(text)
         : { success: true, code: "", message: "", data: null };
@@ -52,8 +79,12 @@ export const postNewQuestion = (
       return result;
     })
     .catch((err) => {
-      console.error(err);
-      if (!/HTTP \d+/.test(String(err?.message))) {
+      console.error("[POST] /posts", err?.message);
+      if (
+        String(err?.message) === "이미지 업로드가 아직 완료되지 않았습니다."
+      ) {
+        window.alert(err.message);
+      } else if (!/HTTP \d+/.test(String(err?.message))) {
         window.alert("요청 처리 중 오류가 발생했습니다.");
       }
       throw err;

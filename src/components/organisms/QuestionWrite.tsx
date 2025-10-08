@@ -40,7 +40,7 @@ export default function QuestionWrite({
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, categoryId: prev.categoryId ?? 0 }));
+    setForm((prev: any) => ({ ...prev, categoryId: prev.categoryId ?? 0 }));
   }, [setForm]);
 
   const toggleMosModal = () => setIsMosModalOpen(!isMosModalOpen);
@@ -64,32 +64,31 @@ export default function QuestionWrite({
     const selected = files
       .filter((f) => acceptTypes.has(f.type) && f.size <= maxSize)
       .slice(0, remain);
-    if (!selected.length) {
-      setFileInputKey(Date.now().toString());
-      return;
-    }
+    setFileInputKey(Date.now().toString());
+    if (!selected.length) return;
+
     setUploading(true);
+    setForm((prev: any) => ({ ...prev, isUploading: true }));
     try {
-      const presigned = [];
+      const keys: string[] = [];
       for (const file of selected) {
         const p = await presignImage(file.type, file.size);
         await putToPresignedUrl(p.url, file);
-        presigned.push({ key: p.key, file });
+        keys.push(p.key);
       }
-      const keys = presigned.map((p) => p.key);
       const urlMap = await getViewUrls(keys);
       const urls = keys.map((k) => urlMap[k]).filter(Boolean);
       setForm((prev: any) => ({
         ...prev,
         imagesUrl: [...(prev.imagesUrl || []), ...urls],
-        imageKeys: [...(prev.imageKeys || []), ...keys],
+        imageKeys: [...((prev as any).imageKeys || []), ...keys],
       }));
     } catch (e) {
       console.error(e);
       window.alert("이미지 업로드 중 오류가 발생했습니다.");
     } finally {
       setUploading(false);
-      setFileInputKey(Date.now().toString());
+      setForm((prev: any) => ({ ...prev, isUploading: false }));
     }
   };
 
@@ -97,28 +96,28 @@ export default function QuestionWrite({
     setForm((prev: any) => {
       const idx = (prev.imagesUrl || []).indexOf(image);
       const nextImages = (prev.imagesUrl || []).filter(
-        (img: string) => img !== image
+        (_: string, i: number) => i !== idx
       );
       const nextKeys = Array.isArray(prev.imageKeys)
         ? prev.imageKeys.filter((_: string, i: number) => i !== idx)
-        : prev.imageKeys;
-      return { ...prev, imagesUrl: nextImages, imageKeys: nextKeys || [] };
+        : [];
+      return { ...prev, imagesUrl: nextImages, imageKeys: nextKeys };
     });
   };
 
   useEffect(() => {
     setIsAllType(type.length === serviceType.length);
-    setForm((prev) => ({ ...prev, serviceTypeId: type }));
+    setForm((prev: any) => ({ ...prev, serviceTypeId: type }));
   }, [type, setForm]);
 
   useEffect(() => {
     if (isAllMos) {
-      setForm((prev) => ({
+      setForm((prev: any) => ({
         ...prev,
         serviceMosId: serviceMos.map((item) => item.id),
       }));
     } else {
-      setForm((prev) => ({ ...prev, serviceMosId: mos }));
+      setForm((prev: any) => ({ ...prev, serviceMosId: mos }));
     }
   }, [isAllMos, mos, setForm]);
 
@@ -135,6 +134,22 @@ export default function QuestionWrite({
       setIsAllMos(false);
     }
   };
+
+  const titleOk = !!form.title && form.title.trim().length > 0;
+  const contentOk = !!form.content && form.content.trim().length > 0;
+  const categoryOk = typeof form.categoryId === "number" && form.categoryId > 0;
+  const canSubmit =
+    titleOk &&
+    contentOk &&
+    categoryOk &&
+    !uploading &&
+    !(form as any).isUploading;
+
+  useEffect(() => {
+    setForm((prev: any) =>
+      prev?.canSubmit === canSubmit ? prev : { ...prev, canSubmit }
+    );
+  }, [canSubmit, setForm]);
 
   return (
     <div className="flex flex-col w-4/5 gap-6 bg-gray-100 rounded-lg">
@@ -205,7 +220,7 @@ export default function QuestionWrite({
             <button
               key={item.id}
               onClick={() =>
-                setForm((prev) => ({ ...prev, categoryId: item.id }))
+                setForm((prev: any) => ({ ...prev, categoryId: item.id }))
               }
               className={`px-2 py-1 text-sm rounded-xl ${
                 form.categoryId === item.id
