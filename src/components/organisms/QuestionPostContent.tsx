@@ -62,19 +62,19 @@ export default function QuestionPostContent() {
   const [postData, setPostData] = useState<postDataProps>({
     id: Number(params["id"]),
     writerId: -1,
-    writerNick: "로딩중...",
-    writerType: "로딩중...",
-    writerLevel: "로딩중...",
-    writerMos: "로딩중...",
-    writerUnit: "로딩중...",
+    writerNick: "",
+    writerType: "",
+    writerLevel: "",
+    writerMos: "",
+    writerUnit: "",
     categoryId: -1,
-    title: "로딩중...",
-    content: "로딩중...",
+    title: "",
+    content: "",
     view: -1,
     like: 0,
     dislike: 0,
     answer: -1,
-    createdAt: "로딩중...",
+    createdAt: "",
     isLiked: false,
     isDisliked: false,
     isScrapped: false,
@@ -231,7 +231,9 @@ export default function QuestionPostContent() {
             </p>
             <p className="text-2xl font-semibold">{postData.title}</p>
           </div>
-          <p className="text-base">{postData.content}</p>
+          <div className="text-base whitespace-pre-wrap">
+            {postData.content}
+          </div>
           <div className="flex justify-between text-sm">
             <div className="flex gap-2 font-semibold ">
               <button
