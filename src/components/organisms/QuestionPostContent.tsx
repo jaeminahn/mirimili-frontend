@@ -34,6 +34,7 @@ interface postDataProps {
   isLiked: boolean;
   isDisliked: boolean;
   isScrapped: boolean;
+  images: string[];
 }
 
 interface answerDataProps {
@@ -78,8 +79,10 @@ export default function QuestionPostContent() {
     isLiked: false,
     isDisliked: false,
     isScrapped: false,
+    images: [],
   });
   const [answerData, setAnswerData] = useState<answerDataProps[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const getCategoryLabel = (id: number) => {
@@ -160,6 +163,7 @@ export default function QuestionPostContent() {
       view: d.viewCount,
       answer: d.commentCount,
       createdAt: calculateTimeAgo(new Date(d.createdAt)),
+      images: Array.isArray(d.images) ? d.images : [],
     }));
   };
 
@@ -195,6 +199,30 @@ export default function QuestionPostContent() {
       }
     })();
   }, [params["id"]]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIndex(null);
+      if (e.key === "ArrowLeft")
+        setLightboxIndex((i) =>
+          i === null
+            ? null
+            : (i + postData.images.length - 1) % postData.images.length
+        );
+      if (e.key === "ArrowRight")
+        setLightboxIndex((i) =>
+          i === null ? null : (i + 1) % postData.images.length
+        );
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [lightboxIndex, postData.images.length]);
 
   return (
     <div className="flex flex-col w-4/5 gap-4">
@@ -234,6 +262,26 @@ export default function QuestionPostContent() {
           <div className="text-base whitespace-pre-wrap">
             {postData.content}
           </div>
+
+          {postData.images.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto py-1">
+              {postData.images.map((src, idx) => (
+                <button
+                  key={idx}
+                  className="relative flex-shrink-0 w-24 h-24 overflow-hidden border border-gray-300 rounded-xl"
+                  onClick={() => setLightboxIndex(idx)}
+                >
+                  <img
+                    src={src}
+                    alt={`image-${idx + 1}`}
+                    className="object-cover w-full h-full"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="flex justify-between text-sm">
             <div className="flex gap-2 font-semibold ">
               <button
@@ -324,6 +372,63 @@ export default function QuestionPostContent() {
           isDisliked={answer.isDisliked}
         />
       ))}
+
+      {lightboxIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <div
+            className="relative max-w-[90vw] max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={postData.images[lightboxIndex]}
+              alt={`image-${lightboxIndex + 1}`}
+              className="object-contain w-[90vw] max-w-5xl max-h-[85vh] rounded-2xl shadow-2xl"
+            />
+            <button
+              className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70"
+              onClick={() => setLightboxIndex(null)}
+            >
+              <Icon icon="fluent:dismiss-24-filled" className="text-2xl" />
+            </button>
+            {postData.images.length > 1 && (
+              <>
+                <button
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  onClick={() =>
+                    setLightboxIndex((i) =>
+                      i === null
+                        ? null
+                        : (i + postData.images.length - 1) %
+                          postData.images.length
+                    )
+                  }
+                >
+                  <Icon
+                    icon="fluent:chevron-left-24-filled"
+                    className="text-2xl"
+                  />
+                </button>
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  onClick={() =>
+                    setLightboxIndex((i) =>
+                      i === null ? null : (i + 1) % postData.images.length
+                    )
+                  }
+                >
+                  <Icon
+                    icon="fluent:chevron-right-24-filled"
+                    className="text-2xl"
+                  />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
