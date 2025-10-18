@@ -1,10 +1,5 @@
 import { getApiUrl } from "./getApiUrl";
-import {
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-  clearTokens,
-} from "./tokenStore";
+import { getAccessToken, setTokens, clearTokens } from "./tokenStore";
 
 export type JsonResult<T> = { ok: boolean; status: number; data: T | null };
 
@@ -13,22 +8,20 @@ let refreshPromise: Promise<string> | null = null;
 function isAuthEndpoint(path: string) {
   const base = getApiUrl("");
   const url = path.replace(base, "");
-  return /^\/?auth\/(login|join|signup)$/i.test(url);
+  return /^\/?auth\/(login|join|signup|reissue|logout)$/i.test(url);
 }
 
 async function reissueAccessToken(expiredAccess: string): Promise<string> {
-  const refresh = getRefreshToken();
-  if (!refresh) throw new Error("no refresh");
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
     const res = await fetch(getApiUrl("/auth/reissue"), {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        Accept: "application/json",
         Authorization: `Bearer ${expiredAccess}`,
       },
-      body: JSON.stringify({ refreshToken: refresh }),
+      credentials: "include",
     });
     if (!res.ok) throw new Error("reissue failed");
 
@@ -57,10 +50,15 @@ async function doFetch(
 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (!headers.has("Authorization") && access && !isAuthEndpoint(path)) {
-    headers.set("Authorization", `${access}`);
+    headers.set("Authorization", `Bearer ${access}`);
   }
 
-  const res = await fetch(getApiUrl(path), { ...init, headers });
+  const res = await fetch(getApiUrl(path), {
+    ...init,
+    headers,
+    credentials: "include",
+  });
+
   if (res.status !== 401 || retry) return res;
   if (!access) return res;
 
@@ -70,9 +68,13 @@ async function doFetch(
     if (!retryHeaders.has("Accept"))
       retryHeaders.set("Accept", "application/json");
     if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
-      retryHeaders.set("Authorization", `${newAccess}`);
+      retryHeaders.set("Authorization", `Bearer ${newAccess}`);
     }
-    return await fetch(getApiUrl(path), { ...init, headers: retryHeaders });
+    return await fetch(getApiUrl(path), {
+      ...init,
+      headers: retryHeaders,
+      credentials: "include",
+    });
   } catch {
     clearTokens();
     return res;

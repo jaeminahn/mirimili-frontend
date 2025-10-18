@@ -8,12 +8,7 @@ import {
 } from "react";
 import { post } from "../api/postAndPut";
 import { patchJSON } from "../api/postAndPut";
-import {
-  setTokens,
-  clearTokens,
-  subscribeAccessToken,
-} from "../api/tokenStore";
-import { getRefreshToken } from "../api/tokenStore";
+import { setTokens, clearTokens, subscribeAccessToken } from "../api/tokenStore";
 
 export type LoggedUser = { id: number; tel: string; nick: string };
 type Callback = () => void;
@@ -52,18 +47,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     undefined
   );
   const [accessToken, setAccessToken] = useState<string>("");
-  const [refreshToken, setRefreshToken] = useState<string>("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedAccessToken = localStorage.getItem("accessToken");
-    const storedRefreshToken = localStorage.getItem("refreshToken");
     if (storedUser && storedAccessToken) {
       try {
         setLoggedUser(JSON.parse(storedUser) as LoggedUser);
       } catch {}
       setAccessToken(storedAccessToken || "");
-      setRefreshToken(storedRefreshToken || "");
     }
     subscribeAccessToken((t) => setAccessToken(t));
   }, []);
@@ -113,7 +105,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           }
           if (result?.success === true) {
             const access = result?.data?.accessToken ?? "";
-            const refresh = result?.data?.refreshToken ?? "";
             const nickname = result?.data?.nickname ?? "";
             const memberId =
               Number(result?.data?.memberId ?? result?.data?.id ?? 0) || 0;
@@ -124,9 +115,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             };
             setLoggedUser(user);
             setAccessToken(access);
-            setRefreshToken(refresh);
             localStorage.setItem("user", JSON.stringify(user));
-            setTokens(access, refresh);
+            setTokens(access);
             callback?.();
           } else {
             alert(result?.message ?? "로그인 실패");
@@ -141,15 +131,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const logout = useCallback(async (callback?: Callback) => {
     try {
-      const refresh = getRefreshToken();
-      if (refresh) {
-        await patchJSON("/auth/logout", { refreshToken: refresh });
-      }
+      await patchJSON("/auth/logout");
     } catch {
     } finally {
       setLoggedUser(undefined);
       setAccessToken("");
-      setRefreshToken("");
       localStorage.removeItem("user");
       clearTokens();
       callback?.();
