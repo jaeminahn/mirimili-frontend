@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import PostItem from "../molecules/PostItem";
 import CategoryButton from "../molecules/CategoryButton";
 import { get } from "../../api/getAndDel";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import categories from "../../data/category.json";
+import { calculateTimeAgo } from "../../utils/calculateTime";
 
 interface PostItemProps {
   id: number;
@@ -19,63 +20,58 @@ interface PostItemProps {
   updatedAt: string;
 }
 
-interface _PostItemProps {
-  id: number;
-  writer_id: number;
-  title: string;
-  content: string;
-  category_id?: number;
-  answer: number;
-  like: number;
-  dislike: number;
-  scrapped: number;
-  view: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const orderLabel = [
-  "최신순",
-  "오래된순",
-  "조회수많은순",
-  "조회수적은순",
-  "추천순",
-  "비추천순",
-  "답변많은순",
-  "답변적은순",
-];
-
 export default function QuestionsMain() {
   const [tabIndex, setTabIndex] = useState(0);
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [postData, setPostData] = useState<PostItemProps[]>([]);
-  const [orderBy, setOrderBy] = useState(0);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
 
   useEffect(() => {
-    const categoryQuery =
-      categoryId !== undefined ? `&category=${categoryId}` : "";
+    const params = new URLSearchParams();
+    if (categoryId !== undefined) {
+      params.append("categoryIds", String(categoryId));
+    } else {
+      categories.forEach((c: { id: number }) =>
+        params.append("categoryIds", String(c.id))
+      );
+    }
+    params.append("page", String(page));
+    params.append("size", "10");
+    params.append("sortBy", "createdAt");
 
-    get(`/questions?order=${orderBy}${categoryQuery}`)
+    get(`/posts/list?${params.toString()}`)
       .then((res) => res.json())
       .then((res) => {
+        const items = res?.data?.content ?? [];
         setPostData(
-          res.map((item: _PostItemProps) => ({
+          items.map((item: any) => ({
             id: item.id,
-            writerId: item.writer_id,
+            writerId: 0,
             title: item.title,
-            content: item.content,
-            categoryId: item.category_id,
-            answer: 0,
-            like: item.like,
-            dislike: item.dislike,
-            scrapped: item.scrapped,
-            view: item.view,
+            content: item.body,
+            categoryId: undefined,
+            answer: item.commentCount,
+            like: item.likeCount,
+            dislike: 0,
+            scrapped: 0,
+            view: item.viewCount,
             createdAt: item.createdAt,
-            updatedAt: item.updatedAt,
+            updatedAt: item.createdAt,
           }))
         );
+        setTotalPages(res?.data?.totalPages ?? 0);
+        setHasNext(res?.data?.hasNext ?? false);
       });
-  }, [tabIndex, categoryId, orderBy]);
+  }, [tabIndex, categoryId, page]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [categoryId]);
+
+  const canPrev = page > 0;
+  const canNext = totalPages > 0 ? page < totalPages - 1 : hasNext;
 
   return (
     <div className="flex flex-col w-full lg:w-4/5 max-w-full gap-4">
@@ -106,43 +102,54 @@ export default function QuestionsMain() {
         <CategoryButton categoryId={categoryId} setCategoryId={setCategoryId} />
       </div>
 
-      <div className="flex justify-end">
-        <Menu as="div" className="relative">
-          <MenuButton className="h-10 px-3 py-2 font-normal text-gray-600">
-            {orderLabel[orderBy]} ▾
-          </MenuButton>
-          <MenuItems
-            anchor="bottom start"
-            className="absolute mt-2 w-36 bg-white rounded-lg shadow-md"
-          >
-            {orderLabel.map((label, idx) => (
-              <MenuItem key={idx}>
-                <button
-                  className="block w-full h-10 px-3 py-2 text-sm font-medium text-gray-600 focus:outline-none text-left"
-                  onClick={() => setOrderBy(idx)}
-                >
-                  {label}
-                </button>
-              </MenuItem>
-            ))}
-          </MenuItems>
-        </Menu>
-      </div>
-
       <div className="flex flex-col h-full gap-2 p-4 bg-white rounded-3xl">
         {postData.length > 0 ? (
-          postData.map((item) => (
-            <PostItem
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              content={item.content}
-              createdAt={item.createdAt}
-              view={item.view}
-              like={item.like}
-              answer={item.answer}
-            />
-          ))
+          <>
+            {postData.map((item) => (
+              <PostItem
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                content={item.content}
+                createdAt={calculateTimeAgo(new Date(item.createdAt))}
+                view={item.view}
+                like={item.like}
+                answer={item.answer}
+              />
+            ))}
+
+            <div className="mt-2 flex items-center justify-between">
+              <div className="w-28">
+                {canPrev && (
+                  <button
+                    className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    이전 페이지
+                  </button>
+                )}
+              </div>
+
+              <div className="text-sm text-gray-700">
+                {Math.min(
+                  page + 1,
+                  Math.max(1, totalPages || (hasNext ? page + 1 : 1))
+                )}
+                /{totalPages || (hasNext ? "…" : 1)}
+              </div>
+
+              <div className="w-28 flex justify-end">
+                {canNext && (
+                  <button
+                    className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    다음 페이지
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
         ) : (
           <p className="p-4 text-gray-600">
             선택한 카테고리에 해당하는 글이 없어요.
