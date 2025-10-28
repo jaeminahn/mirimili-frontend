@@ -131,11 +131,13 @@ export default function QuestionsMain() {
               </div>
 
               <div className="text-sm text-gray-700">
-                {Math.min(
-                  page + 1,
-                  Math.max(1, totalPages || (hasNext ? page + 1 : 1))
-                )}
-                /{totalPages || (hasNext ? "…" : 1)}
+                <b>
+                  {Math.min(
+                    page + 1,
+                    Math.max(1, totalPages || (hasNext ? page + 1 : 1))
+                  )}
+                </b>
+                &nbsp;/&nbsp;{totalPages || (hasNext ? "…" : 1)}
               </div>
 
               <div className="w-28 flex justify-end">

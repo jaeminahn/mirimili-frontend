@@ -1,50 +1,131 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import NotificationItem from "../../molecules/NotificationItem";
+import { get } from "../../../api/getAndDel";
+import { patch } from "../../../api/postAndPut";
+import { calculateTimeAgo } from "../../../utils/calculateTime";
 
-const initialNotificationData = [
-  {
-    id: 1,
-    title: "홍길동123님이 내 질문에 답변했어요!",
-    content:
-      "내가 작성한 [군대 훈련소 입소 준비물 관련 질문] 질문에 대한 답변 내용을 확인해보세요.",
-    createdAt: "1시간 전"
-  },
-  {
-    id: 2,
-    title: "동그라미님이 내 질문에 답변했어요!",
-    content:
-      "내가 작성한 [군대 훈련소 입소 준비물 관련 질문] 질문에 대한 답변 내용을 확인해보세요.",
-    createdAt: "6시간 전"
-  },
-  {
-    id: 3,
-    title: "상병 진급을 진심으로 축하드려요!🎉🎉",
-    content:
-      "그동안 고생 많았어요. 앞으로도 조금만 더 힘내주세요:)",
-    createdAt: "12시간 전"
-  },
-];
+interface ApiNotification {
+  id: number;
+  type: "NOTICE_NEW" | string;
+  title: string;
+  message: string;
+  targetUrl?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+interface ApiListResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    content: ApiNotification[];
+    totalPages: number;
+    totalElements: number;
+    currentPage: number;
+    size: number;
+    hasNext: boolean;
+  };
+}
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(initialNotificationData);
+  const [items, setItems] = useState<ApiNotification[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [readingAll, setReadingAll] = useState(false);
 
-  const handleRead = (id: number) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
-  };
+  const canPrev = page > 0;
+  const canNext = totalPages > 0 ? page < totalPages - 1 : hasNext;
 
-  const handleMarkAllAsRead = () => {
-    setNotifications([]);
-  };
+  const fetchNotifications = useCallback(
+    async (pageToFetch = page) => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        params.append("page", String(pageToFetch));
+        params.append("size", "10");
 
-  const notificationList = notifications.map((notification) => (
-    <NotificationItem
-      key={notification.id}
-      title={notification.title}
-      content={notification.content}
-      createdAt={notification.createdAt}
-      onRead={() => handleRead(notification.id)}
-    />
-  ));
+        const res = (await get(`/notifications?${params.toString()}`).then(
+          (r) => r.json()
+        )) as ApiListResponse;
+
+        const data = res?.data;
+        setItems(data?.content ?? []);
+        setTotalPages(data?.totalPages ?? 0);
+        setHasNext(data?.hasNext ?? false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page]
+  );
+
+  useEffect(() => {
+    fetchNotifications(page);
+  }, [page, fetchNotifications]);
+
+  const handleReadOnly = useCallback(
+    async (id: number) => {
+      const prev = items;
+      setItems(items.filter((n) => n.id !== id));
+      try {
+        await patch(`/notifications/${id}/read`, {});
+      } catch {
+        setItems(prev);
+        alert("알림 읽음 처리에 실패했습니다.");
+      }
+    },
+    [items]
+  );
+
+  const handleClickBox = useCallback(
+    async (id: number, targetUrl?: string) => {
+      const prev = items;
+      setItems(items.filter((n) => n.id !== id));
+      try {
+        await patch(`/notifications/${id}/read`, {});
+        if (targetUrl) window.open(targetUrl, "_blank", "noopener,noreferrer");
+      } catch {
+        setItems(prev);
+        alert("알림 읽음 처리에 실패했습니다.");
+      }
+    },
+    [items]
+  );
+
+  const handleMarkAllAsRead = useCallback(async () => {
+    if (items.length === 0) return;
+    setReadingAll(true);
+    try {
+      await patch(`/notifications/read-all`, {});
+      setItems([]);
+      setPage(0);
+      await fetchNotifications(0);
+    } catch {
+      alert("모두 읽음 처리에 실패했습니다.");
+    } finally {
+      setReadingAll(false);
+    }
+  }, [items, fetchNotifications]);
+
+  const notificationList = useMemo(() => {
+    return items.map((n) => (
+      <div
+        key={n.id}
+        onClick={() => handleClickBox(n.id, n.targetUrl)}
+        className="cursor-pointer hover:bg-gray-50 transition rounded-xl"
+      >
+        <NotificationItem
+          title={n.title}
+          content={n.message}
+          createdAt={calculateTimeAgo(new Date(n.createdAt))}
+          onRead={() => handleReadOnly(n.id)}
+        />
+      </div>
+    ));
+  }, [items, handleClickBox, handleReadOnly]);
 
   return (
     <div className="flex flex-col lg:w-4/5 gap-4">
@@ -52,21 +133,65 @@ export default function Notifications() {
         <div className="flex justify-end mb-4">
           <button
             onClick={handleMarkAllAsRead}
-            disabled={notifications.length === 0}
+            disabled={items.length === 0 || readingAll}
             className={`w-24 h-8 text-sm font-bold rounded-xl ${
-              notifications.length === 0 ? "bg-gray-200 text-gray-500" : "bg-gray-100"
+              items.length === 0 || readingAll
+                ? "bg-gray-200 text-gray-500"
+                : "bg-gray-100"
             }`}
           >
-            모두 읽음
+            {readingAll ? "처리 중…" : "모두 읽음"}
           </button>
         </div>
-        {notificationList.length > 0 ? (
+
+        {loading ? (
+          <p className="text-gray-600 text-center">불러오는 중…</p>
+        ) : notificationList.length > 0 ? (
           <>
             {notificationList}
-            <p className="text-gray-600 text-center mt-4">최근 30일 동안의 알림을 확인할 수 있어요.</p>
+
+            <p className="text-gray-600 text-center mt-3 mb-2">
+              최근 30일 동안의 알림을 확인할 수 있어요.
+            </p>
+
+            <div className="mt-2 flex items-center justify-between">
+              <div className="w-28">
+                {canPrev && (
+                  <button
+                    className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    이전 페이지
+                  </button>
+                )}
+              </div>
+
+              <div className="text-sm text-gray-700">
+                <b>
+                  {Math.min(
+                    page + 1,
+                    Math.max(1, totalPages || (hasNext ? page + 1 : 1))
+                  )}
+                </b>
+                &nbsp;/&nbsp;{totalPages || (hasNext ? "…" : 1)}
+              </div>
+
+              <div className="w-28 flex justify-end">
+                {canNext && (
+                  <button
+                    className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    다음 페이지
+                  </button>
+                )}
+              </div>
+            </div>
           </>
         ) : (
-          <p className="text-gray-600 text-center">최근 30일 동안 새로운 알림이 없어요.</p>
+          <p className="text-gray-600 text-center">
+            최근 30일 동안 새로운 알림이 없어요.
+          </p>
         )}
       </div>
     </div>
