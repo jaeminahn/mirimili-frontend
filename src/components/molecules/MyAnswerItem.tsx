@@ -20,7 +20,7 @@ export default function MyAnswerItem({
 }: MyAnswerItemProps) {
   return (
     <Link
-      to={`/questions/${questionId}`}
+      to={`/post/${questionId}`}
       className="flex flex-col gap-2 p-6 border border-gray-300 rounded-lg hover:cursor-pointer"
     >
       <div className="flex items-center gap-2">

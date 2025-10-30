@@ -19,17 +19,17 @@ export default function RouterSetup() {
       <Route index element={<Home />} />
 
       <Route path="/" element={<Layout />}>
-        <Route index path="/questions" element={<Questions />} />
+        <Route index path="/post" element={<Questions />} />
         <Route
           index
-          path="/questions/new"
+          path="/post/new"
           element={
             <ProtectedRoute>
               <QuestionNew />
             </ProtectedRoute>
           }
         />
-        <Route index path="/questions/:id" element={<QuestionPost />} />
+        <Route index path="/post/:id" element={<QuestionPost />} />
         <Route index path="/users/mypage" element={<Users />} />
         <Route index path="/search" element={<SearchResults />} />
         <Route path="*" element={<NoMatch />} />

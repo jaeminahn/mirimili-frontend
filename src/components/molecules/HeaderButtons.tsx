@@ -27,7 +27,7 @@ const HeaderButtons: FC<HeaderButtonsProps> = ({ onItemClick }) => {
     <div className="flex flex-col items-center gap-4 md:flex-row md:gap-5 md:items-stretch">
       <Link
         className="hover:text-emerald-600"
-        to="/questions"
+        to="/post"
         onClick={onItemClick}
       >
         질문&답변

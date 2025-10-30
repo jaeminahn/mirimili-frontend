@@ -16,12 +16,12 @@ export default function NavigationBar() {
           />
           <span className={`${isActive("/") ? "text-emerald-500" : "text-gray-600"} text-xs`}>홈</span>
         </Link>
-        <Link to="/questions" className="flex flex-col items-center">
+        <Link to="/post" className="flex flex-col items-center">
           <Icon
             icon="fluent:chat-bubbles-question-24-filled"
-            className={`w-6 h-6 ${isActive("/questions") ? "text-emerald-500" : "text-gray-600"}`}
+            className={`w-6 h-6 ${isActive("/post") ? "text-emerald-500" : "text-gray-600"}`}
           />
-          <span className={`${isActive("/questions") ? "text-emerald-500" : "text-gray-600"} text-xs`}>질문&답변</span>
+          <span className={`${isActive("/post") ? "text-emerald-500" : "text-gray-600"} text-xs`}>질문&답변</span>
         </Link>
         <Link to="/millitip" className="flex flex-col items-center">
           <Icon

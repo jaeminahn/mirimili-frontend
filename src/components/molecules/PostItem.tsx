@@ -22,7 +22,7 @@ export default function PostItem({
 }: PostItemProps) {
   return (
     <Link
-      to={`/questions/${id}`}
+      to={`/post/${id}`}
       className="flex flex-col gap-3 p-6 border border-gray-300 rounded-lg hover:cursor-pointer"
     >
       <div className="flex items-center flex-wrap">
