@@ -12,6 +12,7 @@ import Users from "./Users";
 import SearchResults from "./SearchResults";
 import MobileSearchPage from "./MobileSearchPage";
 import ProtectedRoute from "./ProtectedRoute";
+import DetailProfile from "./DetailProfile";
 
 export default function RouterSetup() {
   return (
@@ -40,6 +41,14 @@ export default function RouterSetup() {
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/signup" element={<SignUp />} />
       <Route path="/auth/findpassword" element={<FindPassword />} />
+      <Route
+        path="/detail/setup"
+        element={
+          <ProtectedRoute>
+            <DetailProfile />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/auth/*" element={<NoMatch />} />
     </Routes>
   );

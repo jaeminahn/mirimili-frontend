@@ -1,47 +1,50 @@
-// @ts-nocheck
-import { useState, useEffect, ChangeEvent } from "react";
-import { SignUpFormType } from "../../routes/Auth/SignUp";
+import { useEffect, useState, ChangeEvent } from "react";
 import SelectModal from "../SelectModal";
 import serviceMos from "../../../data/serviceMos.json";
 import serviceUnit from "../../../data/serviceUnit.json";
 import { MosAndUnitRecord } from "../../../data/data";
 import { Icon } from "@iconify/react";
+import { DetailProfileForm } from "../../routes/DetailProfile";
 
-type SetMosAndUnitProps = {
-  form: SignUpFormType;
-  changed: (
-    key: keyof SignUpFormType
-  ) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  setCanProceed: (value: boolean) => void;
-  step: number;
+type Props = {
+  form: DetailProfileForm;
+  setField: <K extends keyof DetailProfileForm>(
+    k: K,
+    v: DetailProfileForm[K]
+  ) => void;
+  setCanProceed: (v: boolean) => void;
 };
 
 export default function SetMosAndUnit({
   form,
-  changed,
+  setField,
   setCanProceed,
-  step,
-}: SetMosAndUnitProps) {
+}: Props) {
   const [isNoMos, setIsNoMos] = useState(false);
   const [isMosModalOpen, setIsMosModalOpen] = useState(false);
-  const [selectedMosId, setSelectedMosId] = useState(-1);
+  const [selectedMosId, setSelectedMosId] = useState<number>(
+    form.specialtyId ?? -1
+  );
   const [isNoUnit, setIsNoUnit] = useState(false);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
-  const [selectedUnitId, setSelectedUnitId] = useState(-1);
+  const [selectedUnitId, setSelectedUnitId] = useState<number>(
+    form.unitId ?? -1
+  );
 
   const toggleMosModal = () => setIsMosModalOpen(!isMosModalOpen);
   const handleMosSelect = (mos: MosAndUnitRecord) => {
     setSelectedMosId(mos.id);
     setIsMosModalOpen(false);
   };
+
   const handleServiceMosSelect = (mosId: number) => {
-    changed("serviceMos")({
-      target: { value: mosId },
-    } as unknown as ChangeEvent<HTMLSelectElement>);
+    setField("specialtyId", mosId);
   };
+
   useEffect(() => {
     if (isNoMos) handleServiceMosSelect(0);
-    else handleServiceMosSelect(selectedMosId);
+    else if (selectedMosId !== -1) handleServiceMosSelect(selectedMosId);
+    else setField("specialtyId", null);
   }, [isNoMos, selectedMosId]);
 
   const toggleUnitModal = () => setIsUnitModalOpen(!isUnitModalOpen);
@@ -49,20 +52,22 @@ export default function SetMosAndUnit({
     setSelectedUnitId(unit.id);
     setIsUnitModalOpen(false);
   };
+
   const handleServiceUnitSelect = (unitId: number) => {
-    changed("serviceUnit")({
-      target: { value: unitId },
-    } as unknown as ChangeEvent<HTMLSelectElement>);
+    setField("unitId", unitId);
   };
+
   useEffect(() => {
     if (isNoUnit) handleServiceUnitSelect(0);
-    else handleServiceUnitSelect(selectedUnitId);
+    else if (selectedUnitId !== -1) handleServiceUnitSelect(selectedUnitId);
+    else setField("unitId", null);
   }, [isNoUnit, selectedUnitId]);
 
   useEffect(() => {
-    if (step !== 6) return;
-    setCanProceed(form.serviceMos !== -1 && form.serviceUnit !== -1);
-  }, [form.serviceMos, form.serviceUnit, step]);
+    const mosOk = isNoMos || selectedMosId !== -1;
+    const unitOk = isNoUnit || selectedUnitId !== -1;
+    setCanProceed(mosOk && unitOk);
+  }, [isNoMos, isNoUnit, selectedMosId, selectedUnitId]);
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">

@@ -6,11 +6,19 @@ import {
   useCallback,
   useEffect,
 } from "react";
-import { post } from "../api/postAndPut";
-import { patchJSON } from "../api/postAndPut";
-import { setTokens, clearTokens, subscribeAccessToken } from "../api/tokenStore";
+import { post, patchJSON } from "../api/postAndPut";
+import {
+  setTokens,
+  clearTokens,
+  subscribeAccessToken,
+} from "../api/tokenStore";
 
-export type LoggedUser = { id: number; tel: string; nick: string };
+export type LoggedUser = {
+  id: number;
+  tel: string;
+  nick: string;
+  hasMilitaryInfo?: boolean;
+};
 type Callback = () => void;
 
 export enum ServiceTypeE {
@@ -34,12 +42,14 @@ type ContextType = {
   signup: (data: SignupPayload, callback?: Callback) => void;
   login: (tel: string, password: string, callback?: Callback) => void;
   logout: (callback?: Callback) => Promise<void>;
+  markProfileCompleted: () => void;
 };
 
 export const AuthContext = createContext<ContextType>({
   signup: () => {},
   login: () => {},
   logout: async () => {},
+  markProfileCompleted: () => {},
 });
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -108,10 +118,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             const nickname = result?.data?.nickname ?? "";
             const memberId =
               Number(result?.data?.memberId ?? result?.data?.id ?? 0) || 0;
+            const hasMilitaryInfo = Boolean(
+              result?.data?.hasMilitaryInfo ?? false
+            );
             const user: LoggedUser = {
               id: memberId,
               tel: phoneNumber,
               nick: nickname,
+              hasMilitaryInfo,
             };
             setLoggedUser(user);
             setAccessToken(access);
@@ -142,7 +156,16 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const value = { loggedUser, signup, login, logout };
+  const markProfileCompleted = useCallback(() => {
+    setLoggedUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, hasMilitaryInfo: true };
+      localStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const value = { loggedUser, signup, login, logout, markProfileCompleted };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
