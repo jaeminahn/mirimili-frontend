@@ -50,10 +50,10 @@ export default function SetDetailDate({
 
   return (
     <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
-      <h2 className="mb-4 text-lg font-bold text-gray-700">전역예정일</h2>
+      <h2 className="mb-4 text-lg font-bold">전역일 (전역예정일)</h2>
       <DatePicker date={endDate} setDate={setEndDate} />
 
-      <h2 className="mt-4 mb-4 text-lg font-bold text-gray-700">진급일</h2>
+      <h2 className="mt-4 mb-4 text-lg font-bold">진급일 (진급예정일)</h2>
       <div className="flex items-center gap-4 mb-4">
         <p className="flex-shrink-0 text-sm min-w-2">일병</p>
         <DatePicker date={pfcDate} setDate={setPfcDate} />

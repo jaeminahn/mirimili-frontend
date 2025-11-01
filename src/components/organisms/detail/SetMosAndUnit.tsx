@@ -72,7 +72,7 @@ export default function SetMosAndUnit({
   return (
     <div className="flex flex-col p-6 bg-white rounded-3xl w-[360px]">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-lg font-bold text-gray-700">군사특기</p>
+        <p className="text-lg font-bold">군사특기</p>
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => setIsNoMos((prev) => !prev)}
@@ -123,7 +123,7 @@ export default function SetMosAndUnit({
       />
 
       <div className="flex items-center justify-between mt-8 mb-4">
-        <p className="text-lg font-bold text-gray-700">복무부대</p>
+        <p className="text-lg font-bold">복무부대</p>
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => setIsNoUnit((prev) => !prev)}
