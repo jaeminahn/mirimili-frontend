@@ -66,33 +66,48 @@ export default function Notifications() {
     fetchNotifications(page);
   }, [page, fetchNotifications]);
 
+  const maybeAdvanceIfEmpty = useCallback(
+    async (nextItemsCount: number) => {
+      if (nextItemsCount !== 0) return;
+      const hasMore = totalPages > 0 ? page < totalPages - 1 : hasNext;
+      if (!hasMore) return;
+      await fetchNotifications(page + 1);
+      setPage((p) => p + 1);
+    },
+    [page, totalPages, hasNext, fetchNotifications]
+  );
+
   const handleReadOnly = useCallback(
     async (id: number) => {
       const prev = items;
-      setItems(items.filter((n) => n.id !== id));
+      const next = items.filter((n) => n.id !== id);
+      setItems(next);
       try {
         await patch(`/notifications/${id}/read`, {});
+        await maybeAdvanceIfEmpty(next.length);
       } catch {
         setItems(prev);
         alert("알림 읽음 처리에 실패했습니다.");
       }
     },
-    [items]
+    [items, maybeAdvanceIfEmpty]
   );
 
   const handleClickBox = useCallback(
     async (id: number, targetUrl?: string) => {
       const prev = items;
-      setItems(items.filter((n) => n.id !== id));
+      const next = items.filter((n) => n.id !== id);
+      setItems(next);
       try {
         await patch(`/notifications/${id}/read`, {});
         if (targetUrl) window.open(targetUrl, "_blank", "noopener,noreferrer");
+        await maybeAdvanceIfEmpty(next.length);
       } catch {
         setItems(prev);
         alert("알림 읽음 처리에 실패했습니다.");
       }
     },
-    [items]
+    [items, maybeAdvanceIfEmpty]
   );
 
   const handleMarkAllAsRead = useCallback(async () => {
@@ -101,14 +116,20 @@ export default function Notifications() {
     try {
       await patch(`/notifications/read-all`, {});
       setItems([]);
-      setPage(0);
-      await fetchNotifications(0);
+      const hasMore = totalPages > 0 ? page < totalPages - 1 : hasNext;
+      if (hasMore) {
+        await fetchNotifications(page + 1);
+        setPage((p) => p + 1);
+      } else {
+        await fetchNotifications(0);
+        setPage(0);
+      }
     } catch {
       alert("모두 읽음 처리에 실패했습니다.");
     } finally {
       setReadingAll(false);
     }
-  }, [items, fetchNotifications]);
+  }, [items, page, totalPages, hasNext, fetchNotifications]);
 
   const notificationList = useMemo(() => {
     return items.map((n) => (
