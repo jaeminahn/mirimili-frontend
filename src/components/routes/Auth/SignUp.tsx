@@ -1,12 +1,10 @@
 import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, ServiceTypeE } from "../../../contexts/AuthContext";
-
 import TermsandConditions from "../../organisms/signup/TermsandConditions";
 import SetMember from "../../organisms/signup/SetMember";
 import SetPhonePassword from "../../organisms/signup/SetPhonePassword";
 import SetNickname from "../../organisms/signup/SetNickname";
-
 import partyImg from "../../../images/party.png";
 
 export type SignUpFormType = {
@@ -48,7 +46,6 @@ export default function SignUp() {
     (key: keyof SignUpFormType) =>
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const t = e.target as HTMLInputElement;
-
       if (
         key === "serviceAgreed" ||
         key === "privacyPolicyAgreed" ||
@@ -56,15 +53,12 @@ export default function SignUp() {
       ) {
         return setField(key, t.checked as any);
       }
-
       if (key === "memberType") {
         return setField(key, Number(t.value) as any);
       }
-
       if (key === "serviceType") {
         return setField(key, t.value as ServiceTypeE as any);
       }
-
       return setField(key, t.value as any);
     };
 
@@ -94,12 +88,42 @@ export default function SignUp() {
     );
   };
 
-  const goToNextStep = () => setStep((prev) => prev + 1);
+  const resetFromStep = (start: number) => {
+    setForm((prev) => {
+      const next = { ...prev };
+      if (start <= 1) {
+        next.serviceAgreed = false;
+        next.privacyPolicyAgreed = false;
+        next.marketingConsentAgreed = false;
+      }
+      if (start <= 2) {
+        next.memberType = -1;
+        next.serviceType = undefined;
+      }
+      if (start <= 3) {
+        next.tel = "";
+        next.password = "";
+      }
+      if (start <= 4) {
+        next.nick = "";
+      }
+      return next;
+    });
+  };
+
+  const goToNextStep = () => {
+    setCanProceed(false);
+    setStep((prev) => prev + 1);
+  };
+
   const goToPreviousStep = () => {
     if (step === 1) {
       navigate("/auth/login");
     } else {
-      setStep((prev) => prev - 1);
+      const targetStep = step - 1;
+      resetFromStep(step);
+      setCanProceed(false);
+      setStep(targetStep);
     }
   };
 
@@ -133,38 +157,38 @@ export default function SignUp() {
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-100">
-      <div className={`${step === 1 ? "" : "hidden"}`}>
+      {step === 1 && (
         <TermsandConditions
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
           step={step}
         />
-      </div>
-      <div className={`${step === 2 ? "" : "hidden"}`}>
+      )}
+      {step === 2 && (
         <SetMember
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
           step={step}
         />
-      </div>
-      <div className={`${step === 3 ? "" : "hidden"}`}>
+      )}
+      {step === 3 && (
         <SetPhonePassword
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
           step={step}
         />
-      </div>
-      <div className={`${step === 4 ? "" : "hidden"}`}>
+      )}
+      {step === 4 && (
         <SetNickname
           form={form}
           changed={changed}
           setCanProceed={setCanProceed}
           step={step}
         />
-      </div>
+      )}
 
       {step >= 1 && (
         <div className="flex items-center justify-between mt-4 w-[360px]">
