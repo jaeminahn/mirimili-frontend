@@ -9,21 +9,15 @@ function isAuthEndpoint(path: string) {
   return /^\/?auth\/(login|join|signup|reissue|logout)$/i.test(url);
 }
 
-function cleanBearer(t?: string | null) {
-  return (t || "").replace(/^Bearer\s+/i, "");
-}
-
 async function reissueAccessToken(expiredAccess: string): Promise<string> {
   if (refreshPromise) return refreshPromise;
-
-  const expired = cleanBearer(expiredAccess);
 
   refreshPromise = (async () => {
     const res = await fetch(getApiUrl("/auth/reissue"), {
       method: "POST",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${expired}`,
+        Authorization: expiredAccess,
       },
       credentials: "include",
     });
@@ -54,7 +48,7 @@ async function doFetch(
 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (!headers.has("Authorization") && access && !isAuthEndpoint(path)) {
-    headers.set("Authorization", `Bearer ${cleanBearer(access)}`);
+    headers.set("Authorization", access);
   }
 
   const res = await fetch(getApiUrl(path), {
@@ -72,7 +66,7 @@ async function doFetch(
     if (!retryHeaders.has("Accept"))
       retryHeaders.set("Accept", "application/json");
     if (!retryHeaders.has("Authorization") && !isAuthEndpoint(path)) {
-      retryHeaders.set("Authorization", `Bearer ${cleanBearer(newAccess)}`);
+      retryHeaders.set("Authorization", newAccess);
     }
     return await fetch(getApiUrl(path), {
       ...init,
