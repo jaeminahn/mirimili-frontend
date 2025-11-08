@@ -1,2 +1,2 @@
 export const getApiUrl = (path: string) =>
-  "https://www.mirimili.co.kr/" + String(path || "").replace(/^\/+/, "");
+  "https://api.mirimili.co.kr/" + String(path || "").replace(/^\/+/, "");
