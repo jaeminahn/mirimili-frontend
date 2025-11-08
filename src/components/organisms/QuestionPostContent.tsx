@@ -1,29 +1,27 @@
 import { Icon } from "@iconify/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
-import category from "../../data/category.json";
 import { get } from "../../api/getAndDel";
+import { calculateTimeAgo } from "../../utils";
 import {
-  calculateLevel,
-  calculateTimeAgo,
-  mosId2Label,
-  readObjectP,
-  typeId2Label,
-  unitId2Label,
-} from "../../utils";
-import { postNewAnswer, fetchAnswers, likeQuestion } from "../../api/answers";
+  postNewAnswer,
+  fetchAnswers,
+  likeQuestion,
+  likeComment,
+} from "../../api/answers";
+import {
+  presignImage,
+  putToPresignedUrl,
+  getViewUrls,
+} from "../../api/uploads";
 
-interface postDataProps {
+interface PostData {
   id: number;
-  writerId: number;
   writerNick: string;
-  writerType: string;
-  writerLevel: string;
-  writerMos: string;
-  writerUnit: string;
-  categoryId: number;
+  writerStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  writerSpecialty?: string;
   title: string;
   content: string;
   view: number;
@@ -35,60 +33,65 @@ interface postDataProps {
   isDisliked: boolean;
   isScrapped: boolean;
   images: string[];
+  categories: string[];
+  targetSpecialties: string[];
 }
 
-interface answerDataProps {
+interface AnswerData {
   id: number;
-  writerId: number;
   writerNick: string;
-  writerType: string;
-  writerLevel: string;
-  writerMos: string;
-  writerUnit: string;
+  writerStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  writerSpecialty?: string;
   content: string;
   like: number;
   dislike: number;
   createdAt: string;
   isLiked: boolean;
   isDisliked: boolean;
-  isScrapped: boolean;
+  imagesUrl: string[];
 }
 
 export default function QuestionPostContent() {
   const params = useParams();
   const { loggedUser } = useAuth();
   const [answerText, setAnswerText] = useState("");
-  const [hideUnit, setHideUnit] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [postData, setPostData] = useState<postDataProps>({
+  const [postData, setPostData] = useState<PostData>({
     id: Number(params["id"]),
-    writerId: -1,
     writerNick: "",
-    writerType: "",
-    writerLevel: "",
-    writerMos: "",
-    writerUnit: "",
-    categoryId: -1,
+    writerStatus: undefined,
+    writerSpecialty: "",
     title: "",
     content: "",
-    view: -1,
+    view: 0,
     like: 0,
     dislike: 0,
-    answer: -1,
+    answer: 0,
     createdAt: "",
     isLiked: false,
     isDisliked: false,
     isScrapped: false,
     images: [],
+    categories: [],
+    targetSpecialties: [],
   });
-  const [answerData, setAnswerData] = useState<answerDataProps[]>([]);
+  const [answerData, setAnswerData] = useState<AnswerData[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const navigate = useNavigate();
+  const [cmtImagesUrl, setCmtImagesUrl] = useState<string[]>([]);
+  const [cmtImageKeys, setCmtImageKeys] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState<string>(
+    Date.now().toString()
+  );
 
-  const getCategoryLabel = (id: number) => {
-    const foundCategory = category.find((cat) => cat.id === id);
-    return foundCategory ? foundCategory.label : null;
-  };
+  const statusLabel = (s?: string) =>
+    s === "PRE_ENLISTED"
+      ? "입대전"
+      : s === "ENLISTED"
+      ? "현역"
+      : s === "DISCHARGED"
+      ? "예비역"
+      : "";
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setAnswerText(event.target.value);
@@ -98,105 +101,112 @@ export default function QuestionPostContent() {
     }
   };
 
-  const handleLike = async () => {
+  const handleLikePost = async () => {
     if (postData.isLiked) return;
-    try {
-      await likeQuestion(Number(params["id"]));
-      setPostData((prev) => ({
-        ...prev,
-        isLiked: true,
-        like: (prev.like ?? 0) + 1,
-      }));
-    } catch (e) {
-      console.error(e);
-      alert("좋아요 처리 중 오류가 발생했습니다.");
-    }
+    await likeQuestion(Number(params["id"]));
+    setPostData((prev) => ({ ...prev, isLiked: true, like: prev.like + 1 }));
   };
 
-  const newAnswer = () => {
+  const newAnswer = async () => {
     if (!answerText.trim()) return;
     if (!loggedUser) {
       alert("로그인이 필요합니다.");
       return;
     }
-    postNewAnswer(Number(params["id"]), answerText)
-      .then(async () => {
-        setAnswerText("");
-        await loadAnswers();
-        setPostData((prev) => ({ ...prev, answer: prev.answer + 1 }));
-      })
-      .catch((e) => {
-        console.error(e);
-        alert("답변 등록 중 오류가 발생했습니다.");
-      });
+    await postNewAnswer(Number(params["id"]), answerText, cmtImagesUrl);
+    setAnswerText("");
+    setCmtImagesUrl([]);
+    setCmtImageKeys([]);
+    await loadAnswers();
+    setPostData((prev) => ({ ...prev, answer: prev.answer + 1 }));
+  };
+
+  const handleCmtImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!e.target.files) return;
+    const accept = new Set(["image/jpeg", "image/png", "image/webp"]);
+    const maxSize = 10 * 1024 * 1024;
+    const maxCount = 5;
+    const remain = Math.max(0, maxCount - cmtImagesUrl.length);
+    const selected = Array.from(e.target.files)
+      .filter((f) => accept.has(f.type) && f.size <= maxSize)
+      .slice(0, remain);
+    setFileInputKey(Date.now().toString());
+    if (!selected.length) return;
+    setUploading(true);
+    try {
+      const keys: string[] = [];
+      for (const f of selected) {
+        const p = await presignImage(f.type, f.size);
+        await putToPresignedUrl(p.url, f);
+        keys.push(p.key);
+      }
+      const map = await getViewUrls(keys);
+      const urls = keys.map((k) => map[k]).filter(Boolean);
+      setCmtImagesUrl((prev) => [...prev, ...urls]);
+      setCmtImageKeys((prev) => [...prev, ...keys]);
+    } catch {
+      alert("이미지 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeCmtImage = (url: string) => {
+    setCmtImagesUrl((prev) => prev.filter((u) => u !== url));
+    setCmtImageKeys((prev) => {
+      const idx = cmtImagesUrl.indexOf(url);
+      return prev.filter((_, i) => i !== idx);
+    });
   };
 
   const loadPost = async () => {
     const res = await get(`/posts/${params["id"]}`);
-    if (!res.ok) {
-      console.error("loadPost failed", res.status);
-      return;
-    }
-    const txt = await res.text();
-    if (!txt) return;
-    let j: any = null;
-    try {
-      j = JSON.parse(txt);
-    } catch {}
+    if (!res.ok) return;
+    const j = await res.json();
     const d = j?.data ?? j;
     if (!d) return;
     setPostData((prev) => ({
       ...prev,
       id: d.id,
-      writerId: -1,
       writerNick: d.writerNickname,
-      writerType: d.writerStatus,
-      writerLevel: d.writerSpecialty,
-      writerMos: d.targetMiliType ?? "",
-      writerUnit:
-        Array.isArray(d.targetSpecialties) && d.targetSpecialties.length
-          ? d.targetSpecialties[0]
-          : "",
-      categoryId: -1,
+      writerStatus: d.writerStatus,
+      writerSpecialty: d.writerSpecialty,
       title: d.title,
       content: d.body,
       view: d.viewCount,
       answer: d.commentCount,
       createdAt: calculateTimeAgo(new Date(d.createdAt)),
       images: Array.isArray(d.images) ? d.images : [],
+      categories: Array.isArray(d.categories) ? d.categories : [],
+      targetSpecialties: Array.isArray(d.targetSpecialties)
+        ? d.targetSpecialties
+        : [],
     }));
   };
 
   const loadAnswers = async () => {
     const list = await fetchAnswers(Number(params["id"]));
-    const mapped = (list ?? []).map((c: any) => {
-      return {
-        id: c.id,
-        writerId: -1,
-        writerNick: c.writerNickname,
-        writerType: c.writerStatus,
-        writerLevel: c.writerMiliType,
-        writerMos: "",
-        writerUnit: "",
-        content: c.content ?? c.body,
-        like: c.likeCount ?? 0,
-        dislike: c.dislikeCount ?? 0,
-        createdAt: calculateTimeAgo(new Date(c.createdAt)),
-        isLiked: false,
-        isDisliked: false,
-        isScrapped: false,
-      };
-    });
+    const mapped = (list ?? []).map((c: any) => ({
+      id: c.id,
+      writerNick: c.writerNickname,
+      writerStatus: c.writerStatus,
+      writerSpecialty: c.writerSpecialty,
+      content: c.content ?? c.body,
+      like: c.likeCount ?? 0,
+      dislike: c.dislikeCount ?? 0,
+      createdAt: calculateTimeAgo(new Date(c.createdAt)),
+      isLiked: false,
+      isDisliked: false,
+      imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
+    }));
     setAnswerData(mapped);
   };
 
   useEffect(() => {
     (async () => {
-      try {
-        await Promise.all([loadPost(), loadAnswers()]);
-      } catch (e) {
-        console.error(e);
-      }
+      await Promise.all([loadPost(), loadAnswers()]);
     })();
   }, [params["id"]]);
 
@@ -224,6 +234,24 @@ export default function QuestionPostContent() {
     };
   }, [lightboxIndex, postData.images.length]);
 
+  const postWriterInfo =
+    postData.writerStatus === "ENLISTED" && postData.writerSpecialty
+      ? `공군 · ${statusLabel(postData.writerStatus)} · ${
+          postData.writerSpecialty
+        }`
+      : `공군 · ${statusLabel(postData.writerStatus)}`;
+
+  const categoryChip = postData.categories?.[0] ?? "";
+
+  const targetMsg =
+    postData.targetSpecialties?.length > 1
+      ? `${postData.targetSpecialties[0]} 외 ${
+          postData.targetSpecialties.length - 1
+        }개 특기만 답변할 수 있어요`
+      : postData.targetSpecialties?.length === 1
+      ? `${postData.targetSpecialties[0]}만 답변할 수 있어요`
+      : "";
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
@@ -231,10 +259,7 @@ export default function QuestionPostContent() {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <p className="font-semibold">{postData.writerNick}</p>
-              <p className="text-emerald-600">
-                {postData.writerType}∙{postData.writerLevel}∙
-                {postData.writerMos}∙{postData.writerUnit}
-              </p>
+              <p className="text-emerald-600">{postWriterInfo}</p>
               <p className="text-xs text-gray-600">{postData.createdAt}</p>
             </div>
             <div className="flex items-center gap-4 p-2 text-xs text-gray-500">
@@ -251,14 +276,14 @@ export default function QuestionPostContent() {
               </div>
             </div>
           </div>
+
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold text-emerald-600">
-              {Array.isArray((readObjectP as any)?.categories)
-                ? ""
-                : getCategoryLabel(postData.categoryId)}
+              {categoryChip}
             </p>
             <p className="text-2xl font-semibold">{postData.title}</p>
           </div>
+
           <div className="text-base whitespace-pre-wrap">
             {postData.content}
           </div>
@@ -283,14 +308,14 @@ export default function QuestionPostContent() {
           )}
 
           <div className="flex justify-between text-sm">
-            <div className="flex gap-2 font-semibold ">
+            <div className="flex gap-2 font-semibold">
               <button
                 className={`flex gap-1 items-center p-1 px-2 rounded-lg ${
                   postData.isLiked
                     ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
                     : "text-gray-600 bg-gray-100"
                 }`}
-                onClick={handleLike}
+                onClick={handleLikePost}
               >
                 <Icon icon="fluent:thumb-like-24-filled" />
                 <p>{postData.like}</p>
@@ -326,10 +351,12 @@ export default function QuestionPostContent() {
 
         {loggedUser && (
           <div className="flex flex-col gap-4 pt-2">
-            <div className="flex flex-col gap-2 p-4 mt-4 bg-gray-100 rounded-lg">
-              <div className="flex items-center gap-2 p-1 text-sm">
-                <p className="font-semibold">{loggedUser.nick}</p>
-              </div>
+            {!!targetMsg && (
+              <p className="px-2 py-1 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-md">
+                {targetMsg}
+              </p>
+            )}
+            <div className="flex flex-col gap-2 p-4 mt-2 bg-gray-100 rounded-lg">
               <textarea
                 ref={textareaRef}
                 placeholder="답변을 남겨주세요!"
@@ -337,17 +364,50 @@ export default function QuestionPostContent() {
                 onChange={handleChange}
                 className="p-4 mb-2 overflow-hidden border-2 rounded-lg resize-none min-h-20 focus:outline-none"
               />
+              {!!cmtImagesUrl.length && (
+                <div className="flex flex-wrap gap-2">
+                  {cmtImagesUrl.map((u, i) => (
+                    <div
+                      key={i}
+                      className="relative w-20 h-20 overflow-hidden border border-gray-300 rounded-lg"
+                    >
+                      <img
+                        src={u}
+                        alt={`cmt-up-${i}`}
+                        className="object-cover w-full h-full"
+                      />
+                      <button
+                        className="absolute flex items-center justify-center w-5 h-5 text-gray-700 bg-gray-200 rounded-full top-1 right-1 hover:bg-gray-300"
+                        onClick={() => removeCmtImage(u)}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="flex justify-between">
+                <div className="flex items-center justify-center bg-white border border-gray-300 rounded-lg cursor-pointer w-12 h-12">
+                  <label className="flex items-center justify-center w-full h-full cursor-pointer">
+                    <Icon
+                      icon="fluent:camera-add-24-filled"
+                      className="text-xl text-gray-400"
+                    />
+                    <input
+                      key={fileInputKey}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleCmtImageUpload}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
                 <button
-                  className="px-4 py-2 text-sm bg-white rounded-lg"
-                  onClick={() => setHideUnit(!hideUnit)}
-                >
-                  {hideUnit ? "복무 부대 표시하기" : "복무 부대 숨기기"}
-                </button>
-                <button
-                  className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                  className="px-6 py-2 text-sm text-white rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
                   onClick={newAnswer}
-                  disabled={!answerText.trim()}
+                  disabled={!answerText.trim() || uploading}
                 >
                   답변 등록
                 </button>
@@ -357,19 +417,28 @@ export default function QuestionPostContent() {
         )}
       </div>
 
-      {answerData.map((answer) => (
+      {answerData.map((a) => (
         <AnswerItem
-          key={answer.id}
-          id={answer.id}
-          writerNick={answer.writerNick}
-          writerType={answer.writerType}
-          writerLevel={answer.writerLevel}
-          createdAt={answer.createdAt}
-          content={answer.content}
-          like={answer.like}
-          dislike={answer.dislike}
-          isLiked={answer.isLiked}
-          isDisliked={answer.isDisliked}
+          key={a.id}
+          id={a.id}
+          writerNick={a.writerNick}
+          writerStatus={a.writerStatus}
+          writerSpecialty={a.writerSpecialty}
+          createdAt={a.createdAt}
+          content={a.content}
+          like={a.like}
+          dislike={a.dislike}
+          isLiked={a.isLiked}
+          isDisliked={a.isDisliked}
+          imagesUrl={a.imagesUrl}
+          onLike={async (id) => {
+            await likeComment(id);
+            setAnswerData((prev) =>
+              prev.map((x) =>
+                x.id === id ? { ...x, like: x.like + 1, isLiked: true } : x
+              )
+            );
+          }}
         />
       ))}
 

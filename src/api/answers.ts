@@ -3,11 +3,12 @@ import { get } from "./getAndDel";
 
 export async function postNewAnswer(
   questionId: number,
-  content: string
+  content: string,
+  imagesUrl: string[] = []
 ): Promise<void> {
   const res = await post(`/posts/${questionId}/comments`, {
     body: content,
-    imagesUrl: [],
+    imagesUrl,
   });
   if (!res.ok) {
     let msg = `postNewAnswer failed (${res.status})`;
@@ -46,6 +47,18 @@ export async function likeQuestion(questionId: number): Promise<void> {
   const res = await post(`/posts/${questionId}/likes`, {});
   if (!res.ok) {
     let msg = `likeQuestion failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+}
+
+export async function likeComment(commentId: number): Promise<void> {
+  const res = await post(`/comments/${commentId}/likes`, {});
+  if (!res.ok) {
+    let msg = `likeComment failed (${res.status})`;
     try {
       const j = await res.json();
       if (j?.message) msg = j.message;
