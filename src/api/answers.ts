@@ -44,7 +44,7 @@ export async function fetchAnswers(questionId: number): Promise<any[]> {
 }
 
 export async function likeQuestion(questionId: number): Promise<void> {
-  const res = await post(`/posts/${questionId}/likes`, {});
+  const res = await post(`/posts/${questionId}/likes`, { type: "LIKE" });
   if (!res.ok) {
     let msg = `likeQuestion failed (${res.status})`;
     try {
@@ -56,7 +56,7 @@ export async function likeQuestion(questionId: number): Promise<void> {
 }
 
 export async function likeComment(commentId: number): Promise<void> {
-  const res = await post(`/comments/${commentId}/likes`, {});
+  const res = await post(`/comments/${commentId}/likes`, { type: "LIKE" });
   if (!res.ok) {
     let msg = `likeComment failed (${res.status})`;
     try {
