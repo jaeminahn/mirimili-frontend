@@ -1,11 +1,8 @@
 import { Icon } from "@iconify/react";
 import { ChangeEvent, RefObject } from "react";
 
-type MiliStatus = "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED" | undefined;
-
 interface AnswerComposerProps {
   visible: boolean;
-  targetMsg?: string;
   nickName?: string;
   infoLine?: string;
   textareaRef: RefObject<HTMLTextAreaElement>;
@@ -22,7 +19,6 @@ interface AnswerComposerProps {
 
 export default function AnswerComposer({
   visible,
-  targetMsg,
   nickName,
   infoLine,
   textareaRef,
@@ -39,11 +35,6 @@ export default function AnswerComposer({
   if (!visible) return null;
   return (
     <div className="flex flex-col gap-4 pt-2">
-      {!!targetMsg && (
-        <p className="px-2 py-1 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-md">
-          {targetMsg}
-        </p>
-      )}
       <div className="flex flex-col gap-2 p-4 mt-2 bg-gray-100 rounded-lg">
         <div className="flex items-center gap-2 text-sm px-1 py-2">
           <p className="font-semibold">{nickName ?? ""}</p>

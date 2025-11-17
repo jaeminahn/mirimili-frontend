@@ -391,22 +391,28 @@ export default function QuestionPostContent() {
           </div>
         </div>
 
-        <AnswerComposer
-          visible={canWriteAnswer}
-          targetMsg={targetMsg}
-          nickName={myInfo?.nickName}
-          infoLine={myInfoLine}
-          textareaRef={textareaRef}
-          answerText={answerText}
-          onChange={handleChange}
-          cmtImagesUrl={cmtImagesUrl}
-          onRemoveImage={removeCmtImage}
-          onUploadImages={handleCmtImageUpload}
-          fileInputKey={fileInputKey}
-          uploading={uploading}
-          onSubmit={newAnswer}
-          submitDisabled={!answerText.trim() || uploading}
-        />
+        <div className="flex flex-col gap-2 pt-4">
+          {!!targetMsg && (
+            <p className="px-2 py-1 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-md">
+              {targetMsg}
+            </p>
+          )}
+          <AnswerComposer
+            visible={canWriteAnswer}
+            nickName={myInfo?.nickName}
+            infoLine={myInfoLine}
+            textareaRef={textareaRef}
+            answerText={answerText}
+            onChange={handleChange}
+            cmtImagesUrl={cmtImagesUrl}
+            onRemoveImage={removeCmtImage}
+            onUploadImages={handleCmtImageUpload}
+            fileInputKey={fileInputKey}
+            uploading={uploading}
+            onSubmit={newAnswer}
+            submitDisabled={!answerText.trim() || uploading}
+          />
+        </div>
       </div>
 
       {answerData.map((a) => (
