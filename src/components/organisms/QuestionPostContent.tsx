@@ -211,7 +211,7 @@ export default function QuestionPostContent() {
       isDisliked: false,
       imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
     }));
-    setAnswerData(mapped);
+    setAnswerData(mapped.reverse());
   };
 
   const loadMyAnswerInfo = async () => {
