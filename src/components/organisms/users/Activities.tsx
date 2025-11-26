@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PostItem from "../../molecules/PostItem";
 import MyAnswerItem from "../../molecules/MyAnswerItem";
-import { Icon } from "@iconify/react";
 import { getJSON } from "../../../api/getAndDel";
 import { calculateTimeAgo } from "../../../utils/calculateTime";
 
@@ -11,6 +10,15 @@ type ApiEnvelope<T> = {
   code: string;
   message: string;
   data: T;
+};
+
+type PageResult<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  currentPage: number;
+  size: number;
+  hasNext: boolean;
 };
 
 type MyPost = {
@@ -37,6 +45,15 @@ export default function Activities() {
 
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [answers, setAnswers] = useState<MyAnswer[]>([]);
+
+  const [postPage, setPostPage] = useState(0);
+  const [postTotalPages, setPostTotalPages] = useState(0);
+  const [postHasNext, setPostHasNext] = useState(false);
+
+  const [answerPage, setAnswerPage] = useState(0);
+  const [answerTotalPages, setAnswerTotalPages] = useState(0);
+  const [answerHasNext, setAnswerHasNext] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string>("");
 
@@ -47,9 +64,14 @@ export default function Activities() {
     (async () => {
       setLoading(true);
       setErrMsg("");
+
       const [pRes, aRes] = await Promise.all([
-        getJSON<ApiEnvelope<MyPost[]>>("/mypage/posts"),
-        getJSON<ApiEnvelope<MyAnswer[]>>("/mypage/answers"),
+        getJSON<ApiEnvelope<PageResult<MyPost>>>(
+          `/mypage/posts?page=${postPage}&size=10`
+        ),
+        getJSON<ApiEnvelope<PageResult<MyAnswer>>>(
+          `/mypage/answers?page=${answerPage}&size=10`
+        ),
       ]);
 
       if (pRes.status === 401 || aRes.status === 401) {
@@ -60,11 +82,11 @@ export default function Activities() {
       if (!mounted) return;
 
       if (pRes.ok && pRes.data?.success) {
-        const sortedPosts = [...(pRes.data.data ?? [])].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setPosts(sortedPosts);
+        const data = pRes.data.data;
+        const items = data?.content ?? [];
+        setPosts(items);
+        setPostTotalPages(data?.totalPages ?? 0);
+        setPostHasNext(data?.hasNext ?? false);
       } else {
         setErrMsg(
           pRes.data?.message || "게시글을 불러오는 중 오류가 발생했습니다."
@@ -72,19 +94,18 @@ export default function Activities() {
       }
 
       if (aRes.ok && aRes.data?.success) {
-        const sortedAnswers = [...(aRes.data.data ?? [])].sort(
-          (a, b) =>
-            new Date(b.createdAt ?? "").getTime() -
-            new Date(a.createdAt ?? "").getTime()
-        );
-        setAnswers(sortedAnswers);
+        const data = aRes.data.data;
+        const items = data?.content ?? [];
+        setAnswers(items);
+        setAnswerTotalPages(data?.totalPages ?? 0);
+        setAnswerHasNext(data?.hasNext ?? false);
       } else {
-        setErrMsg(
-          (prev) =>
-            prev ||
-            aRes.data?.message ||
-            "답변을 불러오는 중 오류가 발생했습니다."
-        );
+        setErrMsg((prev) => {
+          if (prev) return prev;
+          return (
+            aRes.data?.message || "답변을 불러오는 중 오류가 발생했습니다."
+          );
+        });
       }
 
       setLoading(false);
@@ -93,7 +114,7 @@ export default function Activities() {
     return () => {
       mounted = false;
     };
-  }, [navigate]);
+  }, [navigate, postPage, answerPage]);
 
   const renderPosts = () => {
     if (loading) return <p className="text-gray-500">불러오는 중…</p>;
@@ -101,18 +122,60 @@ export default function Activities() {
     if (!posts.length)
       return <p className="text-gray-600">게시글이 존재하지 않아요.</p>;
 
-    return posts.map((p) => (
-      <PostItem
-        key={p.id}
-        id={p.id}
-        title={p.title}
-        content={p.body}
-        createdAt={calculateTimeAgo(new Date(p.createdAt))}
-        view={p.viewCount}
-        like={p.likeCount}
-        answer={p.commentCount}
-      />
-    ));
+    const canPrev = postPage > 0;
+    const canNext =
+      postTotalPages > 0 ? postPage < postTotalPages - 1 : postHasNext;
+
+    return (
+      <>
+        {posts.map((p) => (
+          <PostItem
+            key={p.id}
+            id={p.id}
+            title={p.title}
+            content={p.body}
+            createdAt={calculateTimeAgo(new Date(p.createdAt))}
+            view={p.viewCount}
+            like={p.likeCount}
+            answer={p.commentCount}
+          />
+        ))}
+
+        <div className="mt-2 flex items-center justify-between">
+          <div className="w-28">
+            {canPrev && (
+              <button
+                className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                onClick={() => setPostPage((p) => Math.max(0, p - 1))}
+              >
+                이전 페이지
+              </button>
+            )}
+          </div>
+
+          <div className="text-sm text-gray-700">
+            <b>
+              {Math.min(
+                postPage + 1,
+                Math.max(1, postTotalPages || (postHasNext ? postPage + 1 : 1))
+              )}
+            </b>
+            &nbsp;/&nbsp;{postTotalPages || (postHasNext ? "…" : 1)}
+          </div>
+
+          <div className="w-28 flex justify-end">
+            {canNext && (
+              <button
+                className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                onClick={() => setPostPage((p) => p + 1)}
+              >
+                다음 페이지
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    );
   };
 
   const renderAnswers = () => {
@@ -121,17 +184,64 @@ export default function Activities() {
     if (!answers.length)
       return <p className="text-gray-600">답변이 존재하지 않아요.</p>;
 
-    return answers.map((a, idx) => (
-      <MyAnswerItem
-        key={`${a.postId}-${idx}`}
-        id={a.postId}
-        questionId={a.postId}
-        title={a.postTitle}
-        content={a.myCommentBody}
-        like={a.likeCount ?? 0}
-        createdAt={a.createdAt ? calculateTimeAgo(new Date(a.createdAt)) : ""}
-      />
-    ));
+    const canPrev = answerPage > 0;
+    const canNext =
+      answerTotalPages > 0 ? answerPage < answerTotalPages - 1 : answerHasNext;
+
+    return (
+      <>
+        {answers.map((a, idx) => (
+          <MyAnswerItem
+            key={`${a.postId}-${idx}`}
+            id={a.postId}
+            questionId={a.postId}
+            title={a.postTitle}
+            content={a.myCommentBody}
+            like={a.likeCount ?? 0}
+            createdAt={
+              a.createdAt ? calculateTimeAgo(new Date(a.createdAt)) : ""
+            }
+          />
+        ))}
+
+        <div className="mt-2 flex items-center justify-between">
+          <div className="w-28">
+            {canPrev && (
+              <button
+                className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                onClick={() => setAnswerPage((p) => Math.max(0, p - 1))}
+              >
+                이전 페이지
+              </button>
+            )}
+          </div>
+
+          <div className="text-sm text-gray-700">
+            <b>
+              {Math.min(
+                answerPage + 1,
+                Math.max(
+                  1,
+                  answerTotalPages || (answerHasNext ? answerPage + 1 : 1)
+                )
+              )}
+            </b>
+            &nbsp;/&nbsp;{answerTotalPages || (answerHasNext ? "…" : 1)}
+          </div>
+
+          <div className="w-28 flex justify-end">
+            {canNext && (
+              <button
+                className="px-2 py-1 text-sm rounded-xl border-2 bg-gray-100 border-gray-100 font-medium"
+                onClick={() => setAnswerPage((p) => p + 1)}
+              >
+                다음 페이지
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    );
   };
 
   return (
