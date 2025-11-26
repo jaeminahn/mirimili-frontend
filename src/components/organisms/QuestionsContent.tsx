@@ -29,46 +29,76 @@ export default function QuestionsMain() {
   const [hasNext, setHasNext] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (categoryId !== undefined) {
-      params.append("categoryIds", String(categoryId));
-    } else {
-      categories.forEach((c: { id: number }) =>
-        params.append("categoryIds", String(c.id))
-      );
-    }
-    params.append("page", String(page));
-    params.append("size", "10");
-    params.append("sortBy", "createdAt");
-
-    get(`/posts/list?${params.toString()}`)
-      .then((res) => res.json())
-      .then((res) => {
-        const items = res?.data?.content ?? [];
-        setPostData(
-          items.map((item: any) => ({
-            id: item.id,
-            writerId: 0,
-            title: item.title,
-            content: item.body,
-            categoryId: undefined,
-            answer: item.commentCount,
-            like: item.likeCount,
-            dislike: 0,
-            scrapped: 0,
-            view: item.viewCount,
-            createdAt: item.createdAt,
-            updatedAt: item.createdAt,
-          }))
+    if (tabIndex === 0) {
+      const params = new URLSearchParams();
+      if (categoryId !== undefined) {
+        params.append("categoryIds", String(categoryId));
+      } else {
+        categories.forEach((c: { id: number }) =>
+          params.append("categoryIds", String(c.id))
         );
-        setTotalPages(res?.data?.totalPages ?? 0);
-        setHasNext(res?.data?.hasNext ?? false);
-      });
+      }
+      params.append("page", String(page));
+      params.append("size", "10");
+      params.append("sortBy", "createdAt");
+
+      get(`/posts/list?${params.toString()}`)
+        .then((res) => res.json())
+        .then((res) => {
+          const items = res?.data?.content ?? [];
+          setPostData(
+            items.map((item: any) => ({
+              id: item.id,
+              writerId: 0,
+              title: item.title,
+              content: item.body,
+              categoryId: undefined,
+              answer: item.commentCount,
+              like: item.likeCount,
+              dislike: 0,
+              scrapped: 0,
+              view: item.viewCount,
+              createdAt: item.createdAt,
+              updatedAt: item.createdAt,
+            }))
+          );
+          setTotalPages(res?.data?.totalPages ?? 0);
+          setHasNext(res?.data?.hasNext ?? false);
+        });
+    } else {
+      const params = new URLSearchParams();
+      params.append("page", String(page));
+      params.append("size", "10");
+
+      get(`/posts/answerable?${params.toString()}`)
+        .then((res) => res.json())
+        .then((res) => {
+          const items = res?.data?.content ?? [];
+          setPostData(
+            items.map((item: any) => ({
+              id: item.id,
+              writerId: 0,
+              title: item.title,
+              content: item.body,
+              categoryId: undefined,
+              answer: item.commentCount,
+              like: item.likeCount,
+              dislike: 0,
+              scrapped: 0,
+              view: item.viewCount,
+              createdAt: item.createdAt,
+              updatedAt: item.createdAt,
+            }))
+          );
+          setTotalPages(res?.data?.totalPages ?? 0);
+          setHasNext(res?.data?.hasNext ?? false);
+        });
+    }
   }, [tabIndex, categoryId, page]);
 
   useEffect(() => {
-    setPage(0);
-  }, [categoryId]);
+    if (tabIndex === 0) setPage(0);
+  }, [categoryId, tabIndex]);
 
   const canPrev = page > 0;
   const canNext = totalPages > 0 ? page < totalPages - 1 : hasNext;
@@ -82,7 +112,10 @@ export default function QuestionsMain() {
               ? "bg-emerald-100 border-emerald-600"
               : "bg-white border-white"
           }`}
-          onClick={() => setTabIndex(0)}
+          onClick={() => {
+            setTabIndex(0);
+            setPage(0);
+          }}
         >
           전체 질문
         </button>
@@ -92,7 +125,10 @@ export default function QuestionsMain() {
               ? "bg-emerald-100 border-emerald-600"
               : "bg-white border-white"
           }`}
-          onClick={() => setTabIndex(1)}
+          onClick={() => {
+            setTabIndex(1);
+            setPage(0);
+          }}
         >
           내 답변을 기다리는 질문
         </button>
@@ -154,7 +190,9 @@ export default function QuestionsMain() {
           </>
         ) : (
           <p className="p-4 text-gray-600">
-            선택한 카테고리에 해당하는 글이 없어요.
+            {tabIndex === 0
+              ? "선택한 카테고리에 해당하는 글이 없어요."
+              : "현재 답변을 기다리는 질문이 없어요."}
           </p>
         )}
       </div>
