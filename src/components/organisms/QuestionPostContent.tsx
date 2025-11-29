@@ -10,7 +10,9 @@ import {
   postNewAnswer,
   fetchAnswers,
   likeQuestion,
+  dislikeQuestion,
   likeComment,
+  dislikeComment,
 } from "../../api/answers";
 import {
   presignImage,
@@ -47,6 +49,7 @@ interface AnswerData {
   like: number;
   dislike: number;
   createdAt: string;
+  createdAtRaw: string;
   isLiked: boolean;
   isDisliked: boolean;
   imagesUrl: string[];
@@ -112,9 +115,57 @@ export default function QuestionPostContent() {
   };
 
   const handleLikePost = async () => {
-    if (postData.isLiked) return;
     await likeQuestion(Number(params["id"]));
-    setPostData((prev) => ({ ...prev, isLiked: true, like: prev.like + 1 }));
+    setPostData((prev) => {
+      if (prev.isLiked) {
+        return {
+          ...prev,
+          isLiked: false,
+          like: Math.max(0, prev.like - 1),
+        };
+      }
+      if (prev.isDisliked) {
+        return {
+          ...prev,
+          isLiked: true,
+          isDisliked: false,
+          like: prev.like + 1,
+          dislike: Math.max(0, prev.dislike - 1),
+        };
+      }
+      return {
+        ...prev,
+        isLiked: true,
+        like: prev.like + 1,
+      };
+    });
+  };
+
+  const handleDislikePost = async () => {
+    await dislikeQuestion(Number(params["id"]));
+    setPostData((prev) => {
+      if (prev.isDisliked) {
+        return {
+          ...prev,
+          isDisliked: false,
+          dislike: Math.max(0, prev.dislike - 1),
+        };
+      }
+      if (prev.isLiked) {
+        return {
+          ...prev,
+          isLiked: false,
+          isDisliked: true,
+          dislike: prev.dislike + 1,
+          like: Math.max(0, prev.like - 1),
+        };
+      }
+      return {
+        ...prev,
+        isDisliked: true,
+        dislike: prev.dislike + 1,
+      };
+    });
   };
 
   const newAnswer = async () => {
@@ -193,25 +244,36 @@ export default function QuestionPostContent() {
       targetSpecialties: Array.isArray(d.targetSpecialties)
         ? d.targetSpecialties
         : [],
+      like: d.likeCount ?? 0,
+      dislike: d.dislikeCount ?? 0,
+      isLiked: !!d.isLiked,
+      isDisliked: !!d.isDisliked,
     }));
   };
 
   const loadAnswers = async () => {
     const list = await fetchAnswers(Number(params["id"]));
-    const mapped = (list ?? []).map((c: any) => ({
-      id: c.id,
-      writerNick: c.writerNickname,
-      writerStatus: c.writerStatus,
-      writerSpecialty: c.writerSpecialty,
-      content: c.content ?? c.body,
-      like: c.likeCount ?? 0,
-      dislike: c.dislikeCount ?? 0,
-      createdAt: calculateTimeAgo(new Date(c.createdAt)),
-      isLiked: false,
-      isDisliked: false,
-      imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
-    }));
-    setAnswerData(mapped.reverse());
+    const mapped = (list ?? [])
+      .map((c: any) => ({
+        id: c.id,
+        writerNick: c.writerNickname,
+        writerStatus: c.writerStatus,
+        writerSpecialty: c.writerSpecialty,
+        content: c.content ?? c.body,
+        like: c.likeCount ?? 0,
+        dislike: c.dislikeCount ?? 0,
+        createdAt: calculateTimeAgo(new Date(c.createdAt)),
+        createdAtRaw: c.createdAt,
+        isLiked: !!c.isLiked,
+        isDisliked: !!c.isDisliked,
+        imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
+      }))
+      .sort(
+        (a, b) =>
+          new Date(b.createdAtRaw).getTime() -
+          new Date(a.createdAtRaw).getTime()
+      );
+    setAnswerData(mapped);
   };
 
   const loadMyAnswerInfo = async () => {
@@ -368,6 +430,7 @@ export default function QuestionPostContent() {
                     ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
                     : "text-gray-600 bg-gray-100"
                 }`}
+                onClick={handleDislikePost}
               >
                 <Icon icon="fluent:thumb-dislike-24-filled" />
                 <p>{postData.dislike}</p>
@@ -432,9 +495,59 @@ export default function QuestionPostContent() {
           onLike={async (id) => {
             await likeComment(id);
             setAnswerData((prev) =>
-              prev.map((x) =>
-                x.id === id ? { ...x, like: x.like + 1, isLiked: true } : x
-              )
+              prev.map((x) => {
+                if (x.id !== id) return x;
+                if (x.isLiked) {
+                  return {
+                    ...x,
+                    isLiked: false,
+                    like: Math.max(0, x.like - 1),
+                  };
+                }
+                if (x.isDisliked) {
+                  return {
+                    ...x,
+                    isLiked: true,
+                    isDisliked: false,
+                    like: x.like + 1,
+                    dislike: Math.max(0, x.dislike - 1),
+                  };
+                }
+                return {
+                  ...x,
+                  isLiked: true,
+                  like: x.like + 1,
+                };
+              })
+            );
+          }}
+          onDislike={async (id) => {
+            await dislikeComment(id);
+            setAnswerData((prev) =>
+              prev.map((x) => {
+                if (x.id !== id) return x;
+                if (x.isDisliked) {
+                  return {
+                    ...x,
+                    isDisliked: false,
+                    dislike: Math.max(0, x.dislike - 1),
+                  };
+                }
+                if (x.isLiked) {
+                  return {
+                    ...x,
+                    isLiked: false,
+                    isDisliked: true,
+                    dislike: x.dislike + 1,
+                    like: Math.max(0, x.like - 1),
+                  };
+                }
+                return {
+                  ...x,
+                  isDisliked: true,
+                  dislike: x.dislike + 1,
+                };
+              })
             );
           }}
         />

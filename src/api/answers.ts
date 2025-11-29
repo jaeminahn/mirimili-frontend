@@ -55,10 +55,34 @@ export async function likeQuestion(questionId: number): Promise<void> {
   }
 }
 
+export async function dislikeQuestion(questionId: number): Promise<void> {
+  const res = await post(`/posts/${questionId}/likes`, { type: "DISLIKE" });
+  if (!res.ok) {
+    let msg = `dislikeQuestion failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+}
+
 export async function likeComment(commentId: number): Promise<void> {
   const res = await post(`/comments/${commentId}/likes`, { type: "LIKE" });
   if (!res.ok) {
     let msg = `likeComment failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+}
+
+export async function dislikeComment(commentId: number): Promise<void> {
+  const res = await post(`/comments/${commentId}/likes`, { type: "DISLIKE" });
+  if (!res.ok) {
+    let msg = `dislikeComment failed (${res.status})`;
     try {
       const j = await res.json();
       if (j?.message) msg = j.message;
