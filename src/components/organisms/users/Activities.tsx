@@ -83,7 +83,7 @@ export default function Activities() {
 
       if (pRes.ok && pRes.data?.success) {
         const data = pRes.data.data;
-        const items = data?.content ?? [];
+        const items = [...(data?.content ?? [])].reverse();
         setPosts(items);
         setPostTotalPages(data?.totalPages ?? 0);
         setPostHasNext(data?.hasNext ?? false);
@@ -95,7 +95,7 @@ export default function Activities() {
 
       if (aRes.ok && aRes.data?.success) {
         const data = aRes.data.data;
-        const items = data?.content ?? [];
+        const items = [...(data?.content ?? [])].reverse();
         setAnswers(items);
         setAnswerTotalPages(data?.totalPages ?? 0);
         setAnswerHasNext(data?.hasNext ?? false);

@@ -62,7 +62,7 @@ export default function ScrapedPosts() {
 
       if (res.ok && res.data?.success) {
         const data = res.data.data;
-        const items = data?.content ?? [];
+        const items = [...(data?.content ?? [])].reverse();
         setPosts(items);
         setTotalPages(data?.totalPages ?? 0);
         setHasNext(data?.hasNext ?? false);
