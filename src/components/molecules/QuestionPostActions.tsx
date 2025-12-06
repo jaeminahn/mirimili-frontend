@@ -6,9 +6,12 @@ interface QuestionPostActionsProps {
   isLiked: boolean;
   isDisliked: boolean;
   isScraped: boolean;
+  isMine: boolean;
   onLike: () => void;
   onDislike: () => void;
   onToggleScrap: () => void;
+  onDelete?: () => void;
+  onReport?: () => void;
 }
 
 export default function QuestionPostActions({
@@ -17,9 +20,12 @@ export default function QuestionPostActions({
   isLiked,
   isDisliked,
   isScraped,
+  isMine,
   onLike,
   onDislike,
   onToggleScrap,
+  onDelete,
+  onReport,
 }: QuestionPostActionsProps) {
   return (
     <div className="flex justify-between text-sm">
@@ -61,7 +67,17 @@ export default function QuestionPostActions({
         </button>
       </div>
       <div className="flex items-center gap-2 text-xs text-gray-600">
-        <button>신고하기</button>
+        <button
+          onClick={() => {
+            if (isMine) {
+              onDelete?.();
+            } else {
+              onReport?.();
+            }
+          }}
+        >
+          {isMine ? "삭제하기" : "신고하기"}
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { post } from "./postAndPut";
-import { get } from "./getAndDel";
+import { get, del } from "./getAndDel";
 
 export async function postNewAnswer(
   questionId: number,
@@ -18,7 +18,7 @@ export async function postNewAnswer(
     } catch {}
     throw new Error(msg);
   }
-  window.dispatchEvent(new Event("activity:commentCreated"));
+  window.dispatchEvent(new Event("activity:comment"));
 }
 
 export async function fetchAnswers(questionId: number): Promise<any[]> {
@@ -102,4 +102,33 @@ export async function toggleScrapQuestion(questionId: number): Promise<void> {
     } catch {}
     throw new Error(msg);
   }
+}
+
+export async function deleteQuestion(postId: number): Promise<void> {
+  const res = await del(`/posts/${postId}`);
+  if (!res.ok) {
+    let msg = `deleteQuestion failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+  window.dispatchEvent(new Event("activity:post"));
+}
+
+export async function deleteComment(
+  postId: number,
+  commentId: number
+): Promise<void> {
+  const res = await del(`/posts/${postId}/comments/${commentId}`);
+  if (!res.ok) {
+    let msg = `deleteComment failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+  window.dispatchEvent(new Event("activity:comment"));
 }

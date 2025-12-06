@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
@@ -17,6 +17,8 @@ import {
   likeComment,
   dislikeComment,
   toggleScrapQuestion,
+  deleteQuestion,
+  deleteComment,
 } from "../../api/answers";
 import {
   presignImage,
@@ -69,6 +71,7 @@ interface MyAnswerInfo {
 
 export default function QuestionPostContent() {
   const params = useParams();
+  const navigate = useNavigate();
   const { loggedUser } = useAuth();
   const [answerText, setAnswerText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -180,6 +183,32 @@ export default function QuestionPostContent() {
     }));
   };
 
+  const handleDeletePost = async () => {
+    if (
+      !window.confirm(
+        "게시글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다."
+      )
+    ) {
+      return;
+    }
+    await deleteQuestion(postData.id);
+    window.alert("게시글이 삭제되었습니다.");
+    navigate(-1);
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (
+      !window.confirm(
+        "댓글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다."
+      )
+    ) {
+      return;
+    }
+    await deleteComment(postData.id, commentId);
+    window.alert("댓글이 삭제되었습니다.");
+    await loadAnswers();
+  };
+
   const newAnswer = async () => {
     if (!answerText.trim()) return;
     if (!loggedUser) {
@@ -191,7 +220,6 @@ export default function QuestionPostContent() {
     setCmtImagesUrl([]);
     setCmtImageKeys([]);
     await loadAnswers();
-    setPostData((prev) => ({ ...prev, answer: prev.answer + 1 }));
   };
 
   const handleCmtImageUpload = async (
@@ -367,6 +395,10 @@ export default function QuestionPostContent() {
     );
   };
 
+  const isMyPost =
+    !!myInfo?.nickName && myInfo.nickName === postData.writerNick;
+  const myNick = myInfo?.nickName || "";
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
@@ -393,9 +425,11 @@ export default function QuestionPostContent() {
             isLiked={postData.isLiked}
             isDisliked={postData.isDisliked}
             isScraped={postData.isScraped}
+            isMine={isMyPost}
             onLike={handleLikePost}
             onDislike={handleDislikePost}
             onToggleScrap={handleToggleScrap}
+            onDelete={handleDeletePost}
           />
         </div>
 
@@ -437,6 +471,7 @@ export default function QuestionPostContent() {
           isLiked={a.isLiked}
           isDisliked={a.isDisliked}
           imagesUrl={a.imagesUrl}
+          isMine={!!myNick && myNick === a.writerNick}
           onLike={async (id) => {
             await likeComment(id);
             setAnswerData((prev) =>
@@ -495,6 +530,7 @@ export default function QuestionPostContent() {
               })
             );
           }}
+          onDelete={handleDeleteComment}
         />
       ))}
 

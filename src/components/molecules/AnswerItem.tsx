@@ -13,9 +13,11 @@ interface AnswerItemProps {
   isLiked: boolean;
   isDisliked: boolean;
   imagesUrl?: string[];
+  isMine: boolean;
   onLike?: (id: number) => void;
   onDislike?: (id: number) => void;
   onReport?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 export default function AnswerItem({
@@ -30,9 +32,11 @@ export default function AnswerItem({
   isLiked,
   isDisliked,
   imagesUrl = [],
+  isMine,
   onLike,
   onDislike,
   onReport,
+  onDelete,
 }: AnswerItemProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const statusLabel =
@@ -105,9 +109,15 @@ export default function AnswerItem({
 
         <button
           className="text-xs text-gray-600"
-          onClick={() => onReport?.(id)}
+          onClick={() => {
+            if (isMine) {
+              onDelete?.(id);
+            } else {
+              onReport?.(id);
+            }
+          }}
         >
-          신고하기
+          {isMine ? "삭제하기" : "신고하기"}
         </button>
       </div>
 

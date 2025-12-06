@@ -45,20 +45,11 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
     const handler = () => {
       refresh();
     };
-    window.addEventListener("activity:postCreated", handler as EventListener);
-    window.addEventListener(
-      "activity:commentCreated",
-      handler as EventListener
-    );
+    window.addEventListener("activity:post", handler as EventListener);
+    window.addEventListener("activity:comment", handler as EventListener);
     return () => {
-      window.removeEventListener(
-        "activity:postCreated",
-        handler as EventListener
-      );
-      window.removeEventListener(
-        "activity:commentCreated",
-        handler as EventListener
-      );
+      window.removeEventListener("activity:post", handler as EventListener);
+      window.removeEventListener("activity:comment", handler as EventListener);
     };
   }, [refresh]);
 
