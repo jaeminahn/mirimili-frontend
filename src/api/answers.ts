@@ -18,6 +18,7 @@ export async function postNewAnswer(
     } catch {}
     throw new Error(msg);
   }
+  window.dispatchEvent(new Event("activity:commentCreated"));
 }
 
 export async function fetchAnswers(questionId: number): Promise<any[]> {

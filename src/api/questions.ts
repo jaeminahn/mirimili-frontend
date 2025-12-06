@@ -74,6 +74,7 @@ export const postNewQuestion = (
       if (!result?.success) {
         window.alert(result?.message ?? "요청이 실패했습니다.");
       } else {
+        window.dispatchEvent(new Event("activity:postCreated"));
         callback?.();
       }
       return result;

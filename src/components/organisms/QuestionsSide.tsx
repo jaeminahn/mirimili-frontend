@@ -1,7 +1,13 @@
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
+import { useActivity } from "../../contexts/ActivityContext";
 
 export default function QuestionsSide() {
+  const { myPostCount, myCommentCount, loading } = useActivity();
+
+  const qCount = loading ? "-" : myPostCount;
+  const aCount = loading ? "-" : myCommentCount;
+
   return (
     <>
       <div className="hidden lg:flex flex-col lg:w-1/5 gap-4">
@@ -11,11 +17,11 @@ export default function QuestionsSide() {
             <div className="flex justify-center gap-3 p-2 bg-gray-100 rounded-lg">
               <div className="flex gap-1">
                 <p>질문</p>
-                <p className="font-semibold">5</p>
+                <p className="font-semibold">{qCount}</p>
               </div>
               <div className="flex gap-1">
                 <p>답변</p>
-                <p className="font-semibold">2</p>
+                <p className="font-semibold">{aCount}</p>
               </div>
             </div>
           </div>

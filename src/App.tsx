@@ -1,23 +1,33 @@
-import { useRef } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts";
 import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
+import { ActivityProvider } from "./contexts/ActivityContext";
 import RouterSetup from "./components/routes/RouterSetup";
 import RouterTransition from "./components/routes/RouterTransition";
 import { ErrorBoundary } from "./components/routes/ErrorBoundary";
 
-function App() {
+function AppInner() {
   const { stop } = useLoading();
 
+  return (
+    <>
+      <RouterTransition />
+      <ErrorBoundary onError={() => stop()}>
+        <RouterSetup />
+      </ErrorBoundary>
+    </>
+  );
+}
+
+function App() {
   return (
     <div className="font-nsk">
       <BrowserRouter>
         <AuthProvider>
           <LoadingProvider>
-            <RouterTransition />
-            <ErrorBoundary onError={() => stop()}>
-              <RouterSetup />
-            </ErrorBoundary>
+            <ActivityProvider>
+              <AppInner />
+            </ActivityProvider>
           </LoadingProvider>
         </AuthProvider>
       </BrowserRouter>
