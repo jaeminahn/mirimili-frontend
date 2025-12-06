@@ -1,9 +1,12 @@
-import { Icon } from "@iconify/react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
 import AnswerComposer from "../molecules/AnswerComposer";
+import QuestionPostHeader from "../molecules/QuestionPostHeader";
+import QuestionPostBody from "../molecules/QuestionPostBody";
+import QuestionPostActions from "../molecules/QuestionPostActions";
+import QuestionImageLightbox from "../molecules/QuestionImageLightbox";
 import { get } from "../../api/getAndDel";
 import { calculateTimeAgo } from "../../utils";
 import {
@@ -13,6 +16,7 @@ import {
   dislikeQuestion,
   likeComment,
   dislikeComment,
+  toggleScrapQuestion,
 } from "../../api/answers";
 import {
   presignImage,
@@ -34,7 +38,7 @@ interface PostData {
   createdAt: string;
   isLiked: boolean;
   isDisliked: boolean;
-  isScrapped: boolean;
+  isScraped: boolean;
   images: string[];
   categories: string[];
   targetSpecialties: string[];
@@ -82,7 +86,7 @@ export default function QuestionPostContent() {
     createdAt: "",
     isLiked: false,
     isDisliked: false,
-    isScrapped: false,
+    isScraped: false,
     images: [],
     categories: [],
     targetSpecialties: [],
@@ -168,6 +172,14 @@ export default function QuestionPostContent() {
     });
   };
 
+  const handleToggleScrap = async () => {
+    await toggleScrapQuestion(Number(params["id"]));
+    setPostData((prev) => ({
+      ...prev,
+      isScraped: !prev.isScraped,
+    }));
+  };
+
   const newAnswer = async () => {
     if (!answerText.trim()) return;
     if (!loggedUser) {
@@ -248,6 +260,7 @@ export default function QuestionPostContent() {
       dislike: d.dislikeCount ?? 0,
       isLiked: !!d.isLiked,
       isDisliked: !!d.isDisliked,
+      isScraped: !!d.isScraped,
     }));
   };
 
@@ -307,30 +320,6 @@ export default function QuestionPostContent() {
     })();
   }, [params["id"], loggedUser]);
 
-  useEffect(() => {
-    if (lightboxIndex === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxIndex(null);
-      if (e.key === "ArrowLeft")
-        setLightboxIndex((i) =>
-          i === null
-            ? null
-            : (i + postData.images.length - 1) % postData.images.length
-        );
-      if (e.key === "ArrowRight")
-        setLightboxIndex((i) =>
-          i === null ? null : (i + 1) % postData.images.length
-        );
-    };
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [lightboxIndex, postData.images.length]);
-
   const postWriterInfo =
     postData.writerStatus === "ENLISTED" && postData.writerSpecialty
       ? `공군 · ${statusLabel(postData.writerStatus)} · ${
@@ -356,102 +345,58 @@ export default function QuestionPostContent() {
       ? `공군 · ${statusLabel(myInfo?.miliStatus)} · ${myInfo?.specialty}`
       : `공군 · ${statusLabel(myInfo?.miliStatus)}`;
 
+  const handleOpenLightbox = (index: number) => {
+    setLightboxIndex(index);
+  };
+
+  const handleCloseLightbox = () => {
+    setLightboxIndex(null);
+  };
+
+  const handlePrevImage = () => {
+    setLightboxIndex((i) =>
+      i === null
+        ? null
+        : (i + postData.images.length - 1) % postData.images.length
+    );
+  };
+
+  const handleNextImage = () => {
+    setLightboxIndex((i) =>
+      i === null ? null : (i + 1) % postData.images.length
+    );
+  };
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold">{postData.writerNick}</p>
-              <p className="text-emerald-600">{postWriterInfo}</p>
-              <p className="text-xs text-gray-600">{postData.createdAt}</p>
-            </div>
-            <div className="flex items-center gap-4 p-2 text-xs text-gray-500">
-              <div className="flex">
-                <Icon icon="fluent:eye-20-filled" className="mr-1 text-base" />
-                <p>{postData.view}</p>
-              </div>
-              <div className="flex">
-                <Icon
-                  icon="fluent:comment-24-filled"
-                  className="mr-1 text-base"
-                />
-                <p>{postData.answer}</p>
-              </div>
-            </div>
-          </div>
+          <QuestionPostHeader
+            writerNick={postData.writerNick}
+            writerInfo={postWriterInfo}
+            createdAt={postData.createdAt}
+            view={postData.view}
+            answer={postData.answer}
+          />
 
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-emerald-600">
-              {categoryChip}
-            </p>
-            <p className="text-2xl font-semibold">{postData.title}</p>
-          </div>
+          <QuestionPostBody
+            category={categoryChip}
+            title={postData.title}
+            content={postData.content}
+            images={postData.images}
+            onClickImage={handleOpenLightbox}
+          />
 
-          <div className="text-base whitespace-pre-wrap">
-            {postData.content}
-          </div>
-
-          {postData.images.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto py-1">
-              {postData.images.map((src, idx) => (
-                <button
-                  key={idx}
-                  className="relative flex-shrink-0 w-24 h-24 overflow-hidden border border-gray-300 rounded-xl"
-                  onClick={() => setLightboxIndex(idx)}
-                >
-                  <img
-                    src={src}
-                    alt={`image-${idx + 1}`}
-                    className="object-cover w-full h-full"
-                    loading="lazy"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="flex justify-between text-sm">
-            <div className="flex gap-2 font-semibold">
-              <button
-                className={`flex gap-1 items-center p-1 px-2 rounded-lg ${
-                  postData.isLiked
-                    ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
-                    : "text-gray-600 bg-gray-100"
-                }`}
-                onClick={handleLikePost}
-              >
-                <Icon icon="fluent:thumb-like-24-filled" />
-                <p>{postData.like}</p>
-              </button>
-              <button
-                className={`flex gap-1 items-center p-1 px-2 rounded-lg ${
-                  postData.isDisliked
-                    ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
-                    : "text-gray-600 bg-gray-100"
-                }`}
-                onClick={handleDislikePost}
-              >
-                <Icon icon="fluent:thumb-dislike-24-filled" />
-                <p>{postData.dislike}</p>
-              </button>
-              <button
-                className={`flex gap-1 items-center px-2 rounded-lg ${
-                  postData.isScrapped
-                    ? "text-emerald-600 bg-emerald-100 border-2 border-emerald-600"
-                    : "text-gray-600 bg-gray-100"
-                }`}
-              >
-                <Icon icon="fluent:bookmark-20-filled" />
-              </button>
-              <button className="flex items-center gap-1 px-2 text-gray-600 bg-gray-100 rounded-lg">
-                <Icon icon="fluent:share-20-filled" />
-              </button>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-600">
-              <button>신고하기</button>
-            </div>
-          </div>
+          <QuestionPostActions
+            like={postData.like}
+            dislike={postData.dislike}
+            isLiked={postData.isLiked}
+            isDisliked={postData.isDisliked}
+            isScraped={postData.isScraped}
+            onLike={handleLikePost}
+            onDislike={handleDislikePost}
+            onToggleScrap={handleToggleScrap}
+          />
         </div>
 
         <div className="flex flex-col gap-2 pt-4">
@@ -554,60 +499,13 @@ export default function QuestionPostContent() {
       ))}
 
       {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
-          onClick={() => setLightboxIndex(null)}
-        >
-          <div
-            className="relative max-w-[90vw] max-h-[85vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={postData.images[lightboxIndex]}
-              alt={`image-${lightboxIndex + 1}`}
-              className="object-contain w-[90vw] max-w-5xl max-h-[85vh] rounded-2xl shadow-2xl"
-            />
-            <button
-              className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70"
-              onClick={() => setLightboxIndex(null)}
-            >
-              <Icon icon="fluent:dismiss-24-filled" className="text-2xl" />
-            </button>
-            {postData.images.length > 1 && (
-              <>
-                <button
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70"
-                  onClick={() =>
-                    setLightboxIndex((i) =>
-                      i === null
-                        ? null
-                        : (i + postData.images.length - 1) %
-                          postData.images.length
-                    )
-                  }
-                >
-                  <Icon
-                    icon="fluent:chevron-left-24-filled"
-                    className="text-2xl"
-                  />
-                </button>
-                <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70"
-                  onClick={() =>
-                    setLightboxIndex((i) =>
-                      i === null ? null : (i + 1) % postData.images.length
-                    )
-                  }
-                >
-                  <Icon
-                    icon="fluent:chevron-right-24-filled"
-                    className="text-2xl"
-                  />
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+        <QuestionImageLightbox
+          images={postData.images}
+          index={lightboxIndex}
+          onClose={handleCloseLightbox}
+          onPrev={handlePrevImage}
+          onNext={handleNextImage}
+        />
       )}
     </div>
   );

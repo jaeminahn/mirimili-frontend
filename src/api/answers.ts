@@ -90,3 +90,15 @@ export async function dislikeComment(commentId: number): Promise<void> {
     throw new Error(msg);
   }
 }
+
+export async function toggleScrapQuestion(questionId: number): Promise<void> {
+  const res = await post(`/posts/${questionId}/scrap`, {});
+  if (!res.ok) {
+    let msg = `toggleScrapQuestion failed (${res.status})`;
+    try {
+      const j = await res.json();
+      if (j?.message) msg = j.message;
+    } catch {}
+    throw new Error(msg);
+  }
+}
