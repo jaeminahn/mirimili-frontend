@@ -6,12 +6,15 @@ export interface TypeRecord {
 export interface MosAndUnitRecord {
   id: number;
   type: string;
-  category: string;
+  category?: string;
   label: string;
   code?: string;
 }
 
 export function extractCategories(data: MosAndUnitRecord[]): string[] {
-  const uniqueLabels = new Set(data.map((item) => item.category));
-  return Array.from(uniqueLabels);
+  const unique = new Set(
+    data.map((item) => item.category).filter((c): c is string => Boolean(c))
+  );
+
+  return Array.from(unique);
 }
