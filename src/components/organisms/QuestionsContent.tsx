@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import PostItem from "../molecules/PostItem";
 import CategoryButton from "../molecules/CategoryButton";
 import { get } from "../../api/getAndDel";
@@ -21,7 +22,11 @@ interface PostItemProps {
 }
 
 export default function QuestionsMain() {
-  const [tabIndex, setTabIndex] = useState(0);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialTab = searchParams.get("tab") === "answerable" ? 1 : 0;
+
+  const [tabIndex, setTabIndex] = useState(initialTab);
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [postData, setPostData] = useState<PostItemProps[]>([]);
   const [page, setPage] = useState(0);
