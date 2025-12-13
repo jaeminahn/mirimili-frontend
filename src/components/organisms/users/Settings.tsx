@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePasswordModal from "./ChangePasswordModal";
 import ChangeDateModal from "./ChangeDateModal";
@@ -70,6 +70,9 @@ function getUnitLabel(id: number | null | undefined): string {
   return item?.label ?? "미설정";
 }
 
+const normalizePhone = (v: string) =>
+  (v ?? "").toString().replace(/[^0-9]/g, "");
+
 export default function Settings() {
   const navigate = useNavigate();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -98,6 +101,11 @@ export default function Settings() {
   const memberTypeLabel = getMemberStatusLabel(info?.status);
   const nickname = formatValue(info?.nickname);
   const phoneNumber = formatValue(info?.phoneNumber);
+
+  const rawPhoneNumber = useMemo(() => {
+    const raw = normalizePhone(info?.phoneNumber ?? "");
+    return raw.length === 11 ? raw : "";
+  }, [info?.phoneNumber]);
 
   const militaryInfo = info?.militaryInfo ?? null;
   const militaryTypeLabel = getMilitaryTypeLabel(militaryInfo?.type ?? null);
@@ -257,7 +265,10 @@ export default function Settings() {
       </div>
 
       {isPasswordModalOpen && (
-        <ChangePasswordModal closeModal={closePasswordModal} />
+        <ChangePasswordModal
+          closeModal={closePasswordModal}
+          phoneNumber={rawPhoneNumber}
+        />
       )}
 
       {isDateModalOpen && militaryInfo && (
