@@ -26,10 +26,18 @@ import {
   getViewUrls,
 } from "../../api/uploads";
 
+type WriterMiliRank =
+  | "BEFORE_ENLISTMENT"
+  | "PRIVATE"
+  | "PRIVATE_FIRST"
+  | "CORPORAL"
+  | "SERGEANT"
+  | "DISCHARGED";
+
 interface PostData {
   id: number;
   writerNick: string;
-  writerStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  writerMiliRank?: WriterMiliRank;
   writerSpecialty?: string;
   title: string;
   content: string;
@@ -49,7 +57,7 @@ interface PostData {
 interface AnswerData {
   id: number;
   writerNick: string;
-  writerStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  writerMiliRank?: WriterMiliRank;
   writerSpecialty?: string;
   content: string;
   like: number;
@@ -66,7 +74,7 @@ interface MyAnswerInfo {
   isAnswerable: boolean;
   specialty?: string;
   miliType?: string;
-  miliStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  miliRank?: WriterMiliRank;
 }
 
 export default function QuestionPostContent() {
@@ -78,7 +86,7 @@ export default function QuestionPostContent() {
   const [postData, setPostData] = useState<PostData>({
     id: Number(params["id"]),
     writerNick: "",
-    writerStatus: undefined,
+    writerMiliRank: undefined,
     writerSpecialty: "",
     title: "",
     content: "",
@@ -104,14 +112,26 @@ export default function QuestionPostContent() {
   );
   const [myInfo, setMyInfo] = useState<MyAnswerInfo | null>(null);
 
-  const statusLabel = (s?: string) =>
-    s === "PRE_ENLISTED"
-      ? "입대전"
-      : s === "ENLISTED"
-      ? "현역"
-      : s === "DISCHARGED"
-      ? "예비역"
+  const rankLabel = (r?: WriterMiliRank) =>
+    r === "BEFORE_ENLISTMENT"
+      ? "입대 전"
+      : r === "PRIVATE"
+      ? "이병"
+      : r === "PRIVATE_FIRST"
+      ? "일병"
+      : r === "CORPORAL"
+      ? "상병"
+      : r === "SERGEANT"
+      ? "병장"
+      : r === "DISCHARGED"
+      ? "전역"
       : "";
+
+  const canShowSpecialtyByRank = (r?: WriterMiliRank) =>
+    r === "PRIVATE" ||
+    r === "PRIVATE_FIRST" ||
+    r === "CORPORAL" ||
+    r === "SERGEANT";
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setAnswerText(event.target.value);
@@ -272,7 +292,7 @@ export default function QuestionPostContent() {
       ...prev,
       id: d.id,
       writerNick: d.writerNickname,
-      writerStatus: d.writerStatus,
+      writerMiliRank: d.writerMiliRank,
       writerSpecialty: d.writerSpecialty,
       title: d.title,
       content: d.body,
@@ -298,7 +318,7 @@ export default function QuestionPostContent() {
       .map((c: any) => ({
         id: c.id,
         writerNick: c.writerNickname,
-        writerStatus: c.writerStatus,
+        writerMiliRank: c.writerMiliRank,
         writerSpecialty: c.writerSpecialty,
         content: c.content ?? c.body,
         like: c.likeCount ?? 0,
@@ -338,7 +358,7 @@ export default function QuestionPostContent() {
       isAnswerable: !!d.isAnswerable,
       specialty: d.specialty ?? "",
       miliType: d.miliType,
-      miliStatus: d.miliStatus,
+      miliRank: d.writerMiliRank ?? d.miliRank,
     });
   };
 
@@ -349,11 +369,11 @@ export default function QuestionPostContent() {
   }, [params["id"], loggedUser]);
 
   const postWriterInfo =
-    postData.writerStatus === "ENLISTED" && postData.writerSpecialty
-      ? `공군 · ${statusLabel(postData.writerStatus)} · ${
+    canShowSpecialtyByRank(postData.writerMiliRank) && postData.writerSpecialty
+      ? `공군 · ${rankLabel(postData.writerMiliRank)} · ${
           postData.writerSpecialty
         }`
-      : `공군 · ${statusLabel(postData.writerStatus)}`;
+      : `공군 · ${rankLabel(postData.writerMiliRank)}`;
 
   const categoryChip = postData.categories?.[0] ?? "";
 
@@ -369,9 +389,9 @@ export default function QuestionPostContent() {
   const canWriteAnswer = !!loggedUser && !!myInfo?.isAnswerable;
 
   const myInfoLine =
-    myInfo?.miliStatus === "ENLISTED" && myInfo?.specialty
-      ? `공군 · ${statusLabel(myInfo?.miliStatus)} · ${myInfo?.specialty}`
-      : `공군 · ${statusLabel(myInfo?.miliStatus)}`;
+    canShowSpecialtyByRank(myInfo?.miliRank) && myInfo?.specialty
+      ? `공군 · ${rankLabel(myInfo?.miliRank)} · ${myInfo?.specialty}`
+      : `공군 · ${rankLabel(myInfo?.miliRank)}`;
 
   const handleOpenLightbox = (index: number) => {
     setLightboxIndex(index);
@@ -462,7 +482,7 @@ export default function QuestionPostContent() {
           key={a.id}
           id={a.id}
           writerNick={a.writerNick}
-          writerStatus={a.writerStatus}
+          writerMiliRank={a.writerMiliRank}
           writerSpecialty={a.writerSpecialty}
           createdAt={a.createdAt}
           content={a.content}

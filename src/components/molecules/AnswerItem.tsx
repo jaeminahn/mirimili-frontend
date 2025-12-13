@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 
+type WriterMiliRank =
+  | "BEFORE_ENLISTMENT"
+  | "PRIVATE"
+  | "PRIVATE_FIRST"
+  | "CORPORAL"
+  | "SERGEANT"
+  | "DISCHARGED";
+
 interface AnswerItemProps {
   id: number;
   writerNick: string;
-  writerStatus?: "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
+  writerMiliRank?: WriterMiliRank;
   writerSpecialty?: string;
   createdAt: string;
   content: string;
@@ -23,7 +31,7 @@ interface AnswerItemProps {
 export default function AnswerItem({
   id,
   writerNick,
-  writerStatus,
+  writerMiliRank,
   writerSpecialty,
   createdAt,
   content,
@@ -39,18 +47,32 @@ export default function AnswerItem({
   onDelete,
 }: AnswerItemProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const statusLabel =
-    writerStatus === "PRE_ENLISTED"
-      ? "입대전"
-      : writerStatus === "ENLISTED"
-      ? "현역"
-      : writerStatus === "DISCHARGED"
-      ? "예비역"
+
+  const rankLabel =
+    writerMiliRank === "BEFORE_ENLISTMENT"
+      ? "입대 전"
+      : writerMiliRank === "PRIVATE"
+      ? "이병"
+      : writerMiliRank === "PRIVATE_FIRST"
+      ? "일병"
+      : writerMiliRank === "CORPORAL"
+      ? "상병"
+      : writerMiliRank === "SERGEANT"
+      ? "병장"
+      : writerMiliRank === "DISCHARGED"
+      ? "전역"
       : "";
-  const info =
-    writerStatus === "ENLISTED" && writerSpecialty
-      ? `공군 · ${statusLabel} · ${writerSpecialty}`
-      : `공군 · ${statusLabel}`;
+
+  const showSpecialty =
+    (writerMiliRank === "PRIVATE" ||
+      writerMiliRank === "PRIVATE_FIRST" ||
+      writerMiliRank === "CORPORAL" ||
+      writerMiliRank === "SERGEANT") &&
+    !!writerSpecialty;
+
+  const info = showSpecialty
+    ? `공군 · ${rankLabel} · ${writerSpecialty}`
+    : `공군 · ${rankLabel}`;
 
   return (
     <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
