@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AnswerItem from "../molecules/AnswerItem";
@@ -81,8 +81,10 @@ export default function QuestionPostContent() {
   const params = useParams();
   const navigate = useNavigate();
   const { loggedUser } = useAuth();
+
   const [answerText, setAnswerText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const [postData, setPostData] = useState<PostData>({
     id: Number(params["id"]),
     writerNick: "",
@@ -102,14 +104,17 @@ export default function QuestionPostContent() {
     categories: [],
     targetSpecialties: [],
   });
+
   const [answerData, setAnswerData] = useState<AnswerData[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   const [cmtImagesUrl, setCmtImagesUrl] = useState<string[]>([]);
   const [cmtImageKeys, setCmtImageKeys] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [fileInputKey, setFileInputKey] = useState<string>(
     Date.now().toString()
   );
+
   const [myInfo, setMyInfo] = useState<MyAnswerInfo | null>(null);
 
   const rankLabel = (r?: WriterMiliRank) =>
@@ -144,13 +149,8 @@ export default function QuestionPostContent() {
   const handleLikePost = async () => {
     await likeQuestion(Number(params["id"]));
     setPostData((prev) => {
-      if (prev.isLiked) {
-        return {
-          ...prev,
-          isLiked: false,
-          like: Math.max(0, prev.like - 1),
-        };
-      }
+      if (prev.isLiked)
+        return { ...prev, isLiked: false, like: Math.max(0, prev.like - 1) };
       if (prev.isDisliked) {
         return {
           ...prev,
@@ -160,24 +160,19 @@ export default function QuestionPostContent() {
           dislike: Math.max(0, prev.dislike - 1),
         };
       }
-      return {
-        ...prev,
-        isLiked: true,
-        like: prev.like + 1,
-      };
+      return { ...prev, isLiked: true, like: prev.like + 1 };
     });
   };
 
   const handleDislikePost = async () => {
     await dislikeQuestion(Number(params["id"]));
     setPostData((prev) => {
-      if (prev.isDisliked) {
+      if (prev.isDisliked)
         return {
           ...prev,
           isDisliked: false,
           dislike: Math.max(0, prev.dislike - 1),
         };
-      }
       if (prev.isLiked) {
         return {
           ...prev,
@@ -187,20 +182,13 @@ export default function QuestionPostContent() {
           like: Math.max(0, prev.like - 1),
         };
       }
-      return {
-        ...prev,
-        isDisliked: true,
-        dislike: prev.dislike + 1,
-      };
+      return { ...prev, isDisliked: true, dislike: prev.dislike + 1 };
     });
   };
 
   const handleToggleScrap = async () => {
     await toggleScrapQuestion(Number(params["id"]));
-    setPostData((prev) => ({
-      ...prev,
-      isScraped: !prev.isScraped,
-    }));
+    setPostData((prev) => ({ ...prev, isScraped: !prev.isScraped }));
   };
 
   const handleDeletePost = async () => {
@@ -208,9 +196,8 @@ export default function QuestionPostContent() {
       !window.confirm(
         "게시글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다."
       )
-    ) {
+    )
       return;
-    }
     await deleteQuestion(postData.id);
     window.alert("게시글이 삭제되었습니다.");
     navigate(-1);
@@ -221,9 +208,8 @@ export default function QuestionPostContent() {
       !window.confirm(
         "댓글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다."
       )
-    ) {
+    )
       return;
-    }
     await deleteComment(postData.id, commentId);
     window.alert("댓글이 삭제되었습니다.");
     await loadAnswers();
@@ -231,10 +217,7 @@ export default function QuestionPostContent() {
 
   const newAnswer = async () => {
     if (!answerText.trim()) return;
-    if (!loggedUser) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
+    if (!loggedUser) return;
     await postNewAnswer(Number(params["id"]), answerText, cmtImagesUrl);
     setAnswerText("");
     setCmtImagesUrl([]);
@@ -246,15 +229,19 @@ export default function QuestionPostContent() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!e.target.files) return;
+
     const accept = new Set(["image/jpeg", "image/png", "image/webp"]);
     const maxSize = 10 * 1024 * 1024;
     const maxCount = 5;
     const remain = Math.max(0, maxCount - cmtImagesUrl.length);
+
     const selected = Array.from(e.target.files)
       .filter((f) => accept.has(f.type) && f.size <= maxSize)
       .slice(0, remain);
+
     setFileInputKey(Date.now().toString());
     if (!selected.length) return;
+
     setUploading(true);
     try {
       const keys: string[] = [];
@@ -288,6 +275,7 @@ export default function QuestionPostContent() {
     const j = await res.json();
     const d = j?.data ?? j;
     if (!d) return;
+
     setPostData((prev) => ({
       ...prev,
       id: d.id,
@@ -313,28 +301,37 @@ export default function QuestionPostContent() {
   };
 
   const loadAnswers = async () => {
-    const list = await fetchAnswers(Number(params["id"]));
-    const mapped = (list ?? [])
-      .map((c: any) => ({
-        id: c.id,
-        writerNick: c.writerNickname,
-        writerMiliRank: c.writerMiliRank,
-        writerSpecialty: c.writerSpecialty,
-        content: c.content ?? c.body,
-        like: c.likeCount ?? 0,
-        dislike: c.dislikeCount ?? 0,
-        createdAt: calculateTimeAgo(new Date(c.createdAt)),
-        createdAtRaw: c.createdAt,
-        isLiked: !!c.isLiked,
-        isDisliked: !!c.isDisliked,
-        imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
-      }))
-      .sort(
-        (a, b) =>
-          new Date(b.createdAtRaw).getTime() -
-          new Date(a.createdAtRaw).getTime()
-      );
-    setAnswerData(mapped);
+    if (!loggedUser) {
+      setAnswerData([]);
+      return;
+    }
+
+    try {
+      const list = await fetchAnswers(Number(params["id"]));
+      const mapped = (list ?? [])
+        .map((c: any) => ({
+          id: c.id,
+          writerNick: c.writerNickname,
+          writerMiliRank: c.writerMiliRank,
+          writerSpecialty: c.writerSpecialty,
+          content: c.content ?? c.body,
+          like: c.likeCount ?? 0,
+          dislike: c.dislikeCount ?? 0,
+          createdAt: calculateTimeAgo(new Date(c.createdAt)),
+          createdAtRaw: c.createdAt,
+          isLiked: !!c.isLiked,
+          isDisliked: !!c.isDisliked,
+          imagesUrl: Array.isArray(c.imagesUrl) ? c.imagesUrl : [],
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.createdAtRaw).getTime() -
+            new Date(a.createdAtRaw).getTime()
+        );
+      setAnswerData(mapped);
+    } catch {
+      setAnswerData([]);
+    }
   };
 
   const loadMyAnswerInfo = async () => {
@@ -364,7 +361,13 @@ export default function QuestionPostContent() {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([loadPost(), loadAnswers(), loadMyAnswerInfo()]);
+      await loadPost();
+      if (loggedUser) {
+        await Promise.all([loadAnswers(), loadMyAnswerInfo()]);
+      } else {
+        setAnswerData([]);
+        setMyInfo(null);
+      }
     })();
   }, [params["id"], loggedUser]);
 
@@ -393,13 +396,8 @@ export default function QuestionPostContent() {
       ? `공군 · ${rankLabel(myInfo?.miliRank)} · ${myInfo?.specialty}`
       : `공군 · ${rankLabel(myInfo?.miliRank)}`;
 
-  const handleOpenLightbox = (index: number) => {
-    setLightboxIndex(index);
-  };
-
-  const handleCloseLightbox = () => {
-    setLightboxIndex(null);
-  };
+  const handleOpenLightbox = (index: number) => setLightboxIndex(index);
+  const handleCloseLightbox = () => setLightboxIndex(null);
 
   const handlePrevImage = () => {
     setLightboxIndex((i) =>
@@ -419,9 +417,28 @@ export default function QuestionPostContent() {
     !!myInfo?.nickName && myInfo.nickName === postData.writerNick;
   const myNick = myInfo?.nickName || "";
 
+  const LoginPrompt = (
+    <div className="w-full bg-emerald-50 rounded-3xl px-5 py-4 flex items-center justify-between">
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-semibold text-emerald-800">
+          답변을 열람하려면 로그인이 필요해요
+        </p>
+        <p className="text-xs text-emerald-700">
+          로그인하고 미리미리의 모든 기능을 이용해 보세요!
+        </p>
+      </div>
+      <Link
+        to="/auth/login"
+        className="shrink-0 h-9 px-4 inline-flex items-center justify-center rounded-full bg-emerald-700 text-white text-sm font-semibold"
+      >
+        로그인/회원가입 바로가기
+      </Link>
+    </div>
+  );
+
   return (
     <div className="flex flex-col w-4/5 gap-4">
-      <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-lg">
+      <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-3xl">
         <div className="flex flex-col gap-6">
           <QuestionPostHeader
             writerNick={postData.writerNick}
@@ -455,104 +472,102 @@ export default function QuestionPostContent() {
 
         <div className="flex flex-col gap-2 pt-4">
           {!!targetMsg && (
-            <p className="px-2 py-1 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-md">
+            <p className="px-2 py-1 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-lg">
               {targetMsg}
             </p>
           )}
-          <AnswerComposer
-            visible={canWriteAnswer}
-            nickName={myInfo?.nickName}
-            infoLine={myInfoLine}
-            textareaRef={textareaRef}
-            answerText={answerText}
-            onChange={handleChange}
-            cmtImagesUrl={cmtImagesUrl}
-            onRemoveImage={removeCmtImage}
-            onUploadImages={handleCmtImageUpload}
-            fileInputKey={fileInputKey}
-            uploading={uploading}
-            onSubmit={newAnswer}
-            submitDisabled={!answerText.trim() || uploading}
-          />
+
+          {loggedUser ? (
+            <AnswerComposer
+              visible={canWriteAnswer}
+              nickName={myInfo?.nickName}
+              infoLine={myInfoLine}
+              textareaRef={textareaRef}
+              answerText={answerText}
+              onChange={handleChange}
+              cmtImagesUrl={cmtImagesUrl}
+              onRemoveImage={removeCmtImage}
+              onUploadImages={handleCmtImageUpload}
+              fileInputKey={fileInputKey}
+              uploading={uploading}
+              onSubmit={newAnswer}
+              submitDisabled={!answerText.trim() || uploading}
+            />
+          ) : null}
         </div>
       </div>
 
-      {answerData.map((a) => (
-        <AnswerItem
-          key={a.id}
-          id={a.id}
-          writerNick={a.writerNick}
-          writerMiliRank={a.writerMiliRank}
-          writerSpecialty={a.writerSpecialty}
-          createdAt={a.createdAt}
-          content={a.content}
-          like={a.like}
-          dislike={a.dislike}
-          isLiked={a.isLiked}
-          isDisliked={a.isDisliked}
-          imagesUrl={a.imagesUrl}
-          isMine={!!myNick && myNick === a.writerNick}
-          onLike={async (id) => {
-            await likeComment(id);
-            setAnswerData((prev) =>
-              prev.map((x) => {
-                if (x.id !== id) return x;
-                if (x.isLiked) {
-                  return {
-                    ...x,
-                    isLiked: false,
-                    like: Math.max(0, x.like - 1),
-                  };
-                }
-                if (x.isDisliked) {
-                  return {
-                    ...x,
-                    isLiked: true,
-                    isDisliked: false,
-                    like: x.like + 1,
-                    dislike: Math.max(0, x.dislike - 1),
-                  };
-                }
-                return {
-                  ...x,
-                  isLiked: true,
-                  like: x.like + 1,
-                };
-              })
-            );
-          }}
-          onDislike={async (id) => {
-            await dislikeComment(id);
-            setAnswerData((prev) =>
-              prev.map((x) => {
-                if (x.id !== id) return x;
-                if (x.isDisliked) {
-                  return {
-                    ...x,
-                    isDisliked: false,
-                    dislike: Math.max(0, x.dislike - 1),
-                  };
-                }
-                if (x.isLiked) {
-                  return {
-                    ...x,
-                    isLiked: false,
-                    isDisliked: true,
-                    dislike: x.dislike + 1,
-                    like: Math.max(0, x.like - 1),
-                  };
-                }
-                return {
-                  ...x,
-                  isDisliked: true,
-                  dislike: x.dislike + 1,
-                };
-              })
-            );
-          }}
-          onDelete={handleDeleteComment}
-        />
-      ))}
+      {!loggedUser && LoginPrompt}
+
+      {loggedUser &&
+        answerData.map((a) => (
+          <AnswerItem
+            key={a.id}
+            id={a.id}
+            writerNick={a.writerNick}
+            writerMiliRank={a.writerMiliRank}
+            writerSpecialty={a.writerSpecialty}
+            createdAt={a.createdAt}
+            content={a.content}
+            like={a.like}
+            dislike={a.dislike}
+            isLiked={a.isLiked}
+            isDisliked={a.isDisliked}
+            imagesUrl={a.imagesUrl}
+            isMine={!!myNick && myNick === a.writerNick}
+            onLike={async (id) => {
+              await likeComment(id);
+              setAnswerData((prev) =>
+                prev.map((x) => {
+                  if (x.id !== id) return x;
+                  if (x.isLiked) {
+                    return {
+                      ...x,
+                      isLiked: false,
+                      like: Math.max(0, x.like - 1),
+                    };
+                  }
+                  if (x.isDisliked) {
+                    return {
+                      ...x,
+                      isLiked: true,
+                      isDisliked: false,
+                      like: x.like + 1,
+                      dislike: Math.max(0, x.dislike - 1),
+                    };
+                  }
+                  return { ...x, isLiked: true, like: x.like + 1 };
+                })
+              );
+            }}
+            onDislike={async (id) => {
+              await dislikeComment(id);
+              setAnswerData((prev) =>
+                prev.map((x) => {
+                  if (x.id !== id) return x;
+                  if (x.isDisliked) {
+                    return {
+                      ...x,
+                      isDisliked: false,
+                      dislike: Math.max(0, x.dislike - 1),
+                    };
+                  }
+                  if (x.isLiked) {
+                    return {
+                      ...x,
+                      isLiked: false,
+                      isDisliked: true,
+                      dislike: x.dislike + 1,
+                      like: Math.max(0, x.like - 1),
+                    };
+                  }
+                  return { ...x, isDisliked: true, dislike: x.dislike + 1 };
+                })
+              );
+            }}
+            onDelete={handleDeleteComment}
+          />
+        ))}
 
       {lightboxIndex !== null && (
         <QuestionImageLightbox
