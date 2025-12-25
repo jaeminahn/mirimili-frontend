@@ -5,16 +5,14 @@ import ChangeDateModal from "./ChangeDateModal";
 import DetailProfilePromptModal from "../../molecules/DetailProfilePromptModal";
 import { getJSON } from "../../../api/getAndDel";
 import { patchJSON } from "../../../api/postAndPut";
-import serviceMos from "../../../data/serviceMos.json";
-import serviceUnits from "../../../data/serviceUnit.json";
 
 type MemberStatus = "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
 type MilitaryType = "ARMY" | "NAVY" | "AIR_FORCE";
 
 type MilitaryInfo = {
   type: MilitaryType | null;
-  specialtyId: number | null;
-  unitId: number | null;
+  specialtyId: string | null;
+  unitId: string | null;
   startDate: string | null;
   privateDate: string | null;
   corporalDate: string | null;
@@ -56,18 +54,6 @@ function getMilitaryTypeLabel(type: MilitaryType | null | undefined): string {
   if (type === "NAVY") return "해군";
   if (type === "AIR_FORCE") return "공군";
   return "미설정";
-}
-
-function getSpecialtyLabel(id: number | null | undefined): string {
-  if (id == null) return "미설정";
-  const item = (serviceMos as any[]).find((m) => m.id === id);
-  return item?.label ?? "미설정";
-}
-
-function getUnitLabel(id: number | null | undefined): string {
-  if (id == null) return "미설정";
-  const item = (serviceUnits as any[]).find((u) => u.id === id);
-  return item?.label ?? "미설정";
 }
 
 const normalizePhone = (v: string) =>
@@ -114,8 +100,8 @@ export default function Settings() {
   const corporalDate = formatValue(militaryInfo?.corporalDate);
   const sergeantDate = formatValue(militaryInfo?.sergeantDate);
   const dischargeDate = formatValue(militaryInfo?.dischargeDate);
-  const specialtyLabel = getSpecialtyLabel(militaryInfo?.specialtyId);
-  const unitLabel = getUnitLabel(militaryInfo?.unitId);
+  const specialtyLabel = formatValue(militaryInfo?.specialtyId);
+  const unitLabel = formatValue(militaryInfo?.unitId);
 
   const isPreEnlisted = info?.status === "PRE_ENLISTED";
 
