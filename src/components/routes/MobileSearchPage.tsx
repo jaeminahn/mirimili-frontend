@@ -1,17 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts";
+import { getJSON } from "../../api/getAndDel";
+
+type ApiEnvelope<T> = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: T;
+};
+
+type RecentKeywords = {
+  keywords: string[];
+};
 
 export default function MobileSearchPage() {
   const [query, setQuery] = useState("");
-  const [recentKeywords, setRecentKeywords] = useState([
-    "일반차량운전",
-    "군대",
-    "준비물",
-    "훈련소",
-    "자격증",
-  ]);
+  const [recentKeywords, setRecentKeywords] = useState<string[]>([]);
+  const [showRecent, setShowRecent] = useState(false);
 
   const navigate = useNavigate();
+  const { loggedUser } = useAuth();
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      if (!loggedUser) {
+        if (!mounted) return;
+        setShowRecent(false);
+        setRecentKeywords([]);
+        return;
+      }
+
+      const res = await getJSON<ApiEnvelope<RecentKeywords>>("/search/recent");
+
+      if (!mounted) return;
+
+      if (res.status === 401) {
+        setShowRecent(false);
+        setRecentKeywords([]);
+        return;
+      }
+
+      if (res.ok && res.data?.success) {
+        setRecentKeywords(res.data.data?.keywords ?? []);
+        setShowRecent(true);
+      } else {
+        setShowRecent(false);
+        setRecentKeywords([]);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [loggedUser]);
 
   const handleSearch = (keyword?: string) => {
     const searchQuery = keyword ?? query;
@@ -24,10 +68,6 @@ export default function MobileSearchPage() {
     if (e.key === "Enter") {
       handleSearch();
     }
-  };
-
-  const handleClearRecent = () => {
-    setRecentKeywords([]);
   };
 
   const handleClose = () => {
@@ -65,10 +105,7 @@ export default function MobileSearchPage() {
             />
           </svg>
         </button>
-        <button
-          onClick={handleClose}
-          className="bg-gray-100 rounded-lg p-2"
-        >
+        <button onClick={handleClose} className="bg-gray-100 rounded-lg p-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -87,28 +124,29 @@ export default function MobileSearchPage() {
       </div>
 
       <div className="flex-1 bg-gray-100 overflow-auto p-6">
-        <div className="flex justify-between items-center px-4 py-2 text-sm font-semibold text-gray-700">
-            <span>최근 검색어</span>
-            <button onClick={handleClearRecent} className="text-sm text-gray-500">
-            지우기
-            </button>
-        </div>
-        
-        <ul className="flex flex-col px-4 py-2 space-y-3 text-sm text-gray-800">
-          {recentKeywords.length > 0 ? (
-            recentKeywords.map((keyword, index) => (
-              <li
-                key={index}
-                className="truncate cursor-pointer"
-                onClick={() => handleSearch(keyword)}
-              >
-                {keyword}
-              </li>
-            ))
-          ) : (
-            <li className="text-gray-400">최근 검색어가 없습니다</li>
-          )}
-        </ul>
+        {showRecent && (
+          <>
+            <div className="flex justify-between items-center px-4 py-2 text-sm font-semibold text-gray-700">
+              <span>최근 검색어</span>
+            </div>
+
+            <ul className="flex flex-col px-4 py-2 space-y-3 text-sm text-gray-800">
+              {recentKeywords.length > 0 ? (
+                recentKeywords.map((keyword, index) => (
+                  <li
+                    key={`${keyword}-${index}`}
+                    className="truncate cursor-pointer"
+                    onClick={() => handleSearch(keyword)}
+                  >
+                    {keyword}
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-400">최근 검색어가 없습니다</li>
+              )}
+            </ul>
+          </>
+        )}
       </div>
     </main>
   );
