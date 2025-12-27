@@ -5,7 +5,7 @@ interface AnswerComposerProps {
   visible: boolean;
   nickName?: string;
   infoLine?: string;
-  textareaRef: RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
   answerText: string;
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   cmtImagesUrl: string[];

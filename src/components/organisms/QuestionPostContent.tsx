@@ -437,7 +437,7 @@ export default function QuestionPostContent() {
   );
 
   return (
-    <div className="flex flex-col w-4/5 gap-4">
+    <div className="flex flex-col w-full lg:w-4/5 gap-4">
       <div className="flex flex-col gap-6 p-4 bg-white divide-y divide-gray-300 rounded-3xl">
         <div className="flex flex-col gap-6">
           <QuestionPostHeader
