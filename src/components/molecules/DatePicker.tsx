@@ -1,8 +1,14 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 interface DatePickerProps {
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  setDate: Dispatch<SetStateAction<Date>>;
 }
 
 const DatePicker = ({ date, setDate }: DatePickerProps) => {
@@ -18,7 +24,13 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
       0
     ).getDate();
     setDays(Array.from({ length: daysInMonth }, (_, i) => i + 1));
-  }, [date.getFullYear(), date.getMonth()]);
+  }, [date]);
+
+  const updateDate = (year: number, month: number, day: number) => {
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const validDay = Math.min(day, daysInMonth);
+    setDate(new Date(year, month, validDay));
+  };
 
   const handleYearChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const year = Number(e.target.value);
@@ -26,19 +38,13 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
   };
 
   const handleMonthChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const month = Number(e.target.value) - 1; // Month is 0-indexed in JavaScript
+    const month = Number(e.target.value) - 1;
     updateDate(date.getFullYear(), month, date.getDate());
   };
 
   const handleDayChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const day = Number(e.target.value);
     updateDate(date.getFullYear(), date.getMonth(), day);
-  };
-
-  const updateDate = (year: number, month: number, day: number) => {
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const validDay = Math.min(day, daysInMonth);
-    setDate(new Date(year, month, validDay));
   };
 
   return (
@@ -49,7 +55,7 @@ const DatePicker = ({ date, setDate }: DatePickerProps) => {
         className="flex-grow p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400"
       >
         {Array.from(
-          { length: currentYear - 1980 + 1 + 3 }, // 현재 연도 + 3년 추가
+          { length: currentYear - 1980 + 1 + 3 },
           (_, i) => 1980 + i
         ).map((year) => (
           <option key={year} value={year}>

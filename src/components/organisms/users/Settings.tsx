@@ -4,15 +4,15 @@ import ChangePasswordModal from "./ChangePasswordModal";
 import ChangeDateModal from "./ChangeDateModal";
 import DetailProfilePromptModal from "../../molecules/DetailProfilePromptModal";
 import { getJSON } from "../../../api/getAndDel";
-import { patchJSON } from "../../../api/postAndPut";
+import { postJSON, patchJSON } from "../../../api/postAndPut";
 
 type MemberStatus = "PRE_ENLISTED" | "ENLISTED" | "DISCHARGED";
 type MilitaryType = "ARMY" | "NAVY" | "AIR_FORCE";
 
 type MilitaryInfo = {
   type: MilitaryType | null;
-  specialtyId: string | null;
-  unitId: string | null;
+  specialty: string | null;
+  unit: string | null;
   startDate: string | null;
   privateDate: string | null;
   corporalDate: string | null;
@@ -32,6 +32,17 @@ type ApiEnvelope<T> = {
   code: string;
   message: string;
   data: T;
+};
+
+type MemberProfilePayload = {
+  type: MilitaryType;
+  specialty: string;
+  unit: string;
+  startDate: string;
+  privateDate: string;
+  corporalDate: string;
+  sergeantDate: string;
+  dischargeDate: string;
 };
 
 function formatValue(value: string | null | undefined): string {
@@ -100,8 +111,8 @@ export default function Settings() {
   const corporalDate = formatValue(militaryInfo?.corporalDate);
   const sergeantDate = formatValue(militaryInfo?.sergeantDate);
   const dischargeDate = formatValue(militaryInfo?.dischargeDate);
-  const specialtyLabel = formatValue(militaryInfo?.specialtyId);
-  const unitLabel = formatValue(militaryInfo?.unitId);
+  const specialtyLabel = formatValue(militaryInfo?.specialty);
+  const unitLabel = formatValue(militaryInfo?.unit);
 
   const isPreEnlisted = info?.status === "PRE_ENLISTED";
 
@@ -144,6 +155,61 @@ export default function Settings() {
   const onProceedDetailSetup = () => {
     setOpenStep2(false);
     navigate("/detail/setup");
+  };
+
+  const onSubmitDates = async (dates: {
+    privateDate: string;
+    corporalDate: string;
+    sergeantDate: string;
+    dischargeDate: string;
+  }) => {
+    if (updating) return;
+
+    const mi = info?.militaryInfo;
+
+    const payload: MemberProfilePayload = {
+      type: mi.type,
+      specialty: mi.specialty,
+      unit: mi.unit,
+      startDate: mi.startDate,
+      privateDate: dates.privateDate,
+      corporalDate: dates.corporalDate,
+      sergeantDate: dates.sergeantDate,
+      dischargeDate: dates.dischargeDate,
+    };
+
+    setUpdating(true);
+    try {
+      const res = await postJSON<ApiEnvelope<null>>("/member/profile", payload);
+      if (!res.ok || !res.data) {
+        alert("날짜 변경에 실패했습니다.");
+        return;
+      }
+      if (!res.data.success) {
+        alert(res.data.message || "날짜 변경에 실패했습니다.");
+        return;
+      }
+
+      setInfo((prev) => {
+        if (!prev || !prev.militaryInfo) return prev;
+        return {
+          ...prev,
+          militaryInfo: {
+            ...prev.militaryInfo,
+            privateDate: dates.privateDate,
+            corporalDate: dates.corporalDate,
+            sergeantDate: dates.sergeantDate,
+            dischargeDate: dates.dischargeDate,
+          },
+        };
+      });
+
+      setIsDateModalOpen(false);
+    } catch {
+      alert("날짜 변경 중 오류가 발생했습니다.");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   return (
@@ -260,12 +326,14 @@ export default function Settings() {
       {isDateModalOpen && militaryInfo && (
         <ChangeDateModal
           closeModal={closeDateModal}
+          disabled={updating}
           initialData={{
-            service_pfc: militaryInfo.privateDate ?? "",
-            service_cpl: militaryInfo.corporalDate ?? "",
-            service_sgt: militaryInfo.sergeantDate ?? "",
-            service_end: militaryInfo.dischargeDate ?? "",
+            privateDate: militaryInfo.privateDate ?? "",
+            corporalDate: militaryInfo.corporalDate ?? "",
+            sergeantDate: militaryInfo.sergeantDate ?? "",
+            dischargeDate: militaryInfo.dischargeDate ?? "",
           }}
+          onSubmit={onSubmitDates}
         />
       )}
 
