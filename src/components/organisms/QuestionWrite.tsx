@@ -152,7 +152,7 @@ export default function QuestionWrite({
   }, [canSubmit, setForm]);
 
   return (
-    <div className="flex flex-col w-4/5 gap-6 bg-gray-100 rounded-lg">
+    <div className="flex flex-col gap-6 bg-gray-100 rounded-lg">
       <div className="flex flex-col gap-2 p-4 bg-white rounded-3xl">
         <p className="mb-2 text-lg font-semibold">질문 제목</p>
         <input

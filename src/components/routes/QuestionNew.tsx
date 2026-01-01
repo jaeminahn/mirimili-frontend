@@ -73,10 +73,22 @@ export default function QuestionNew() {
   }, [form]);
 
   return (
-    <main className="flex justify-center pt-6 bg-gray-100 ">
-      <div className="flex w-3/4 max-w-5xl gap-6">
-        <QuestionWrite form={form} setForm={setForm} changed={changed} />
-        <div className="flex flex-col w-1/5 gap-2">
+    <main className="flex justify-center pt-6 bg-gray-100">
+      <div className="flex w-full px-4 gap-6 lg:w-3/4 lg:max-w-5xl lg:px-0">
+        <div className="w-full lg:flex-1">
+          <QuestionWrite form={form} setForm={setForm} changed={changed} />
+          <div className="mt-4 lg:hidden">
+            <button
+              className="flex justify-center w-full px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300"
+              onClick={onSubmit}
+              disabled={!form.canSubmit}
+            >
+              질문 등록하기
+            </button>
+          </div>
+        </div>
+
+        <div className="hidden lg:flex lg:flex-col lg:w-1/5 lg:gap-2">
           <button
             className="flex justify-center px-6 py-3 text-sm font-semibold text-white rounded-3xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300"
             onClick={onSubmit}
